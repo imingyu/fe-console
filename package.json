@@ -1,0 +1,22 @@
+{
+  "name": "mp-console",
+  "version": "1.0.0",
+  "description": "小程序控制台辅助工具",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imingyu/mp-console.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imingyu/mp-console/issues"
+  },
+  "homepage": "https://github.com/imingyu/mp-console#readme",
+  "devDependencies": {
+    "@types/node": "^14.0.24"
+  }
+}

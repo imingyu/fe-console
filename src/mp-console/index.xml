@@ -1,0 +1,12 @@
+<view class="mpc-hand" @mpc:tap="toggleVisable">Mpc</view>
+
+<view :mpc:if="{{visable || mounted}}" class="mpc-modal {{visable?'is-show':''}}">
+    <view class="mpc-tabs">
+        <view class="mpc-tab {{activeTabIndex===index?'active':''}}" :mpc:for="{{tabs}}" :mpc:for-item="tab" :mpc:key="value" @mpc:tap="setTab" data-tab="{{tab.value}}">{{tab.name}}</view>
+    </view>
+    <view class="mpc-tabs-body" style="transform: translateX(-{{activeTabIndex*100}}%);">
+        <view class="mpc-tabs-panel" :mpc:for="{{tabs}}" :mpc:for-item="tab" :mpc:key="value">
+            <include src="tpl-{{value}}.wxml"/>
+        </view>
+    </view>
+</view>

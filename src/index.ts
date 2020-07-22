@@ -1,12 +1,12 @@
 import { rewriteMP, rewriteConsole, rewriteView } from "./rewrite";
 import { Storage } from "./storage";
-export var wx: object;
-export var my: object;
-export var swan: object;
-export var tt: object;
-export var App: Function;
-export var Page: Function;
-export var Component: Function;
+declare var wx: object;
+declare var my: object;
+declare var swan: object;
+declare var tt: object;
+declare var App: Function;
+declare var Page: Function;
+declare var Component: Function;
 
 const storage = new Storage();
 

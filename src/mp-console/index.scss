@@ -1,1 +1,92 @@
-.mpc-modal {}
+$tab-bar-bg:rgb(243, 243, 243);
+$tab-bar-color:rgb(51, 51, 51);
+$tab-bar-height:80rpx;
+$tab-bar-brcolor:rgb(204, 204, 204);
+$tab-bar-item-active-brcolor:rgb(26, 115, 234);
+
+.mpc-hand {
+    position: fixed;
+    bottom: 100rpx;
+    right: 100rpx;
+    border-radius: 50%;
+    width: 100rpx;
+    height: 100rpx;
+    background-color: #000;
+    color: #fff;
+    font-size: 30rpx;
+    text-align: center;
+    line-height: 100rpx;
+
+    &.is-hide {
+        display: none;
+    }
+}
+
+.mpc-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: rgb(51, 51, 51);
+}
+
+.mpc-modal-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.mpc-tabs-container {
+    background: $tab-bar-bg;
+    color: $tab-bar-color;
+    border-top: 1px solid $tab-bar-brcolor;
+    border-bottom: 1px solid $tab-bar-brcolor;
+    flex-shrink: 0;
+}
+
+.mpc-tabs-body {
+    height: 100%;
+    flex-shrink: 1;
+}
+
+.mpc-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: -1px;
+}
+
+.mpc-tab {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: $tab-bar-height;
+    line-height: $tab-bar-height;
+    padding: 0 30rpx;
+    text-align: center;
+    border-bottom: 6rpx solid transparent;
+    font-size: 28rpx;
+    transition: border-color .5s;
+
+    &.active {
+        border-bottom-color: $tab-bar-item-active-brcolor;
+    }
+}
+
+.mpc-tabs-panels {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: transform .5s;
+
+    .mpc-tabs-panel {
+        flex-shrink: 0;
+        flex: 1;
+        box-sizing: border-box;
+    }
+}

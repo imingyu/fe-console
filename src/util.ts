@@ -1,6 +1,9 @@
 export interface EachHandler<T> {
     (value: T, prop: number | string): void;
 }
+export type IMap<P, T> = {
+    P: T;
+};
 export const toString = Object.prototype.toString;
 export const isArray =
     "isArray" in Array
@@ -43,5 +46,23 @@ export const uuid = () => {
     });
 };
 export const getViewLabel = (vm, viewType) => {
-    return viewType === 'App' ? 'app' : (vm ? vm.route || vm.__route__ || vm.is : '');
+    return viewType === "App"
+        ? "app"
+        : vm
+        ? vm.route || vm.__route__ || vm.is
+        : "";
+};
+
+export function isPlainObject(value) {
+    if (typeof value !== "object") {
+        return false;
+    }
+    if (Object.getPrototypeOf(value) === null) {
+        return true;
+    }
+    let proto = value;
+    while (Object.getPrototypeOf(proto) !== null) {
+        proto = Object.getPrototypeOf(proto);
+    }
+    return Object.getPrototypeOf(value) === proto;
 }

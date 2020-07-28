@@ -1,4 +1,4 @@
-import { uuid, rewrite, getViewLabel, each } from "./util";
+import { uuid, rewrite, getViewLabel, each, isPlainObject } from "./util";
 import { Storage, StorageType } from "./storage";
 export interface ApiHandler {
     (res: any);
@@ -128,18 +128,22 @@ export const rewriteMP = (nativeMp: object, storage: Storage) => {
         };
     });
 };
+const consoleMethods = ["log", "dir", "error", "warn", "info"];
 export const rewriteConsole = (
     nativeTarget: Console,
     storage: Storage
 ): Console => {
     return rewrite(nativeTarget, (value, prop) => {
-        return function (...args) {
-            storage.push(StorageType.CONSOLE, {
-                name: prop,
-                args,
-            });
-            return value.apply(this, args);
-        };
+        if (consoleMethods.indexOf(prop as string) !== -1) {
+            return function (...args) {
+                storage.push(StorageType.CONSOLE, {
+                    name: prop,
+                    args,
+                });
+                return value.apply(this, args);
+            };
+        }
+        return value;
     }) as Console;
 };
 const viewLife = {
@@ -147,12 +151,158 @@ const viewLife = {
     Page: ["onLoad", "onReady", "onShow", "onHide", "onUnload"],
     Component: ["created", "attached", "ready", "moved", "detached"],
 };
+const initViewMPC = (vm, storage, viewName, facData) => {
+    if (!vm.$mpcId) {
+        vm.$mpcId = uuid();
+    }
+    if (!vm.$mpcStorage) {
+        vm.$mpcStorage = storage;
+    }
+    const label = getViewLabel(vm, viewName);
+    if (!facData.label) {
+        facData.label = label;
+    }
+    if (!vm.$mpcInitState) {
+        vm.$mpcInitState = true;
+        const initState = {};
+        each(vm, (value, prop) => {
+            if (prop === "data") {
+                initState[prop] = JSON.parse(JSON.stringify(value));
+            } else {
+                const valType = typeof value;
+                if (valType !== "function") {
+                    if (isPlainObject(value)) {
+                        initState[prop] = JSON.parse(JSON.stringify(value));
+                    } else {
+                        initState[prop] = value;
+                    }
+                }
+            }
+        });
+        vm.$mpcStorage.push(
+            StorageType.VIEW,
+            {
+                label,
+                method: '#initState',
+                view: vm,
+                response: initState,
+            },
+            vm.$mpcId
+        );
+    }
+};
+const rewriteNativeMethod = (vm) => {
+    if (!vm.$isRewriteSetData) {
+        vm.$nativeSetData = vm.setData;
+        vm.setData = function (data: any, callback: Function) {};
+    }
+};
+const rewritePropObserver = (
+    propSpec,
+    propName,
+    storage,
+    viewName,
+    facData
+) => {
+    const specType = typeof propSpec;
+    if (specType === "function") {
+        return {
+            type: propSpec,
+            observer(...args) {
+                initViewMPC(this, storage, viewName, facData);
+                rewriteNativeMethod(this);
+            },
+        };
+    } else if (specType === "object") {
+        const orgObserver = propSpec.observer;
+        propSpec.observer = function (...args) {
+            initViewMPC(this, storage, viewName, facData);
+            rewriteNativeMethod(this);
+            return orgObserver.apply(this, args);
+        };
+        return propSpec;
+    }
+};
+const exexFunc = function (viewName, methodValue, methodName, ...args) {
+    const res = (methodValue as Function).apply(this, args);
+    const label = getViewLabel(this, viewName);
+    const methodResult = {
+        type: "wait",
+        data: null,
+        time: null,
+    };
+    if (typeof res === "object" && res.then) {
+        res.then((data) => {
+            methodResult.type = "success";
+            methodResult.time = Date.now();
+            methodResult.data = data;
+        });
+        res.catch((data) => {
+            methodResult.type = "fail";
+            methodResult.time = Date.now();
+            methodResult.data = data;
+        });
+    } else {
+        methodResult.type = "done";
+        methodResult.time = Date.now();
+        methodResult.data = res;
+    }
+    this.$mpcStorage.push(
+        StorageType.VIEW,
+        {
+            label,
+            args,
+            method: methodName,
+            view: this,
+            response: methodResult,
+        },
+        this.$mpcId
+    );
+    if (
+        args[0] &&
+        typeof args[0] === "object" &&
+        typeof args[0].currentTarget === "object" &&
+        args[0].type
+    ) {
+        this.$mpcStorage.push(
+            StorageType.EVENT,
+            {
+                label,
+                args,
+                method: methodName,
+                view: this,
+                response: methodResult,
+                event: args[0],
+            },
+            this.$mpcId
+        );
+    }
+    return res;
+};
+const mergeMethod = (viewName, target, plus?) => {
+    each(target, (methodValue, methodName) => {
+        if (typeof methodValue === "function") {
+            target[methodName] = function (...args) {
+                if (viewName !== "App") {
+                    rewriteNativeMethod(this);
+                }
+                plus && plus[methodName] && plus[methodName].apply(this, args);
+                return exexFunc.apply(this, [
+                    viewName,
+                    methodValue,
+                    methodName,
+                    ...args,
+                ]);
+            };
+        }
+    });
+};
 export const rewriteView = (
     nativeView: Function,
     viewName: string,
     storage: Storage
 ): Function => {
-    return function View(spec: any) {
+    function ViewFactory(spec: any) {
         const facData = {
             name: viewName,
             label: getViewLabel(null, viewName),
@@ -160,75 +310,53 @@ export const rewriteView = (
         };
         storage.push(StorageType.VIEW, facData);
         let plus = {};
-        each(viewLife[viewName], (name) => {
-            plus[name as string] = function (...args) {
-                if (!this.$mpcId) {
-                    this.$mpcId = uuid();
-                }
-                if (!this.$mpcStorage) {
-                    this.$mpcStorage = storage;
-                }
-                const label = getViewLabel(this, viewName);
-                if (!facData.label) {
-                    facData.label = label;
-                }
+        each(viewLife[viewName], (lifeName) => {
+            plus[lifeName as string] = function (...args) {
+                initViewMPC(this, storage, viewName, facData);
             };
         });
-        const mergeMethod = (target, plus) => {
-            each(target, (method, name) => {
-                if (typeof method === "function") {
-                    target[name] = function (...args) {
-                        plus[name] && plus[name].apply(this, args);
-                        const res = (method as Function).apply(this, args);
-                        const label = getViewLabel(this, viewName);
-                        const methodResult = {
-                            type: "wait",
-                            data: null,
-                            time: null,
-                        };
-                        if (typeof res === "object" && res.then) {
-                            res.then((data) => {
-                                methodResult.type = "success";
-                                methodResult.time = Date.now();
-                                methodResult.data = data;
-                            });
-                            res.catch((data) => {
-                                methodResult.type = "fail";
-                                methodResult.time = Date.now();
-                                methodResult.data = data;
-                            });
-                        } else {
-                            methodResult.type = "done";
-                            methodResult.time = Date.now();
-                            methodResult.data = res;
-                        }
-                        this.$mpcStorage.push(
-                            StorageType.VIEW,
-                            {
-                                label,
-                                args,
-                                method: name,
-                                view: this,
-                                response: methodResult,
-                            },
-                            this.$mpcId
-                        );
-                        return res;
-                    };
-                }
-            });
-            each(plus, (method, name) => {
-                if (!target[name]) {
-                    target[name] = function (...args) {
-                        return (method as Function).apply(this, args);
-                    };
-                }
-            });
-        };
         mergeMethod(spec, plus);
-        if (spec.methods) {
-            mergeMethod(spec.methods, plus);
+        if (viewName === "Component") {
+            if (spec.methods) {
+                mergeMethod(viewName, spec.methods);
+            }
+            if (spec.lifetimes) {
+                mergeMethod(viewName, spec.lifetimes, plus);
+            }
+            if (spec.pageLifetimes) {
+                mergeMethod(viewName, spec.pageLifetimes);
+            }
+            each(plus, (methodValue, methodName) => {
+                if (
+                    !spec[methodName] &&
+                    ((spec.lifetimes && !spec.lifetimes[methodName]) ||
+                        !spec.lifetimes)
+                ) {
+                    spec[methodName] = function (...args) {
+                        rewriteNativeMethod(this);
+                        return exexFunc.apply(this, [
+                            viewName,
+                            methodValue,
+                            methodName,
+                            ...args,
+                        ]);
+                    };
+                }
+            });
+            if (spec.properties) {
+                each(spec.properties, (propSpec, propName) => {
+                    spec.properties[propName] = rewritePropObserver(
+                        propSpec,
+                        propName,
+                        storage,
+                        viewName,
+                        facData
+                    );
+                });
+            }
         }
         return nativeView(spec);
-    };
+    }
+    ViewFactory.displayName = viewName;
+    return ViewFactory;
 };

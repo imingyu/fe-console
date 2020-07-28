@@ -23,6 +23,11 @@ if (typeof wx === "object") {
 
 // 重写console
 console = rewriteConsole(console, storage);
+export const nativeView = {
+    App,
+    Page,
+    Component,
+};
 App = rewriteView(App, "App", storage);
 Page = rewriteView(Page, "Page", storage);
 Component = rewriteView(Component, "Component", storage);

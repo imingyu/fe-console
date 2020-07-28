@@ -1,9 +1,10 @@
 import { Storage } from "../storage";
-declare var Component: Function;
-Component({
+import { nativeView } from "../index";
+nativeView.Component({
     data: {
-        visable: false,
+        visable: true,
         mounted: false,
+        activeTabIndex: 0,
         tabs: [
             {
                 name: "全部",
@@ -22,13 +23,41 @@ Component({
                 value: "view",
             },
             {
+                name: "事件",
+                value: "event",
+            },
+            {
                 name: "Storage",
                 value: "storage",
             },
             {
+                name: "Api",
+                value: "api",
+            },
+            {
                 name: "系统",
                 value: "system",
-            }
+            },
         ],
+        tabData: {},
+    },
+    methods: {
+        noop() {},
+        toggleVisable() {
+            this.setData({
+                visable: !this.data.visable,
+                mounted: true,
+            });
+        },
+        closeModal() {
+            this.setData({
+                visable: false,
+            });
+        },
+        setTab(e) {
+            this.setData({
+                activeTabIndex: parseInt(e.currentTarget.dataset.tab),
+            });
+        },
     },
 });

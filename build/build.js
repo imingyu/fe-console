@@ -1,18 +1,18 @@
 const fs = require('fs');
 const buildSass = require('./sass');
+const rimraf = require('rimraf');
 const fse = require('fs-extra');
 const path = require('path');
 const ts = require('typescript');
-
+const copyDir = require('./copy');
 
 const buildTs = (fileName, outputFileName) => {
     const source = fs.readFileSync(fileName, 'utf-8');
     const output = ts.transpile(source, {
         module: 'ES6'
     });
-    fs.writeFileSync(outputFileName || fileName.replace('src', 'dist').replace('.ts','.js'), output, 'utf8');
+    fs.writeFileSync(outputFileName || fileName.replace('src', 'dist').replace('.ts', '.js'), output, 'utf8');
 }
-
 
 const resolve = file => path.resolve(__dirname, `../src/${file}`);
 
@@ -20,6 +20,7 @@ const files = [
     resolve('index.ts'),
     resolve('rewrite.ts'),
     resolve('storage.ts'),
+    resolve('viewer.ts'),
     resolve('util.ts')
 ];
 const buildXml = (xmlFileName, mpSpec) => {
@@ -38,7 +39,8 @@ const xmlFiles = [
     resolve('mp-console/tpl-network.xml'),
     resolve('mp-console/tpl-storage.xml'),
     resolve('mp-console/tpl-system.xml'),
-    resolve('mp-console/tpl-view.xml')
+    resolve('mp-console/tpl-view.xml'),
+    resolve('mp-console/viewer.xml')
 ]
 
 const buildMP = (mpSpec) => {
@@ -56,32 +58,48 @@ const buildMP = (mpSpec) => {
     })
 }
 
-fs.mkdirSync(path.resolve(__dirname, `../dist`));
-files.forEach(item => buildTs(item));
-[{
-    name: 'wechat',
-    expTag: 'wx:',
-    expEvent: 'bind:',
-    cssSuffix: 'wxss',
-    xmlSuffix: 'wxml'
-}, {
-    name: 'alipay',
-    expTag: 'a:',
-    expEvent: 'bind:',
-    cssSuffix: 'acss',
-    xmlSuffix: 'axml'
-}, {
-    name: 'smart',
-    expTag: 'swan:',
-    expEvent: 'bind:',
-    cssSuffix: 'css',
-    xmlSuffix: 'swan'
-}, {
-    name: 'tiktok',
-    expTag: 'tt:',
-    expEvent: 'bind:',
-    cssSuffix: 'ttss',
-    xmlSuffix: 'ttml'
-}].forEach(spec => {
-    buildMP(spec);
-})
+module.exports = () => {
+    console.log(`开始编译`);
+    const distPath = path.resolve(__dirname, `../dist`);
+    const demoPath = path.resolve(__dirname, `../demo/mp-console`);
+    rimraf.sync(distPath);
+    rimraf.sync(demoPath);
+    fs.mkdirSync(path.resolve(__dirname, `../dist`));
+    fs.mkdirSync(path.resolve(__dirname, `../demo/mp-console`));
+
+    files.forEach(item => buildTs(item));
+    Promise.all([{
+        name: 'wechat',
+        expTag: 'wx:',
+        expEvent: 'bind:',
+        cssSuffix: 'wxss',
+        xmlSuffix: 'wxml'
+    }, {
+        name: 'alipay',
+        expTag: 'a:',
+        expEvent: 'bind:',
+        cssSuffix: 'acss',
+        xmlSuffix: 'axml'
+    }, {
+        name: 'smart',
+        expTag: 'swan:',
+        expEvent: 'bind:',
+        cssSuffix: 'css',
+        xmlSuffix: 'swan'
+    }, {
+        name: 'tiktok',
+        expTag: 'tt:',
+        expEvent: 'bind:',
+        cssSuffix: 'ttss',
+        xmlSuffix: 'ttml'
+    }].map(spec => {
+        return buildMP(spec);
+    })).then(() => {
+        copyDir(path.resolve(__dirname, `../dist`), path.resolve(__dirname, `../demo/mp-console`));
+        console.log(`编译结束\n`);
+    })
+}
+var args = process.argv.splice(2);
+if (args.length) {
+    module.exports()
+};

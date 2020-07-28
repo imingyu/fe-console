@@ -4,7 +4,8 @@
     "description": "小程序控制台辅助工具",
     "main": "index.js",
     "scripts": {
-        "build": "rimraf dist && node build/build.js"
+        "build": "node build/build.js build",
+        "dev": "node build/dev.js"
     },
     "repository": {
         "type": "git",
@@ -22,7 +23,8 @@
         "fs-extra": "^9.0.1",
         "postcss": "^7.0.32",
         "rimraf": "^3.0.2",
-        "typescript": "^3.9.7"
+        "typescript": "^3.9.7",
+        "watch": "^1.0.2"
     },
     "dependencies": {
         "node-sass": "^4.14.1"

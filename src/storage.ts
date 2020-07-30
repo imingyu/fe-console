@@ -1,5 +1,13 @@
-import { uuid, IMap } from "./util";
-import { getDataView, DataView } from "./viewer";
+import {
+    uuid,
+    IMap,
+    each,
+    getMpComponentPageNativeViewId,
+    getMpNativeViewId,
+    getMpViewElementSpec,
+} from "./util";
+import { getDataView, DataView, DataViewType } from "./viewer";
+import { MpViewLike, MpViewElementSpec, MpViewType } from "./vars";
 
 export const enum StorageType {
     NETWORK,
@@ -75,7 +83,18 @@ export class Storage {
         string,
         StorageQueueItem[]
     >;
-    private viewMap = {};
+    private nativeViewIdMap: IMap<string, MpViewLike> = {} as IMap<
+        string,
+        MpViewLike
+    >;
+    private nativePageComponentsMap: IMap<string, MpViewLike[]> = {} as IMap<
+        string,
+        MpViewLike[]
+    >;
+    private viewIdMap: IMap<string, MpViewLike> = {} as IMap<
+        string,
+        MpViewLike
+    >;
     private dataStatusChangeHandlers = {};
     private arrShowItemCount: number;
     private objectShowKeysCount: number;
@@ -112,9 +131,21 @@ export class Storage {
         if (
             type === StorageType.VIEW &&
             data.view &&
-            !this.viewMap[data.view.$mpcId]
+            !this.viewIdMap[data.view.$mpcId]
         ) {
-            this.viewMap[data.view.$mpcId] = data.view;
+            const mpView: MpViewLike = data.view as MpViewLike;
+            if (mpView.$viewType === "Component") {
+                const pageId = getMpComponentPageNativeViewId(data.view);
+                if (pageId) {
+                    if (!this.nativePageComponentsMap[pageId]) {
+                        this.nativePageComponentsMap[pageId] = [];
+                    }
+                    this.nativePageComponentsMap[pageId].push(data.view);
+                }
+            }
+            this.nativeViewIdMap[
+                getMpNativeViewId(mpView, mpView.$viewType)
+            ] = this.viewIdMap[mpView.$mpcId] = mpView;
         }
         if (this.dataStatusChangeHandlers[id]) {
             this.dataStatusChangeHandlers[id].forEach((item) => {
@@ -159,6 +190,68 @@ export class Storage {
             allList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize),
             type
         );
+    }
+    getMpViewDetail(mpcId: string): MpViewLike {
+        return this.viewIdMap[mpcId];
+    }
+    getMpViewChildrenSpec(mpcId: string): MpViewElementSpec[] {
+        const children = [] as MpViewElementSpec[];
+
+        if (mpcId === "app") {
+            const activePages = getCurrentPages() as MpViewLike[];
+            const unactivePage: MpViewLike[] = [];
+            each<MpViewLike>(this.viewIdMap, (view, id) => {
+                if (
+                    view.$viewType === "Page" &&
+                    activePages.every((item) => item.$mpcId !== view.$mpcId)
+                ) {
+                    unactivePage.push(view);
+                }
+            });
+            [
+                [true, activePages],
+                [false, unactivePage],
+            ].forEach(([isActive, pages]) => {
+                const tsPages = pages as MpViewLike[];
+                tsPages.forEach((page) => {
+                    const pageSpec = getMpViewElementSpec(
+                        page,
+                        MpViewType.Page
+                    );
+                    pageSpec.active = isActive as boolean;
+                    children.push(pageSpec);
+                });
+            });
+        } else if (this.viewIdMap[mpcId]) {
+            const view = this.viewIdMap[mpcId];
+            if (view.$viewType === MpViewType.Page) {
+            }
+        }
+        return children;
+    }
+    getMpViewElementSpec(mpcId: string): MpViewElementSpec {
+        const view: MpViewLike = this.getMpViewDetail(mpcId);
+        return getMpViewElementSpec(view, view.$viewType);
+    }
+    getItems(type: StorageType) {
+        if (type === StorageType.VIEW) {
+            const app = getApp() as MpViewLike;
+            const activePages = getCurrentPages() as MpViewLike[];
+            const unactivePage: MpViewLike[] = [];
+            each<MpViewLike>(this.viewIdMap, (view, id) => {
+                if (
+                    view.$viewType === "Page" &&
+                    activePages.every((item) => item.$mpcId !== view.$mpcId)
+                ) {
+                    unactivePage.push(view);
+                }
+            });
+            const appViewSpec: MpViewElementSpec = getMpViewElementSpec(
+                app,
+                MpViewType.App
+            );
+            return appViewSpec;
+        }
     }
     convertList(
         list: StorageQueueItem[],

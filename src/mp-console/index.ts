@@ -1,10 +1,9 @@
-import { Storage } from "../storage";
-import { nativeView } from "../index";
-nativeView.Component({
+import { native, storage } from "../index";
+native.Component({
     data: {
         visable: true,
         mounted: false,
-        activeTabIndex: 0,
+        activeTabIndex: 3,
         tabs: [
             {
                 name: "全部",
@@ -55,9 +54,29 @@ nativeView.Component({
             });
         },
         setTab(e) {
+            const activeTabIndex = parseInt(e.currentTarget.dataset.tab);
             this.setData({
-                activeTabIndex: parseInt(e.currentTarget.dataset.tab),
+                activeTabIndex,
             });
+            if (this.data.tabs[activeTabIndex].value === "view") {
+                this.setTabData(this.data.tabs[activeTabIndex].value, [
+                    storage.getMpViewElementSpec("app"),
+                ]);
+            }
+        },
+        setTabData(tabValue, data) {
+            if (!this.data.tabData[tabValue]) {
+                this.setData({
+                    [`tabData.${tabValue}`]: data,
+                });
+            }
+        },
+        tapViewItem(e) {
+            const mpcId = e.currentTarget.dataset.key;
+            const view = storage.getMpViewDetail(mpcId);
+            if(view){
+                
+            }
         },
     },
 });

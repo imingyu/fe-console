@@ -1,12 +1,19 @@
-import { uuid, rewrite, getViewLabel, each, isPlainObject } from "./util";
+import {
+    uuid,
+    rewrite,
+    getMpViewPathName,
+    each,
+    isPlainObject,
+    MP_PLATFORM,
+} from "./util";
+import {
+    MpPlatfrom,
+    MpViewType,
+    MpViewLike,
+    MpComponentPropSpec,
+    MpViewSpec,
+} from "./vars";
 import { Storage, StorageType } from "./storage";
-export interface ApiHandler {
-    (res: any);
-}
-export interface ApiOptions {
-    success: ApiHandler;
-    fail: ApiHandler;
-}
 const networkApis = ["request", "downloadFile", "uploadFile"];
 const socketLifes = ["onOpen", "onClose", "onError"];
 export const rewriteMP = (nativeMp: object, storage: Storage) => {
@@ -151,14 +158,35 @@ const viewLife = {
     Page: ["onLoad", "onReady", "onShow", "onHide", "onUnload"],
     Component: ["created", "attached", "ready", "moved", "detached"],
 };
-const initViewMPC = (vm, storage, viewName, facData) => {
+if (MP_PLATFORM === MpPlatfrom.alipay) {
+    viewLife.Component = [
+        "onInit",
+        "deriveDataFromProps",
+        "didMount",
+        "didUpdate",
+        "didUnmount",
+    ];
+}
+const initViewMPC = (
+    vm: MpViewLike,
+    storage: Storage,
+    viewType: MpViewType,
+    facData,
+    viewSpec: MpViewSpec
+) => {
+    if (!vm.$viewType) {
+        vm.$viewType = viewType;
+    }
+    if (!vm.$viewSpec) {
+        vm.$viewSpec = viewSpec;
+    }
     if (!vm.$mpcId) {
         vm.$mpcId = uuid();
     }
     if (!vm.$mpcStorage) {
         vm.$mpcStorage = storage;
     }
-    const label = getViewLabel(vm, viewName);
+    const label = getMpViewPathName(viewType, vm);
     if (!facData.label) {
         facData.label = label;
     }
@@ -183,7 +211,7 @@ const initViewMPC = (vm, storage, viewName, facData) => {
             StorageType.VIEW,
             {
                 label,
-                method: '#initState',
+                method: "#initState",
                 view: vm,
                 response: initState,
             },
@@ -191,41 +219,50 @@ const initViewMPC = (vm, storage, viewName, facData) => {
         );
     }
 };
-const rewriteNativeMethod = (vm) => {
+const rewriteNativeMethod = (vm: MpViewLike) => {
     if (!vm.$isRewriteSetData) {
+        vm.$isRewriteSetData = true;
         vm.$nativeSetData = vm.setData;
         vm.setData = function (data: any, callback: Function) {};
     }
 };
 const rewritePropObserver = (
-    propSpec,
-    propName,
-    storage,
-    viewName,
-    facData
-) => {
+    propSpec: Function | Object,
+    propName: string,
+    storage: Storage,
+    viewType: MpViewType,
+    facData,
+    viewSpec: MpViewSpec
+): MpComponentPropSpec => {
     const specType = typeof propSpec;
     if (specType === "function") {
         return {
             type: propSpec,
             observer(...args) {
-                initViewMPC(this, storage, viewName, facData);
+                initViewMPC(this, storage, viewType, facData, viewSpec);
                 rewriteNativeMethod(this);
             },
-        };
+        } as MpComponentPropSpec;
     } else if (specType === "object") {
-        const orgObserver = propSpec.observer;
-        propSpec.observer = function (...args) {
-            initViewMPC(this, storage, viewName, facData);
+        const tsPropSpec = propSpec as MpComponentPropSpec;
+        const orgObserver = tsPropSpec.observer;
+        tsPropSpec.observer = function (...args) {
+            initViewMPC(this, storage, viewType, facData, viewSpec);
             rewriteNativeMethod(this);
             return orgObserver.apply(this, args);
         };
-        return propSpec;
+        return tsPropSpec;
     }
 };
-const exexFunc = function (viewName, methodValue, methodName, ...args) {
+const exexFunc = function (
+    this: MpViewLike,
+    viewType: MpViewType,
+    methodValue: Function,
+    methodName: string,
+    ...args
+) {
     const res = (methodValue as Function).apply(this, args);
-    const label = getViewLabel(this, viewName);
+    const label = getMpViewPathName(viewType, this);
     const methodResult = {
         type: "wait",
         data: null,
@@ -279,16 +316,16 @@ const exexFunc = function (viewName, methodValue, methodName, ...args) {
     }
     return res;
 };
-const mergeMethod = (viewName, target, plus?) => {
+const mergeMethod = (viewType: MpViewType, target, plus?) => {
     each(target, (methodValue, methodName) => {
         if (typeof methodValue === "function") {
-            target[methodName] = function (...args) {
-                if (viewName !== "App") {
+            target[methodName] = function (this: MpViewLike, ...args) {
+                if (viewType !== "App") {
                     rewriteNativeMethod(this);
                 }
                 plus && plus[methodName] && plus[methodName].apply(this, args);
                 return exexFunc.apply(this, [
-                    viewName,
+                    viewType,
                     methodValue,
                     methodName,
                     ...args,
@@ -299,32 +336,38 @@ const mergeMethod = (viewName, target, plus?) => {
 };
 export const rewriteView = (
     nativeView: Function,
-    viewName: string,
+    viewType: MpViewType,
     storage: Storage
 ): Function => {
     function ViewFactory(spec: any) {
         const facData = {
-            name: viewName,
-            label: getViewLabel(null, viewName),
+            name: viewType,
+            label: getMpViewPathName(viewType),
             args: [spec],
         };
         storage.push(StorageType.VIEW, facData);
         let plus = {};
-        each(viewLife[viewName], (lifeName) => {
+        each(viewLife[viewType], (lifeName) => {
             plus[lifeName as string] = function (...args) {
-                initViewMPC(this, storage, viewName, facData);
+                initViewMPC(
+                    this,
+                    storage,
+                    viewType,
+                    facData,
+                    spec as MpViewSpec
+                );
             };
         });
         mergeMethod(spec, plus);
-        if (viewName === "Component") {
+        if (viewType === "Component") {
             if (spec.methods) {
-                mergeMethod(viewName, spec.methods);
+                mergeMethod(viewType, spec.methods);
             }
-            if (spec.lifetimes) {
-                mergeMethod(viewName, spec.lifetimes, plus);
+            if (MP_PLATFORM === MpPlatfrom.wechat && spec.lifetimes) {
+                mergeMethod(viewType, spec.lifetimes, plus);
             }
-            if (spec.pageLifetimes) {
-                mergeMethod(viewName, spec.pageLifetimes);
+            if (MP_PLATFORM === MpPlatfrom.wechat && spec.pageLifetimes) {
+                mergeMethod(viewType, spec.pageLifetimes);
             }
             each(plus, (methodValue, methodName) => {
                 if (
@@ -335,7 +378,7 @@ export const rewriteView = (
                     spec[methodName] = function (...args) {
                         rewriteNativeMethod(this);
                         return exexFunc.apply(this, [
-                            viewName,
+                            viewType,
                             methodValue,
                             methodName,
                             ...args,
@@ -347,16 +390,17 @@ export const rewriteView = (
                 each(spec.properties, (propSpec, propName) => {
                     spec.properties[propName] = rewritePropObserver(
                         propSpec,
-                        propName,
+                        propName as string,
                         storage,
-                        viewName,
-                        facData
+                        viewType,
+                        facData,
+                        spec as MpViewSpec
                     );
                 });
             }
         }
         return nativeView(spec);
     }
-    ViewFactory.displayName = viewName;
+    ViewFactory.displayName = viewType;
     return ViewFactory;
 };

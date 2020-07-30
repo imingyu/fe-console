@@ -1,30 +1,32 @@
 import { isArray, uuid, IMap } from "./util";
 export enum DataViewType {
-    number,
-    string,
-    boolean,
-    function,
-    object,
-    ellipsisObject,
-    null,
-    array,
-    undefined,
-    key,
-    row,
-    getter,
-    protectKey,
-    br,
-    symbol,
+    number = "number",
+    string = "string",
+    boolean = "boolean",
+    function = "function",
+    object = "object",
+    ellipsisObject = "ellipsisObject",
+    null = "null",
+    array = "array",
+    undefined = "undefined",
+    key = "key",
+    row = "row",
+    getter = "getter",
+    protectKey = "protectKey",
+    br = "br",
+    symbol = "symbol",
 }
-interface DataViewLike {
+export interface DataViewLike {
+    name?: string;
     key?: string;
     type: DataViewType;
     value?: any;
     chilren?: DataView[];
     length?: number;
     original?: any;
-    block?: boolean;
     open?: boolean;
+    objectKey?: boolean;
+    arrayKey?: boolean;
 }
 export interface DataView extends DataViewLike {
     key: string;
@@ -53,7 +55,8 @@ export const getDataView = (
         maxObjectShowKeysCount: DEFAULT_ITEM_COUNT,
         objectShowKeysCount: DEFAULT_ITEM_COUNT,
     },
-    map?: IMap<string, DataView>
+    map?: IMap<string, DataView>,
+    objName?: string
 ): DataViewResult => {
     const {
         convertBr,
@@ -119,29 +122,52 @@ export const getDataView = (
             type: obj === null ? DataViewType.null : DataViewType[argType],
             value: argType === "symbol" ? obj.toString() : obj,
         });
+    } else if (argType === "function") {
+        detail = newView({
+            type: DataViewType.function,
+            original: obj,
+        });
     } else if (isArray(obj)) {
         subOptions.ellipsisObject = true;
+        subOptions.convertBr = false;
         detail = newView({
             type: DataViewType.array,
             length: obj.length,
             original: obj,
             [`${getChilren ? "children" : "value"}`]: obj
                 .slice(0, getChilren ? maxArrShowItemCount : arrShowItemCount)
-                .map(
-                    (item, index): DataView => {
-                        const res = getDataView(item, subOptions, map).detail;
-                        return newView({
-                            type: DataViewType.row,
-                            value: [
-                                newView({
-                                    type: DataViewType.key,
-                                    value: index,
-                                }),
-                                ...(isArray(res) ? (res as DataView[]) : [res]),
-                            ],
-                        });
+                .reduce((sum, item, index): DataView[] => {
+                    const res = getDataView(item, subOptions, map).detail;
+                    if (getChilren) {
+                        sum.push(
+                            newView({
+                                type: DataViewType.row,
+                                value: [
+                                    newView({
+                                        type: DataViewType.key,
+                                        value: index,
+                                        arrayKey: true,
+                                    }),
+                                    ...(isArray(res)
+                                        ? (res as DataView[])
+                                        : [res]),
+                                ],
+                            })
+                        );
+                    } else {
+                        sum.push(
+                            newView({
+                                type: DataViewType.key,
+                                value: index,
+                                arrayKey: true,
+                            })
+                        );
+                        sum.push(
+                            ...(isArray(res) ? (res as DataView[]) : [res])
+                        );
                     }
-                ),
+                    return sum;
+                }, []),
         });
     } else {
         if (ellipsisObject) {
@@ -154,31 +180,45 @@ export const getDataView = (
             detail = newView({
                 type: DataViewType.object,
                 original: obj,
-                [`${getChilren ? "children" : "value"}`]: Object.keys(
-                    obj
-                ).reduce((sum, key, index) => {
-                    if (
-                        index <
-                        (getChilren
+                [`${getChilren ? "children" : "value"}`]: Object.keys(obj)
+                    .slice(
+                        0,
+                        getChilren
                             ? maxObjectShowKeysCount
-                            : objectShowKeysCount)
-                    ) {
-                        sum.push(
-                            newView({
-                                type: DataViewType.key,
-                                value: key,
-                            })
-                        );
+                            : objectShowKeysCount
+                    )
+                    .reduce((sum, key) => {
                         const res = getDataView(obj[key], subOptions, map)
                             .detail;
-                        if (isArray(res)) {
-                            sum.push(...(res as DataView[]));
+                        if (getChilren) {
+                            sum.push(
+                                newView({
+                                    type: DataViewType.row,
+                                    value: [
+                                        newView({
+                                            type: DataViewType.key,
+                                            value: key,
+                                        }),
+                                        ...(isArray(res)
+                                            ? (res as DataView[])
+                                            : [res]),
+                                    ],
+                                })
+                            );
                         } else {
-                            sum.push(res);
+                            sum.push(
+                                newView({
+                                    type: DataViewType.key,
+                                    value: key,
+                                    objectKey: true,
+                                })
+                            );
+                            sum.push(
+                                ...(isArray(res) ? (res as DataView[]) : [res])
+                            );
                         }
-                    }
-                    return sum;
-                }, []),
+                        return sum;
+                    }, []),
             });
         }
     }

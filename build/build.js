@@ -17,16 +17,19 @@ const buildTs = (fileName, outputFileName) => {
 const resolve = file => path.resolve(__dirname, `../src/${file}`);
 
 const files = [
+    resolve('config.ts'),
     resolve('index.ts'),
     resolve('rewrite.ts'),
     resolve('storage.ts'),
     resolve('viewer.ts'),
+    resolve('vars.ts'),
     resolve('util.ts')
 ];
 const buildXml = (xmlFileName, mpSpec) => {
     let source = fs.readFileSync(xmlFileName, 'utf-8');
     source = source.replace(/:mpc:/gm, mpSpec.expTag);
     source = source.replace(/@mpc:/gm, mpSpec.expEvent);
+    source = source.replace(/.mpc:xmlSuffix/gm, '.'+mpSpec.xmlSuffix);
     const arr = xmlFileName.split('/');
     const outputFileName = path.resolve(__dirname, `../dist/mpc-${mpSpec.name}/${arr[arr.length - 1].replace('.xml', '')}.${mpSpec.xmlSuffix}`);
     fs.writeFileSync(outputFileName, source, 'utf8');

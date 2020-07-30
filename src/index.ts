@@ -1,33 +1,52 @@
+import MpcConfig from "./config";
 import { rewriteMP, rewriteConsole, rewriteView } from "./rewrite";
+import { getDataView } from "./viewer";
 import { Storage } from "./storage";
-declare var wx: object;
-declare var my: object;
-declare var swan: object;
-declare var tt: object;
-declare var App: Function;
-declare var Page: Function;
-declare var Component: Function;
-
-const storage = new Storage();
-
-// 重写小程序顶级对象
-if (typeof wx === "object") {
-    wx = rewriteMP(wx, storage);
-} else if (typeof my === "object") {
-    my = rewriteMP(my, storage);
-} else if (typeof swan === "object") {
-    swan = rewriteMP(swan, storage);
-} else if (typeof tt === "object") {
-    tt = rewriteMP(tt, storage);
-}
-
-// 重写console
-console = rewriteConsole(console, storage);
-export const nativeView = {
+import { MpViewType, MpPlatfrom } from "./vars";
+import { MP_PLATFORM, MP_API_VAR } from "./util";
+global.getDataView = getDataView;
+export const native = {
     App,
     Page,
     Component,
+    ApiVar: MP_API_VAR,
+    console,
 };
-App = rewriteView(App, "App", storage);
-Page = rewriteView(Page, "Page", storage);
-Component = rewriteView(Component, "Component", storage);
+export const storage = new Storage();
+export const MpcConsole = rewriteConsole(console, storage);
+export const MpcApp = rewriteView(App, MpViewType.App, storage);
+export const MpcPage = rewriteView(Page, MpViewType.Page, storage);
+export const MpcComponent = rewriteView(
+    Component,
+    MpViewType.Component,
+    storage
+);
+export const MpcApiVar = rewriteMP(MP_API_VAR, storage);
+
+// 根据配置重写相关对象
+// 重写小程序顶级对象
+if (MpcConfig.rewrite) {
+    if (MpcConfig.rewrite.console) {
+        console = MpcConsole;
+    }
+    if (MpcConfig.rewrite.app) {
+        App = MpcApp;
+    }
+    if (MpcConfig.rewrite.page) {
+        Page = MpcPage;
+    }
+    if (MpcConfig.rewrite.component) {
+        Component = MpcComponent;
+    }
+    if (MpcConfig.rewrite.api) {
+        if (MP_PLATFORM === MpPlatfrom.wechat) {
+            wx = MpcApiVar;
+        } else if (MP_PLATFORM === MpPlatfrom.alipay) {
+            my = MpcApiVar;
+        } else if (MP_PLATFORM === MpPlatfrom.smart) {
+            swan = MpcApiVar;
+        } else if (MP_PLATFORM === MpPlatfrom.tiktok) {
+            tt = MpcApiVar;
+        }
+    }
+}

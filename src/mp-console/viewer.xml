@@ -1,7 +1,12 @@
 <template name="viewer">
     <view class="viewer-container type-{{dt.type}} {{dt.open?'is-open':''}}">
-        <view :mpc:if="{{dt.type==='number'||dt.type==='string'||dt.type==='boolean'||dt.type==='symbol'||dt.type==='function'}}" class="viewer-value">{{dt.value}}</view>
+        <view :mpc:if="{{dt.type==='number'||dt.type==='string'||dt.type==='boolean'||dt.type==='symbol'}}" class="viewer-value">{{dt.value}}</view>
         <view :mpc:elif="{{dt.type==='null'}}" class="viewer-value">null</view>
+        <view :mpc:elif="{{dt.type==='function'}}" class="viewer-value">
+            <view class="viewer-body">f</view>
+            <view class="viewer-bracket bracket-left">(</view>
+            <view class="viewer-bracket bracket-right">)</view>
+        </view>
         <view :mpc:elif="{{dt.type==='undefined'}}" class="viewer-value">undefined</view>
         <view :mpc:elif="{{dt.type==='arrayLength'}}" class="viewer-value">({{dt.value}})</view>
         <view :mpc:elif="{{dt.type==='ellipsisObject'}}" class="viewer-value" catch:tap="openViewer" data-dt="{{dt}}">

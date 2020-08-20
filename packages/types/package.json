@@ -1,0 +1,32 @@
+{
+    "name": "@mp-console/types",
+    "version": "0.0.0",
+    "description": "types",
+    "author": "imingyu <mingyuhisoft@163.com>",
+    "homepage": "https://github.com/imingyu/mp-console/tree/master/packages/types",
+    "license": "MIT",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "spec/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/imingyu/mp-console.git"
+    },
+    "scripts": {},
+    "bugs": {
+        "url": "https://github.com/imingyu/mp-console/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "mp-console",
+        "小程序",
+        "miniprogram",
+        "小程序开发工具",
+        "小程序辅助工具"
+    ],
+    "dependencies": {
+        "@mpkit/types": "^1.0.5"
+    }
+}

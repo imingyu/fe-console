@@ -1,0 +1,39 @@
+{
+    "name": "@mp-console/core",
+    "version": "0.0.0",
+    "description": "核心功能",
+    "author": "imingyu <mingyuhisoft@163.com>",
+    "homepage": "https://github.com/imingyu/mp-console/tree/master/packages/core",
+    "license": "MIT",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "spec/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/imingyu/mp-console.git"
+    },
+    "scripts": {},
+    "bugs": {
+        "url": "https://github.com/imingyu/mp-console/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "mp-console",
+        "小程序",
+        "miniprogram",
+        "小程序开发工具",
+        "小程序辅助工具"
+    ],
+    "dependencies": {
+        "@mpkit/ebus": "^1.0.6",
+        "@mpkit/mixin": "^1.0.6",
+        "@mpkit/types": "^1.0.6",
+        "@mpkit/util": "^1.0.6"
+    },
+    "devDependencies": {
+        "chai": "^4.2.0",
+        "mocha": "^8.1.1"
+    }
+}

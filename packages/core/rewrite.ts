@@ -233,9 +233,9 @@ export const rewriteView = (storage: MpcStorageLike) => {
                 if (
                     typeof wrapDetail === "object" &&
                     wrapDetail &&
-                    wrapDetail.viewId
+                    wrapDetail._mpcWrap
                 ) {
-                    const { id, viewId, orgDetail } = wrapDetail;
+                    const { id, orgDetail } = wrapDetail;
                     const data = storage.get(id) as MpcStorageEventData;
                     if (data) {
                         data.event = args[0];
@@ -269,15 +269,14 @@ export const rewriteView = (storage: MpcStorageLike) => {
         if ("triggerEvent" in this) {
             this.$nativeTriggerEvent = this.triggerEvent;
             this.triggerEvent = function (...args) {
-                const selfViewId = getMpNativeViewId(this);
                 const orgDetail = args[1];
                 const orgArgs = [args[0], args[1], args[2]];
                 const id = uuid();
                 const name = args[0];
                 args[1] = {
                     id,
+                    _mpcWrap: true,
                     orgDetail,
-                    viewId: selfViewId,
                 };
                 const data = {} as MpcStorageEventData;
                 data.id = id;

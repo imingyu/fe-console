@@ -139,7 +139,7 @@ const wrapWebSocketTask = (
     });
 };
 
-export const rewriteApi = (storage: MpcStorageLike) => {
+export const rewriteApi = (storage: MpcStorageLike): any => {
     MixinStore.addHook("Api", {
         before(name, args, handler, id) {
             if (name === "sendSocketMessage" || name === "closeSocket") {
@@ -196,12 +196,16 @@ export const rewriteApi = (storage: MpcStorageLike) => {
     });
     if (PALTFORM === MpPlatform.wechat) {
         wx = MkApi;
+        return wx;
     } else if (PALTFORM === MpPlatform.alipay) {
         my = MkApi;
+        return my;
     } else if (PALTFORM === MpPlatform.smart) {
         swan = MkApi;
+        return swan;
     } else if (PALTFORM === MpPlatform.tiktok) {
         tt = MkApi;
+        return tt;
     }
 };
 

@@ -62,6 +62,9 @@ export interface MpcStorageEventData extends MpcStorageData {
     triggerView: MpView;
     handleView: MpView;
 }
+export interface MpcStorageConsoleData extends MpcStorageData {
+    args: any[];
+}
 export interface MpcStorageFinder<T> {
     (item: T, index: number, arr: T[]): boolean;
 }

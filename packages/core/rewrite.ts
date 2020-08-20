@@ -6,16 +6,11 @@ import {
     MpcMethodStatus,
     MpcStorageMethodData,
     MpcStorageEventData,
-    MpcStorageData,
+    MpcStorageConsoleData,
 } from "@mp-console/types";
 import { MkApi, MkApp, MkPage, MkComponent, MixinStore } from "@mpkit/mixin";
 import { MpViewType, MpPlatform } from "@mpkit/types";
-import {
-    getMpPlatform,
-    uuid,
-    getMpInitLifeName,
-    getMpNativeViewId,
-} from "@mpkit/util";
+import { getMpPlatform, uuid, getMpInitLifeName } from "@mpkit/util";
 const socketLifes = ["onOpen", "onMessage", "onError", "onClose"];
 
 const PALTFORM = getMpPlatform();
@@ -309,21 +304,18 @@ export const rewriteView = (storage: MpcStorageLike) => {
     Component = wrapView(App, MkComponent);
 };
 
-// const consoleMethods = ["log", "dir", "error", "warn", "info"];
-// export const rewriteConsole = (
-//     nativeTarget: Console,
-//     storage: Storage
-// ): Console => {
-//     return rewrite(nativeTarget, (value, prop) => {
-//         if (consoleMethods.indexOf(prop as string) !== -1) {
-//             return function (...args) {
-//                 storage.push(StorageType.CONSOLE, {
-//                     name: prop,
-//                     args,
-//                 });
-//                 return value.apply(this, args);
-//             };
-//         }
-//         return value;
-//     }) as Console;
-// };
+export const rewriteConsole = (storage: MpcStorageLike) => {
+    if (typeof console === "object" && console) {
+        Object.keys(console).forEach((key) => {
+            const method = console[key];
+            if (typeof method === "function") {
+                console[key] = function (...args) {
+                    storage.push({
+                        type: MpcStorageType.Console,
+                        args,
+                    } as MpcStorageConsoleData);
+                };
+            }
+        });
+    }
+};

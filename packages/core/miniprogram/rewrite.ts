@@ -7,6 +7,7 @@ import {
     FecStorageMethodData,
     FecStorageEventData,
     FecStorageConsoleData,
+    FecStorageViewData,
 } from "@fe-console/types";
 import { MkApi, MkApp, MkPage, MkComponent, MixinStore } from "@mpkit/mixin";
 import { MpViewType, MpPlatform } from "@mpkit/types";
@@ -288,14 +289,36 @@ export const rewriteMpView = (storage: FecStorageLike) => {
             };
         }
     }
+    MixinStore.addHook(MpViewType.App, {
+        [getMpInitLifeName(MpViewType.App)]: {
+            before() {
+                storage.push({
+                    type: FecStorageType.View,
+                    view: this,
+                } as FecStorageViewData);
+            },
+        },
+    });
     MixinStore.addHook(MpViewType.Page, {
         [getMpInitLifeName(MpViewType.Page)]: {
-            before: rewriteTrigger,
+            before() {
+                storage.push({
+                    type: FecStorageType.View,
+                    view: this,
+                } as FecStorageViewData);
+                rewriteTrigger.call(this);
+            },
         },
     });
     MixinStore.addHook(MpViewType.Component, {
         [getMpInitLifeName(MpViewType.Component)]: {
-            before: rewriteTrigger,
+            before() {
+                storage.push({
+                    type: FecStorageType.View,
+                    view: this,
+                } as FecStorageViewData);
+                rewriteTrigger.call(this);
+            },
         },
     });
     const wrapView = (native, mkView) => {

@@ -1,88 +1,88 @@
 import { MpView, EBus, MkMap } from "@mpkit/types";
-export enum MpcStorageType {
+export enum FecStorageType {
     Api = "Api",
     View = "View",
     Method = "Method",
     Console = "Console",
     Event = "Event",
 }
-export interface MpcStorageDataLike {
+export interface FecStorageDataLike {
     id?: string;
-    type: MpcStorageType;
+    type: FecStorageType;
     time?: number;
 }
-export interface MpcStorageData extends MpcStorageDataLike {
+export interface FecStorageData extends FecStorageDataLike {
     id: string;
     time: number;
 }
-interface MethodData extends MpcStorageData {
+interface MethodData extends FecStorageData {
     name: string;
     args: any[];
     result?: any;
-    status: MpcMethodStatus;
+    status: FecMethodStatus;
     endTime?: number;
     error?: Error;
     errorType?: string;
 }
-export interface MpcStorageMethodData extends MethodData {
+export interface FecStorageMethodData extends MethodData {
     view: MpView;
 }
-export interface MpcStorageViewData extends MpcStorageData {
+export interface FecStorageViewData extends FecStorageData {
     view: MpView;
 }
-export enum MpcMethodStatus {
+export enum FecMethodStatus {
     Executed = "Executed",
     Success = "Success",
     Fail = "Fail",
 }
-export enum MpcHasTaskApi {
+export enum MpHasTaskApi {
     request = "request",
     downloadFile = "downloadFile",
     uploadFile = "uploadFile",
     connectSocket = "connectSocket",
     createUDPSocket = "createUDPSocket",
 }
-export interface MpcStorageApiData extends MethodData {
+export interface FecStorageApiData extends MethodData {
     response?: any;
-    children?: MpcStorageApiData[];
+    children?: FecStorageApiData[];
 }
-export interface MpcEventTarget {
+export interface MpEventTarget {
     dataset: any;
 }
-export interface MpcEvent {
+export interface MpEvent {
     type: string;
-    target: MpcEventTarget;
-    currentTarget: MpcEventTarget;
+    target: MpEventTarget;
+    currentTarget: MpEventTarget;
     detail: any;
 }
-export interface MpcStorageEventData extends MpcStorageData {
+export interface FecStorageEventData extends FecStorageData {
     name: string;
     args: any[];
-    event: MpcEvent;
+    event: MpEvent;
     triggerView: MpView;
     handleView: MpView;
 }
-export interface MpcStorageConsoleData extends MpcStorageData {
+export interface FecStorageConsoleData extends FecStorageData {
     args: any[];
 }
-export interface MpcStorageFinder<T> {
+export interface FecStorageFinder<T> {
     (item: T, index: number, arr: T[]): boolean;
 }
 
-export interface MpcStorageLike extends EBus {
-    push(data: MpcStorageDataLike);
-    pushApiTask(apiData: MpcStorageApiData);
-    removeApiTask(apiName: MpcHasTaskApi, dataId: string);
-    getApiTaskMap(apiName: MpcHasTaskApi): MkMap<MpcStorageApiData>;
-    get(id: string): MpcStorageData;
-    getAll(): MpcStorageData[];
-    getType(type: MpcStorageType): MpcStorageData[];
+export interface FecStorageLike extends EBus {
+    push(data: FecStorageDataLike);
+    pushApiTask(apiData: FecStorageApiData);
+    removeApiTask(apiName: MpHasTaskApi, dataId: string);
+    getApiTaskMap(apiName: MpHasTaskApi): MkMap<FecStorageApiData>;
+    get(id: string): FecStorageData;
+    getAll(): FecStorageData[];
+    getType(type: FecStorageType): FecStorageData[];
     findType(
-        type: MpcStorageType,
-        finder: MpcStorageFinder<MpcStorageData>
-    ): null | MpcStorageData;
+        type: FecStorageType,
+        finder: FecStorageFinder<FecStorageData>
+    ): null | FecStorageData;
     filterType(
-        type: MpcStorageType,
-        finder: MpcStorageFinder<MpcStorageData>
-    ): MpcStorageData[];
+        type: FecStorageType,
+        finder: FecStorageFinder<FecStorageData>
+    ): FecStorageData[];
 }

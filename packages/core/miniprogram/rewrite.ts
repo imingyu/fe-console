@@ -1,13 +1,13 @@
 import {
-    MpcStorageType,
-    MpcStorageLike,
-    MpcStorageApiData,
-    MpcHasTaskApi,
-    MpcMethodStatus,
-    MpcStorageMethodData,
-    MpcStorageEventData,
-    MpcStorageConsoleData,
-} from "@mp-console/types";
+    FecStorageType,
+    FecStorageLike,
+    FecStorageApiData,
+    MpHasTaskApi,
+    FecMethodStatus,
+    FecStorageMethodData,
+    FecStorageEventData,
+    FecStorageConsoleData,
+} from "@fe-console/types";
 import { MkApi, MkApp, MkPage, MkComponent, MixinStore } from "@mpkit/mixin";
 import { MpViewType, MpPlatform } from "@mpkit/types";
 import { getMpPlatform, uuid, getMpInitLifeName } from "@mpkit/util";
@@ -18,26 +18,26 @@ const PALTFORM = getMpPlatform();
 const hookWebSocketAction = (
     name: string,
     args,
-    apiStorageData?: MpcStorageApiData,
-    storage?: MpcStorageLike,
+    apiStorageData?: FecStorageApiData,
+    storage?: FecStorageLike,
     socketTask?: any,
     orgAction?: Function
 ) => {
-    let apiStorageDataList: MpcStorageApiData[] = [];
+    let apiStorageDataList: FecStorageApiData[] = [];
     if (!apiStorageData && storage) {
-        const taskMap = storage.getApiTaskMap(MpcHasTaskApi.connectSocket);
+        const taskMap = storage.getApiTaskMap(MpHasTaskApi.connectSocket);
         apiStorageDataList = Object.keys(taskMap).map((item) => taskMap[item]);
     } else if (apiStorageData) {
         apiStorageDataList.push(apiStorageData);
     }
-    const storageData: MpcStorageApiData = {
+    const storageData: FecStorageApiData = {
         name,
-        type: MpcStorageType.Api,
-        status: MpcMethodStatus.Executed,
+        type: FecStorageType.Api,
+        status: FecMethodStatus.Executed,
         id: uuid(),
         time: Date.now(),
         args,
-    } as MpcStorageApiData;
+    } as FecStorageApiData;
     if (!args.length || !args[0]) {
         args[0] = {};
     }
@@ -45,7 +45,7 @@ const hookWebSocketAction = (
         const { success, fail } = args[0];
         args[0].success = (...s) => {
             storageData.endTime = Date.now();
-            storageData.status = MpcMethodStatus.Success;
+            storageData.status = FecMethodStatus.Success;
             if (s.length < 1) {
                 storageData.response = s[0];
             } else {
@@ -54,7 +54,7 @@ const hookWebSocketAction = (
             if (storage) {
                 if (name === "close" && apiStorageData) {
                     storage.removeApiTask(
-                        MpcHasTaskApi.connectSocket,
+                        MpHasTaskApi.connectSocket,
                         apiStorageData.id
                     );
                 } else if (
@@ -63,7 +63,7 @@ const hookWebSocketAction = (
                 ) {
                     apiStorageDataList.forEach((item) => {
                         storage.removeApiTask(
-                            MpcHasTaskApi.connectSocket,
+                            MpHasTaskApi.connectSocket,
                             item.id
                         );
                     });
@@ -73,7 +73,7 @@ const hookWebSocketAction = (
         };
         args[0].fail = (...s) => {
             storageData.endTime = Date.now();
-            storageData.status = MpcMethodStatus.Fail;
+            storageData.status = FecMethodStatus.Fail;
             if (s.length < 1) {
                 storageData.response = s[0];
             } else {
@@ -99,8 +99,8 @@ const hookWebSocketAction = (
 
 const wrapWebSocketTask = (
     socketTask: any,
-    storage: MpcStorageLike,
-    apiStoreData: MpcStorageApiData
+    storage: FecStorageLike,
+    apiStoreData: FecStorageApiData
 ) => {
     const { send, close } = socketTask;
     socketTask.send = function (...args) {
@@ -128,18 +128,18 @@ const wrapWebSocketTask = (
             apiStoreData.children.push({
                 id: uuid(),
                 time: Date.now(),
-                type: MpcStorageType.Api,
+                type: FecStorageType.Api,
                 name: step,
                 args: [],
                 response: res,
-                status: MpcMethodStatus.Executed,
+                status: FecMethodStatus.Executed,
                 endTime: Date.now(),
             });
         });
     });
 };
 
-export const rewriteApi = (storage: MpcStorageLike): any => {
+export const rewriteMpApi = (storage: FecStorageLike): any => {
     MixinStore.addHook("Api", {
         before(name, args, handler, id) {
             if (name === "sendSocketMessage" || name === "closeSocket") {
@@ -148,25 +148,25 @@ export const rewriteApi = (storage: MpcStorageLike): any => {
             }
             storage.push({
                 id,
-                type: MpcStorageType.Api,
+                type: FecStorageType.Api,
                 args,
                 name,
-                status: MpcMethodStatus.Executed,
-            } as MpcStorageApiData);
+                status: FecMethodStatus.Executed,
+            } as FecStorageApiData);
         },
         after(name, args, result, id) {
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
-            const data = storage.get(id) as MpcStorageApiData;
+            const data = storage.get(id) as FecStorageApiData;
             if (data) {
                 data.result = result;
-                if (MpcHasTaskApi[name]) {
+                if (MpHasTaskApi[name]) {
                     data.children = [];
                     storage.pushApiTask(data);
                 }
                 data.endTime = Date.now();
-                if (name === MpcHasTaskApi.connectSocket) {
+                if (name === MpHasTaskApi.connectSocket) {
                     wrapWebSocketTask(result, storage, data);
                 }
             }
@@ -175,19 +175,19 @@ export const rewriteApi = (storage: MpcStorageLike): any => {
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
-            const data = storage.get(id) as MpcStorageApiData;
+            const data = storage.get(id) as FecStorageApiData;
             if (data) {
                 data.response = res;
                 data.status = success
-                    ? MpcMethodStatus.Success
-                    : MpcMethodStatus.Fail;
+                    ? FecMethodStatus.Success
+                    : FecMethodStatus.Fail;
                 data.endTime = Date.now();
             }
         },
         catch(name, args, error, errTyoe, id) {
-            const data = storage.get(id) as MpcStorageApiData;
+            const data = storage.get(id) as FecStorageApiData;
             if (data) {
-                data.status = MpcMethodStatus.Fail;
+                data.status = FecMethodStatus.Fail;
                 data.endTime = Date.now();
                 data.error = error;
                 data.errorType = errTyoe;
@@ -209,7 +209,7 @@ export const rewriteApi = (storage: MpcStorageLike): any => {
     }
 };
 
-export const rewriteView = (storage: MpcStorageLike) => {
+export const rewriteMpView = (storage: FecStorageLike) => {
     const isEvent = (obj) =>
         typeof obj === "object" &&
         obj &&
@@ -221,12 +221,12 @@ export const rewriteView = (storage: MpcStorageLike) => {
         before(name, args, handler, id) {
             storage.push({
                 id,
-                type: MpcStorageType.Method,
+                type: FecStorageType.Method,
                 name,
                 args,
                 view: this,
-                status: MpcMethodStatus.Executed,
-            } as MpcStorageMethodData);
+                status: FecMethodStatus.Executed,
+            } as FecStorageMethodData);
             if (isEvent(args[0])) {
                 const wrapDetail = args[0].detail;
                 if (
@@ -235,7 +235,7 @@ export const rewriteView = (storage: MpcStorageLike) => {
                     wrapDetail._mpcWrap
                 ) {
                     const { id, orgDetail } = wrapDetail;
-                    const data = storage.get(id) as MpcStorageEventData;
+                    const data = storage.get(id) as FecStorageEventData;
                     if (data) {
                         data.event = args[0];
                         data.handleView = this;
@@ -245,16 +245,16 @@ export const rewriteView = (storage: MpcStorageLike) => {
             }
         },
         after(name, args, result, id) {
-            const data = storage.get(id) as MpcStorageMethodData;
+            const data = storage.get(id) as FecStorageMethodData;
             if (data) {
                 data.result = result;
                 data.endTime = Date.now();
             }
         },
         catch(name, args, error, errTyoe, id) {
-            const data = storage.get(id) as MpcStorageMethodData;
+            const data = storage.get(id) as FecStorageMethodData;
             if (data) {
-                data.status = MpcMethodStatus.Fail;
+                data.status = FecMethodStatus.Fail;
                 data.endTime = Date.now();
                 data.error = error;
                 data.errorType = errTyoe;
@@ -277,9 +277,9 @@ export const rewriteView = (storage: MpcStorageLike) => {
                     _mpcWrap: true,
                     orgDetail,
                 };
-                const data = {} as MpcStorageEventData;
+                const data = {} as FecStorageEventData;
                 data.id = id;
-                data.type = MpcStorageType.Event;
+                data.type = FecStorageType.Event;
                 data.name = name;
                 data.args = orgArgs;
                 data.triggerView = this;
@@ -300,7 +300,7 @@ export const rewriteView = (storage: MpcStorageLike) => {
     });
     const wrapView = (native, mkView) => {
         return (spec) => {
-            native(mkView(spec));
+            return native(mkView(spec));
         };
     };
     App = wrapView(App, MkApp);
@@ -308,16 +308,16 @@ export const rewriteView = (storage: MpcStorageLike) => {
     Component = wrapView(App, MkComponent);
 };
 
-export const rewriteConsole = (storage: MpcStorageLike) => {
+export const rewriteMpConsole = (storage: FecStorageLike) => {
     if (typeof console === "object" && console) {
         Object.keys(console).forEach((key) => {
             const method = console[key];
             if (typeof method === "function") {
                 console[key] = function (...args) {
                     storage.push({
-                        type: MpcStorageType.Console,
+                        type: FecStorageType.Console,
                         args,
-                    } as MpcStorageConsoleData);
+                    } as FecStorageConsoleData);
                 };
             }
         });

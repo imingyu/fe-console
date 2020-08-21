@@ -2,7 +2,7 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@mp-console/*": ["packages/*"]
+            "@fe-console/*": ["packages/*"]
         },
         "declaration": true
     },

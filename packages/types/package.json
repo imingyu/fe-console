@@ -1,26 +1,26 @@
 {
-    "name": "@mp-console/types",
+    "name": "@fe-console/types",
     "version": "0.0.0",
     "description": "types",
     "author": "imingyu <mingyuhisoft@163.com>",
-    "homepage": "https://github.com/imingyu/mp-console/tree/master/packages/types",
+    "homepage": "https://github.com/imingyu/fe-console/tree/master/packages/types",
     "license": "MIT",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
     "types": "spec/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/imingyu/mp-console.git"
+        "url": "git+https://github.com/imingyu/fe-console.git"
     },
     "scripts": {},
     "bugs": {
-        "url": "https://github.com/imingyu/mp-console/issues"
+        "url": "https://github.com/imingyu/fe-console/issues"
     },
     "publishConfig": {
         "access": "public"
     },
     "keywords": [
-        "mp-console",
+        "fe-console",
         "小程序",
         "miniprogram",
         "小程序开发工具",

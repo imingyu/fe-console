@@ -2,9 +2,9 @@ import {
     rewriteApi,
     rewriteView,
     rewriteConsole,
-    MpcStorage,
-} from "@mp-console/core";
-const mpcStorage = new MpcStorage();
+    FecStorage,
+} from "@fe-console/core";
+const mpcStorage = new FecStorage();
 const Api = rewriteApi(mpcStorage);
 rewriteView(mpcStorage);
 rewriteConsole(mpcStorage);

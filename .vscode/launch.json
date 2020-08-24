@@ -15,9 +15,9 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "debug mixin",
+            "name": "debug core",
             "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/packages/mixin/debug.js",
+            "program": "${workspaceFolder}/packages/core/debug.js",
             "outFiles": ["${workspaceFolder}/**/*.js"]
         }
     ]

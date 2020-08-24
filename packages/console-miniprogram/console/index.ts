@@ -52,29 +52,29 @@ Component({
                 visable: false,
             });
         },
-        setTab(e) {
-            const activeTabIndex = parseInt(e.currentTarget.dataset.tab);
-            this.setData({
-                activeTabIndex,
-            });
-            if (this.data.tabs[activeTabIndex].value === "view") {
-                this.setTabData(this.data.tabs[activeTabIndex].value, [
-                    storage.getMpViewElementSpec("app"),
-                ]);
-            }
-        },
-        setTabData(tabValue, data) {
-            if (!this.data.tabData[tabValue]) {
-                this.setData({
-                    [`tabData.${tabValue}`]: data,
-                });
-            }
-        },
-        tapViewItem(e) {
-            const mpcId = e.currentTarget.dataset.key;
-            const view = storage.getMpViewDetail(mpcId);
-            if (view) {
-            }
-        },
+        // setTab(e) {
+        //     const activeTabIndex = parseInt(e.currentTarget.dataset.tab);
+        //     this.setData({
+        //         activeTabIndex,
+        //     });
+        //     if (this.data.tabs[activeTabIndex].value === "view") {
+        //         this.setTabData(this.data.tabs[activeTabIndex].value, [
+        //             storage.getMpViewElementSpec("app"),
+        //         ]);
+        //     }
+        // },
+        // setTabData(tabValue, data) {
+        //     if (!this.data.tabData[tabValue]) {
+        //         this.setData({
+        //             [`tabData.${tabValue}`]: data,
+        //         });
+        //     }
+        // },
+        // tapViewItem(e) {
+        //     const mpcId = e.currentTarget.dataset.key;
+        //     const view = storage.getMpViewDetail(mpcId);
+        //     if (view) {
+        //     }
+        // },
     },
 });

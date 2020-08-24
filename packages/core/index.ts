@@ -1,3 +1,5 @@
 export * from "./miniprogram/rewrite";
+export * from "./web/rewrite";
 import FecStorage from "./storage";
-export { FecStorage };
+import parseData from "./data-parser";
+export { FecStorage, parseData };

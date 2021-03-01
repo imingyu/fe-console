@@ -27,6 +27,6 @@
         "小程序辅助工具"
     ],
     "dependencies": {
-        "@mpkit/types": "^1.0.5"
+        "@mpkit/types": "^1.0.16"
     }
 }

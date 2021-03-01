@@ -1,6 +1,0 @@
-{
-    "component": true,
-    "usingComponents": {
-        "t2": "../t2/index"
-    }
-}

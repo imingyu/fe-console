@@ -16,13 +16,13 @@ import { FcEventEmitter } from "@fe-console/util";
 /**
  * 存储者，负责保存数据，至于怎么保存，存在哪，存多久，看具体实现
  */
-export abstract class FcStoragerImpl<T = any>
-    extends FcEventEmitter<FcProduct<T>>
+export abstract class FcStoragerImpl<T extends FcProduct = FcProduct>
+    extends FcEventEmitter<T>
     implements IFcStorager<T> {
     constructor() {
         super();
     }
-    push(data: FcProduct<T>) {
+    push(data: T) {
         this.emit("data", data);
     }
 }
@@ -30,14 +30,14 @@ export abstract class FcStoragerImpl<T = any>
 /**
  * 存储数据在内存中
  */
-export abstract class FcMemoryStoragerImpl<T = any>
-    extends FcEventEmitter<FcProduct<T>>
+export abstract class FcMemoryStoragerImpl<T extends FcProduct = FcProduct>
+    extends FcEventEmitter<T>
     implements IFcStorager<T> {
-    protected list: FcProduct<T>[] = [];
+    protected list: T[] = [];
     constructor() {
         super();
     }
-    push(data: FcProduct<T>) {
+    push(data: T) {
         this.list.push(data);
         this.emit("data", data);
     }
@@ -50,10 +50,12 @@ export abstract class FcMemoryStoragerImpl<T = any>
 /**
  * 存储数据到网络中
  */
-export abstract class FcNetworkStoragerImpl<T = any> extends FcStoragerImpl<T> {
+export abstract class FcNetworkStoragerImpl<
+    T extends FcProduct = FcProduct
+> extends FcStoragerImpl<T> {
     protected reporter: Squirrel;
     constructor(
-        public request: FcStoragerRequestHandler<FcProduct<T>>,
+        public request: FcStoragerRequestHandler<T>,
         reportOptions?: SquirrelOptions
     ) {
         super();
@@ -72,7 +74,7 @@ export abstract class FcNetworkStoragerImpl<T = any> extends FcStoragerImpl<T> {
         }
         this.reporter = new Squirrel(reportOptions);
     }
-    push(data: FcProduct<T>, level: DataLevel = DataLevel.normal) {
+    push(data: T, level: DataLevel = DataLevel.normal) {
         super.push(data);
         this.reporter.stuff(data, level);
     }

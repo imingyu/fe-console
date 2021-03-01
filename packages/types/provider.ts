@@ -1,27 +1,45 @@
+import { Overwrite, PartialBy } from "./tool";
 import { IFcEventEmitter } from "./util";
-
-export interface FcProduct<T = any> {
-    data?: T;
-    time: number;
-    id: string;
+export interface FcProductOptionalProps {
+    time?: number;
+    id?: string;
+    name?: string;
 }
-export interface FcProducerRunHandler<T = any> {
+
+export interface FcProduct {
+    id: string;
+    time: number;
+    /** 如果存在父子关系，子数据需要携带父数据的id */
+    parentId?: string;
+    // [prop: string]: any;
+}
+export interface FcWhereProduct<T> extends FcProduct {
+    where: T;
+}
+
+export interface FcProducerRunHandler<T extends FcProduct = FcProduct> {
     (producer: IFcProducer<T>);
 }
-export interface IFcProducer<T = any> extends IFcEventEmitter<FcProduct<T>> {
-    create(data: T, time?: number, id?: string);
+export interface IFcProducer<T extends FcProduct = FcProduct>
+    extends IFcEventEmitter<T> {
+    create(data: PartialBy<T, "id" | "time">): T;
 }
 export interface FcStoragerRequestHandler<T = any> {
     (data: T | T[]);
 }
-export interface IFcStorager<T = any> extends IFcEventEmitter<FcProduct<T>> {
-    push(data: FcProduct<T>);
+export interface IFcStorager<T extends FcProduct = FcProduct>
+    extends IFcEventEmitter<T> {
+    push(data: T);
     destory();
 }
 
-export interface IFcObserver<T = any> extends IFcEventEmitter<FcProduct<T>> {
-    storager?: IFcStorager<T>;
-    connect(storager?: IFcStorager<T>): Promise<void>;
+export interface IFcObserver<
+    W = string,
+    T extends FcProduct = FcProduct,
+    S extends FcProduct = FcProduct
+> extends IFcEventEmitter<T> {
+    storager?: IFcStorager<S>;
+    connect(storager?: IFcStorager<S>): Promise<void>;
     close();
-    call<R>(where: T, eid?: string, timeout?: number): Promise<R>;
+    call<R>(where: W, eid?: string, timeout?: number): Promise<R>;
 }

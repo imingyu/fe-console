@@ -1,6 +1,0 @@
-{
-    "usingComponents": {
-        "mp-console": "../../mp-console/mpc-wechat/index",
-        "t1": "../../t1/index"
-    }
-}

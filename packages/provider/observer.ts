@@ -11,10 +11,8 @@ export abstract class FcObserverImpl<
     >
     extends FcEventEmitter<T>
     implements IFcObserver<W, T, S> {
+    storager?: IFcStorager<S>;
     protected connected: boolean = false;
-    constructor(public storager: IFcStorager<S>) {
-        super();
-    }
     call<R>(
         where: W,
         eid: string = uuid(),
@@ -40,13 +38,9 @@ export abstract class FcObserverImpl<
                         (type, data) => {
                             timer && clearTimeout(timer);
                             reject(
-                                data && data.data
-                                    ? data.data
-                                    : new Error(
-                                          typeof data === "string"
-                                              ? data
-                                              : "未知错误"
-                                      )
+                                new Error(
+                                    typeof data === "string" ? data : "未知错误"
+                                )
                             );
                         }
                     );

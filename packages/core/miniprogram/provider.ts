@@ -1,4 +1,4 @@
-import { FcProducerImpl } from "@fe-console/provider";
+import { FcProducerImpl, FcMemoryStoragerImpl } from "@fe-console/provider";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
@@ -26,3 +26,7 @@ export class FcMpProducer extends FcProducerImpl<
         super(FcMpProducerRunHandler);
     }
 }
+
+export class FcMpMemoryStorager extends FcMemoryStoragerImpl<
+    FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+> {}

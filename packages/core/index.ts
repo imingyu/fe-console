@@ -1,2 +1,2 @@
-export { FcMpProducer } from "./miniprogram/provider";
-export { FcWebProducer } from "./web/provider";
+export { FcMpProducer, FcMpMemoryStorager } from "./miniprogram/provider";
+export { FcWebProducer, FcWebMemoryStorager } from "./web/provider";

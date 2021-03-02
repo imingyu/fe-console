@@ -1,9 +1,6 @@
-import { FcProducerImpl } from "@fe-console/provider";
+import { FcMemoryStoragerImpl, FcProducerImpl } from "@fe-console/provider";
 import {
     FcConsoleProduct,
-    FcMpApiProduct,
-    FcMpHookInfo,
-    FcMpViewProduct,
     IFcProducer,
     FcCommonProduct,
 } from "@fe-console/types";
@@ -20,3 +17,7 @@ export class FcWebProducer extends FcProducerImpl<
         super(FcWebProducerRunHandler);
     }
 }
+
+export class FcWebMemoryStorager extends FcMemoryStoragerImpl<
+    FcCommonProduct | FcConsoleProduct
+> {}

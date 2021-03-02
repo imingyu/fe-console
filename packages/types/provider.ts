@@ -1,4 +1,4 @@
-import { Overwrite, PartialBy } from "./tool";
+import { PartialBy } from "./tool";
 import { IFcEventEmitter } from "./util";
 export interface FcProductOptionalProps {
     time?: number;
@@ -24,11 +24,16 @@ export interface IFcProducer<T extends FcProduct = FcProduct>
     extends IFcEventEmitter<T> {
     create(data: PartialBy<T, "id" | "time">): T;
 }
-export interface FcStoragerRequestHandler<T = any> {
-    (data: T | T[]);
+export interface FcStoragerFilter<T extends FcProduct = FcProduct> {
+    (): T[] | Promise<T[]>;
+}
+
+export interface FcStoragerRequest<T extends FcProduct = FcProduct> {
+    (list: T): Promise<any>;
 }
 export interface IFcStorager<T extends FcProduct = FcProduct>
     extends IFcEventEmitter<T> {
+    getList(filter: FcStoragerFilter): Promise<T[]>;
     push(data: T);
     destory();
 }

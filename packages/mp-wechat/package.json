@@ -1,0 +1,16 @@
+{
+    "name": "@fe-console/mp-wechat",
+    "version": "1.0.0",
+    "description": "微信小程序控制台辅助开发工具",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "spec/index.d.ts",
+    "keywords": [],
+    "author": "imingyu<mingyuhisoft@163.com>",
+    "license": "MIT",
+    "dependencies": {
+        "@mpkit/set-data": "^1.0.17",
+        "@mpkit/mixin": "^1.0.17",
+        "@mpkit/types": "^1.0.17"
+    }
+}

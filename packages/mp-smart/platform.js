@@ -1,0 +1,20 @@
+module.exports = {
+    "namespace": "s-",
+    "for": "for",
+    "forItem": "for-item",
+    "forIndex": "for-index",
+    "key": "key",
+    "if": "if",
+    "elseIf": "elif",
+    "else": "else",
+    "xmlFileSuffix": ".swan",
+    "xjsFileSuffix": ".sjs",
+    "xjsNodeName": "import-sjs",
+    "xjsModuleAttrName": "module",
+    "xjsSrcAttrName": "src",
+    "forAndWhereAttrNeedBracket": false,
+    "importNodeName": "import",
+    "importSrcAttrName": "src",
+    "includeNodeName": "include",
+    "includeSrcAttrName": "src"
+}

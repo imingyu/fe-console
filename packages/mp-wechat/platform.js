@@ -1,0 +1,20 @@
+module.exports = {
+    "namespace": "wx:",
+    "for": "for",
+    "forItem": "for-item",
+    "forIndex": "for-index",
+    "key": "key",
+    "if": "if",
+    "elseIf": "elif",
+    "else": "else",
+    "xmlFileSuffix": ".wxml",
+    "xjsFileSuffix": ".wxs",
+    "xjsNodeName": "wxs",
+    "xjsModuleAttrName": "module",
+    "xjsSrcAttrName": "src",
+    "forAndWhereAttrNeedBracket": true,
+    "importNodeName": "import",
+    "importSrcAttrName": "src",
+    "includeNodeName": "include",
+    "includeSrcAttrName": "src"
+}

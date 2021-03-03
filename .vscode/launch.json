@@ -15,9 +15,9 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "debug core",
+            "name": "debug template",
             "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/packages/core/debug.js",
+            "program": "${workspaceFolder}/build/template.js",
             "outFiles": ["${workspaceFolder}/**/*.js"]
         }
     ]

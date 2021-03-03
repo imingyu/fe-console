@@ -38,9 +38,9 @@ export interface FcMpSocketTask {
 }
 
 export enum FcMpSocketTaskStatus {
-    Unknown,
-    Connecting,
-    Opened,
+    Unknown = 1,
+    Connecting = 2,
+    Opened = 3,
 }
 
 export type FcMpSocketTaskHookInfo<T = any, K = any> = [
@@ -71,6 +71,7 @@ export interface FcMpViewContextBase<T = any> {
     $fcOnce(this: FcMpViewContextBase, name: string, handler: FcEventHandler);
     $fcEmit(this: FcMpViewContextBase, name: string, data?: any);
     $fcOff(this: FcMpViewContextBase, name: string, handler?: FcEventHandler);
+    [prop: string]: any;
 }
 
 export interface FcMpViewMethod<T = any> {

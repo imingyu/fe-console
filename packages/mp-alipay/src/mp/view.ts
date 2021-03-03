@@ -5,7 +5,7 @@ import { createSetDataMixin } from "./mixins/set-data";
 
 export const FcMpComponent = (...mixins) => {
     mixins.splice(0, 0, createSetDataMixin(MpViewType.Component));
-    //<% if(platform==='alipay'){%>
+    //
     // 处理支付宝小程序的props
     mixins.splice(0, 0, {
         deriveDataFromProps(nextPropsState) {
@@ -63,6 +63,6 @@ export const FcMpComponent = (...mixins) => {
             }
         },
     });
-    //<%}%>
+    //
     return MkNative.Component(MkComponent.apply(null, mixins));
 };

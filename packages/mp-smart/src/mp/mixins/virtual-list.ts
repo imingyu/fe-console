@@ -391,7 +391,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
     };
     const destoryLife =
         type === MpViewType.Component
-            ? '<%= (platform==="alipay"?"didUnmount":"detached") %>'
+            ? 'detached'
             : "onUnload";
     const mixin: any = {
         data: {

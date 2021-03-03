@@ -4,7 +4,10 @@
     "files.associations": {
         "*.wxss": "css",
         "*.wxs": "javascript",
-        "*.wxml": "xml"
+        "*.wxml": "xml",
+        "*.swan": "xml",
+        "*.ttml": "xml",
+        "*.axml": "xml",
     },
     "[html]": {
         "editor.defaultFormatter": "vscode.html-language-features"

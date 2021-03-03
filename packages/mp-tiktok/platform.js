@@ -1,0 +1,20 @@
+module.exports = {
+    "namespace": "tt:",
+    "for": "for",
+    "forItem": "for-item",
+    "forIndex": "for-index",
+    "key": "",
+    "if": "if",
+    "elseIf": "elif",
+    "else": "else",
+    "xmlFileSuffix": ".ttml",
+    "xjsFileSuffix": ".sjs",
+    "xjsNodeName": "sjs",
+    "xjsModuleAttrName": "module",
+    "xjsSrcAttrName": "src",
+    "forAndWhereAttrNeedBracket": true,
+    "importNodeName": "import",
+    "importSrcAttrName": "src",
+    "includeNodeName": "include",
+    "includeSrcAttrName": "src"
+}

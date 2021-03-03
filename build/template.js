@@ -6,7 +6,6 @@ const { replaceDir, rmDir, readFile, writeFile, removeFile } = require('./fs');
 const packagesRoot = path.resolve(__dirname, '../packages');
 const templatePackRoot = path.join(packagesRoot, 'template');;
 const templateSourceDir = path.join(templatePackRoot, 'mp');
-const templateTplDir = path.join(templatePackRoot, 'tpl');
 const MpXmlTranslator = require('@mpkit/mpxml-translator');
 const MpXmlParser = require('@mpkit/mpxml-parser');
 templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
@@ -24,7 +23,6 @@ const renderPackage = (platform) => {
     const packRoot = path.join(packagesRoot, `mp-${platform}`);
     const tplDir = path.join(packRoot, 'tpl');
     replaceDir(templateSourceDir, packRoot);
-    replaceDir(templateTplDir, tplDir);
     const spec = MpXmlParser.mpViewSyntaxSpec[platform];
     writeFile(path.join(packRoot, 'platform.js'), `module.exports = ${JSON.stringify(spec, null, 4)}`);
     const renderData = {

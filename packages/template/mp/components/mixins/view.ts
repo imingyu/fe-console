@@ -1,11 +1,11 @@
 import { MpViewType } from "@fe-console/types/node_modules/@mpkit/types/spec";
 import { MkComponent, MkNative } from "@mpkit/mixin";
 import { diffMpData } from "@mpkit/set-data";
-import { createSetDataMixin } from "./mixins/set-data";
+import { createSetDataMixin } from "./set-data";
 
 export const FcMpComponent = (...mixins) => {
     mixins.splice(0, 0, createSetDataMixin(MpViewType.Component));
-    //<% if(platform==='alipay'){%>
+    // 针对平台处理props<%=(platform==='alipay'?'需要':'不需要')%>  <% if(platform==='alipay'){%>
     // 处理支付宝小程序的props
     mixins.splice(0, 0, {
         deriveDataFromProps(nextPropsState) {

@@ -1,6 +1,6 @@
-import { removeEndZero } from "../../../util";
+import { removeEndZero } from "../../../common/util";
 import { FcMpViewContextBase } from "@fe-console/types";
-import { FcMpComponent } from "../../view";
+import { FcMpComponent } from "../../mixins/view";
 FcMpComponent({
     properties: {
         data: {

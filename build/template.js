@@ -5,7 +5,7 @@ const junk = require('junk');
 const { replaceDir, rmDir, readFile, writeFile, removeFile } = require('./fs');
 const packagesRoot = path.resolve(__dirname, '../packages');
 const templatePackRoot = path.join(packagesRoot, 'template');;
-const templateSourceDir = path.join(templatePackRoot, 'source');
+const templateSourceDir = path.join(templatePackRoot, 'mp');
 const templateTplDir = path.join(templatePackRoot, 'tpl');
 const MpXmlTranslator = require('@mpkit/mpxml-translator');
 const MpXmlParser = require('@mpkit/mpxml-parser');
@@ -22,9 +22,8 @@ const compiledTpls = {};
 
 const renderPackage = (platform) => {
     const packRoot = path.join(packagesRoot, `mp-${platform}`);
-    const srcDir = path.join(packRoot, 'src');
     const tplDir = path.join(packRoot, 'tpl');
-    replaceDir(templateSourceDir, srcDir);
+    replaceDir(templateSourceDir, packRoot);
     replaceDir(templateTplDir, tplDir);
     const spec = MpXmlParser.mpViewSyntaxSpec[platform];
     writeFile(path.join(packRoot, 'platform.js'), `module.exports = ${JSON.stringify(spec, null, 4)}`);
@@ -50,16 +49,13 @@ const renderPackage = (platform) => {
         renderData[tplName] = compiledTpls[orgFileName](renderData);
     });
     rmDir(tplDir);
-    renderTemplate(platform, srcDir, renderData);
-
-    // 移动package.json
-    writeFile(path.join(packRoot, 'package.json'), readFile(path.join(srcDir, 'package.json')));
-    removeFile(path.join(srcDir, 'package.json'));
+    renderTemplate(platform, packRoot, renderData);
 }
 
 const renderTemplate = (platform, dir, renderData) => {
     const packRoot = path.join(packagesRoot, `mp-${platform}`);
     fs.readdirSync(dir).forEach(item => {
+        const isMpDir = item === 'mp';
         if (junk.is(item)) {
             return;
         }

@@ -1,6 +1,0 @@
-{
-    "component": true,
-    "usingComponents": {
-        "fc-api-renderer": "../../renderer/api/index"
-    }
-}

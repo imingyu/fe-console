@@ -34,14 +34,16 @@ const mkDir = (dir) => {
     }
 };
 exports.mkDir = mkDir;
-const replaceDir = (source, target) => {
+const replaceDir = (source, target, targetNameFilter) => {
+    target = targetNameFilter ? targetNameFilter(target, source) : target;
     exports.mkDir(target);
     fs.readdirSync(source).forEach((item) => {
         const fileName = path.join(source, item);
         if (junk.is(item)) {
             return;
         }
-        const targetFileName = path.join(target, item);
+        let targetFileName = path.join(target, item);
+        targetFileName = targetNameFilter ? targetNameFilter(targetFileName, fileName) : targetFileName;
         const stat = fs.statSync(fileName);
         if (stat.isFile()) {
             if (fs.existsSync(targetFileName)) {
@@ -52,7 +54,7 @@ const replaceDir = (source, target) => {
         else if (stat.isDirectory() &&
             item !== ".git" &&
             item !== ".vscode") {
-            exports.replaceDir(fileName, path.join(target, item));
+            exports.replaceDir(fileName, targetFileName);
         }
     });
 };

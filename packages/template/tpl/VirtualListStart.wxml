@@ -1,0 +1,19 @@
+<scroll-view class="vl-list-scroll"
+             scroll-y
+    <%= (platform==='alipay'?'onScroll="onVlScroll"':'bindscroll="onVlScroll"') %>
+    <%= (platform==='alipay'?'onTouchStart="onVlTouchStart"':'bindtouchstart="onVlScroll"') %>
+    <%= (platform==='alipay'?'onTouchEnd="onVlTouchEnd"':'bindtouchend="onVlTouchEnd"') %>
+    <%= (platform==='alipay'?'onTouchMove="onVlTouchMove"':'bindtouchmove="onVlTouchMove"') %>
+    <%= (platform==='alipay'?'onTouchCancel="onVlTouchCancel"':'bindtouchcancel="onVlTouchCancel"') %>
+    <%= (platform==='alipay'?'onScrollToUpper="onVlScrollToUpper"':'bindscrolltoupper="onVlScrollToUpper"') %>
+    <%= (platform==='alipay'?'onScrollToLower="onVlScrollToLower"':'bindscrolltolower="onVlScrollToLower"') %>>
+    <view class="vl-list-placeholder is-start"
+          style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
+        <view class="vl-list">
+            <view wx:for="{{ $vlShowList }}"
+                wx:for-item="$vlItem"
+                wx:for-index="$vlItemIndex"
+                wx:key="id"
+                wx:if="{{ $vlStatus[$vlItem.id] !== 'recovery'}}"
+                class="vl-item-container status-{{ $vlStatus[$vlItem.id] || 'none' }}"
+                style="height:{{ $vlItem.$vlHeight || $vlItemHeight || 0 }}px;">

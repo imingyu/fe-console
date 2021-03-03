@@ -5,6 +5,7 @@ import {
     FcRequestProduct,
     FcResponseProduct,
 } from "./core";
+import { FcEventHandler } from "./util";
 
 export interface FcMpApiProduct<T = any, K = any>
     extends FcCommonProduct<string, string>,
@@ -52,4 +53,26 @@ export type FcMpSocketTaskHookInfo<T = any, K = any> = [
 export interface FcMpHookInfo {
     socketTasks?: Array<FcMpSocketTaskHookInfo>;
     productMap: { [prop: string]: FcMpApiProduct | FcMpViewProduct };
+}
+export interface FcMpViewContextBase<T = any> {
+    $tid: string;
+    $cid: string;
+    data: T;
+    $mkNativeSetData(data: any, callback?: Function): void;
+    setData(data: any, callback?: Function): void;
+    $fcEvents?: { [prop: string]: FcEventHandler[] };
+    $fcUnDispatchEvents?: Array<[string, any, FcMpViewContextBase]>;
+    $fcGetProp<T = any>(prop: string): T;
+    /** 向父组件（不限层级）广播数据 */
+    $fcDispatch(type: string, data: any, root: FcMpViewContextBase);
+    $fcGetParentTid(): string;
+    $fcGetParentCid(): string;
+    $fcOn(this: FcMpViewContextBase, name: string, handler: FcEventHandler);
+    $fcOnce(this: FcMpViewContextBase, name: string, handler: FcEventHandler);
+    $fcEmit(this: FcMpViewContextBase, name: string, data?: any);
+    $fcOff(this: FcMpViewContextBase, name: string, handler?: FcEventHandler);
+}
+
+export interface FcMpViewMethod<T = any> {
+    (this: T & FcMpViewContextBase);
 }

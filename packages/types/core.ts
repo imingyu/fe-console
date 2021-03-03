@@ -17,9 +17,9 @@ export interface FcCommonProduct<C = string, G = string> extends FcProduct {
 }
 
 export enum FcMethodExecStatus {
-    Executed,
-    Success,
-    Fail,
+    Executed = 1,
+    Success = 2,
+    Fail = 3,
 }
 
 export interface FcResponseProduct<T = any, K = any>

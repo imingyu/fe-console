@@ -1,5 +1,5 @@
 {
-    "name": "@fe-console/types",
+    "name": "@fe-console/template",
     "version": "0.0.0",
     "description": "types",
     "author": "imingyu <mingyuhisoft@163.com>",
@@ -27,6 +27,9 @@
         "小程序辅助工具"
     ],
     "dependencies": {
-        "@mpkit/types": "^1.0.17"
+        "@mpkit/mixin": "^1.0.17",
+        "@mpkit/set-data": "^1.0.17",
+        "@mpkit/types": "^1.0.17",
+        "@mpkit/util": "^1.0.17"
     }
 }

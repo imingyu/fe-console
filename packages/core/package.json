@@ -12,8 +12,8 @@
     "dependencies": {
         "@fe-console/provider": "^1.0.0",
         "@fe-console/types": "^1.0.0",
-        "@mpkit/mixin": "^1.0.16",
-        "@mpkit/types": "^1.0.16",
-        "@mpkit/util": "^1.0.16"
+        "@mpkit/mixin": "^1.0.17",
+        "@mpkit/types": "^1.0.17",
+        "@mpkit/util": "^1.0.17"
     }
 }

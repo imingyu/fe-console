@@ -1,0 +1,12 @@
+<view wx:if="{{ active }}" class="reader re-api virtual-list-container">
+    <%= VirtualListStart %>
+    <fc-api-renderer
+        wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}"
+        data="{{ $vlItem }}"
+        parentCid="{{ $cid }}"
+        parentTid="{{ $tid }}"
+        data-id="{{ $vlItem.id }}"
+    >
+    </fc-api-renderer>
+    <%= VirtualListEnd %>
+</view>

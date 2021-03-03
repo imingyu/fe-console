@@ -1,4 +1,12 @@
 {
-    "editor.formatOnSave": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "editor.formatOnSave": false,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "files.associations": {
+        "*.wxss": "css",
+        "*.wxs": "javascript",
+        "*.wxml": "xml"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    }
 }

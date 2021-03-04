@@ -1,7 +1,9 @@
 import { removeEndZero } from "../../../common/util";
 import { FcMpViewContextBase } from "@fe-console/types";
 import { FcMpComponent } from "../../mixins/view";
-FcMpComponent({
+import { createLiaisonMixin } from "../../mixins/liaison";
+import { MpViewType } from "@mpkit/types";
+FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
     properties: {
         data: {
             type: Object,

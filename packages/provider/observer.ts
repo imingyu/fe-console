@@ -21,7 +21,7 @@ export abstract class FcObserverImpl<
         return (this.connected ? Promise.resolve() : this.connect()).then(
             () => {
                 new Promise((resolve, reject) => {
-                    this.storager.emit(`Request.${eid}`, ({
+                    this.storager.emit("Request", ({
                         where,
                         id: eid,
                         time: now(),

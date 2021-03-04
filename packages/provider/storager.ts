@@ -22,6 +22,9 @@ export abstract class FcStoragerImpl<T extends FcProduct = FcProduct>
     push(data: T) {
         this.emit("data", data);
     }
+    destory() {
+        this.emit("destory");
+    }
 }
 
 /**
@@ -31,13 +34,16 @@ export class FcMemoryStoragerImpl<
     T extends FcProduct = FcProduct
 > extends FcStoragerImpl<T> {
     protected list: T[] = [];
+    constructor() {
+        super();
+    }
     push(data: T) {
         this.list.push(data);
         super.push(data);
     }
     destory() {
-        super.destory();
         this.list.splice(0, this.list.length);
+        super.destory();
     }
 }
 

@@ -1,10 +1,10 @@
 import { FcProduct } from "./provider";
 
 export enum FcProductType {
-    Console,
-    Event,
-    MpApi,
-    MpView,
+    Console = 1,
+    Event = 2,
+    MpApi = 3,
+    MpView = 4,
 }
 
 export interface FcCommonProduct<C = string, G = string> extends FcProduct {

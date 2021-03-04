@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "rootDir": "../",
+        "paths": {
+            "@fe-console/*": ["../packages/*"],
+            "@mpkit/*": ["../node_modules/@mpkit/*"],
+            "squirrel-report": ["../node_modules/squirrel-report"],
+            "forgiving-xml-parser": ["../node_modules/forgiving-xml-parser/dist/index.esm.js"],
+        },
+        "declaration": true,
+        "lib": ["ES2015"]
+    },
+    "include": [
+        "../packages/**/*.ts",
+        "../node_modules/@mpkit/**/*.js",
+        "../node_modules/squirrel-report/**/*.js",
+        "../node_modules/forgiving-xml-parser/**/*.js",
+    ]
+}

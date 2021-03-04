@@ -48,6 +48,12 @@ const renderPackage = (platform) => {
     });
     rmDir(tplDir);
     renderTemplate(platform, packRoot, renderData);
+    if (platform === 'wechat') {
+        const dir = path.resolve(__dirname, '../demo/fe-console')
+        if (fs.existsSync(dir)) {
+            replaceDir(path.join(packRoot, 'dist'), dir);
+        }
+    }
 }
 
 const renderTemplate = (platform, dir, renderData) => {

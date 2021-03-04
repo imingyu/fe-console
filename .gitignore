@@ -104,3 +104,6 @@ dist
 .tern-port
 
 demo/mp-console
+demo
+*.d.ts
+spec

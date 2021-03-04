@@ -10,4 +10,5 @@ declare global {
     var App: MpViewFactory;
     var Page: MpViewFactory;
     var Component: MpViewFactory;
+    var performance: any;
 }

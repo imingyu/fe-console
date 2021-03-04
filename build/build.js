@@ -1,108 +1,135 @@
-const fs = require('fs');
-const buildSass = require('./sass');
-const rimraf = require('rimraf');
-const fse = require('fs-extra');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const { babel } = require('@rollup/plugin-babel');
+const { uglify } = require('rollup-plugin-uglify');
+let { version } = require('../lerna.json');
+const rollupCommonjs = require('@rollup/plugin-commonjs');
+const rollupReplace = require('@rollup/plugin-replace');
+const rollupJSON = require('@rollup/plugin-json');
 const path = require('path');
-const ts = require('typescript');
-const copyDir = require('./copy');
-
-const buildTs = (fileName, outputFileName) => {
-    const source = fs.readFileSync(fileName, 'utf-8');
-    const output = ts.transpile(source, {
-        module: 'ES6'
-    });
-    fs.writeFileSync(outputFileName || fileName.replace('src', 'dist').replace('.ts', '.js'), output, 'utf8');
+const rollup = require('rollup');
+const entrys = require('./entrys');
+const rollupTS = require('@rollup/plugin-typescript')
+const { replaceFileContent, oneByOne, copyFiles, rmdirSync } = require('./util');
+const { readdirSync, existsSync, mkdirSync } = require('fs');
+const getPackageName = (str) => {
+    return (str || '').replace(path.resolve(__dirname, '../packages'), '');
 }
+console.log(`version=${version}, ${typeof version}`);
+version = version.split('.');
+version[version.length - 1] = parseInt(version[version.length - 1]) + 1;
+version = version.join('.');
 
-const resolve = file => path.resolve(__dirname, `../src/${file}`);
+console.log(`🌟开始编译...`);
 
-const files = [
-    resolve('config.ts'),
-    resolve('index.ts'),
-    resolve('rewrite.ts'),
-    resolve('storage.ts'),
-    resolve('viewer.ts'),
-    resolve('vars.ts'),
-    resolve('util.ts')
-];
-const buildXml = (xmlFileName, mpSpec) => {
-    let source = fs.readFileSync(xmlFileName, 'utf-8');
-    source = source.replace(/:mpc:/gm, mpSpec.expTag);
-    source = source.replace(/@mpc:/gm, mpSpec.expEvent);
-    source = source.replace(/.mpc:xmlSuffix/gm, '.'+mpSpec.xmlSuffix);
-    const arr = xmlFileName.split('/');
-    const outputFileName = path.resolve(__dirname, `../dist/mpc-${mpSpec.name}/${arr[arr.length - 1].replace('.xml', '')}.${mpSpec.xmlSuffix}`);
-    fs.writeFileSync(outputFileName, source, 'utf8');
-}
+const targetPackNames = process.argv.slice(2);
+const specIsMoved = {};
 
-const xmlFiles = [
-    resolve('mp-console/index.xml'),
-    resolve('mp-console/tpl-all.xml'),
-    resolve('mp-console/tpl-console.xml'),
-    resolve('mp-console/tpl-network.xml'),
-    resolve('mp-console/tpl-storage.xml'),
-    resolve('mp-console/tpl-system.xml'),
-    resolve('mp-console/tpl-view.xml'),
-    resolve('mp-console/viewer.xml')
-]
+oneByOne(entrys.map((rollupConfig, index) => {
+    const packageName = getPackageName(rollupConfig.output.file);
+    const currentPackName = packageName.split('/')[1];
 
-const buildMP = (mpSpec) => {
-    const outputPath = path.resolve(__dirname, `../dist/mpc-${mpSpec.name}`);
-    const outSass = path.join(outputPath, 'index.scss');
-    fs.mkdirSync(outputPath);
-    fse.copySync(resolve('mp-console/index.json'), path.join(outputPath, 'index.json'));
-    fse.copySync(resolve('mp-console/index.scss'), outSass);
-    buildTs(resolve('mp-console/index.ts'), path.join(outputPath, 'index.js'));
-    xmlFiles.forEach(xmlFileName => {
-        buildXml(xmlFileName, mpSpec);
-    });
-    return buildSass(outSass).then(content => {
-        fs.writeFileSync(path.join(outputPath, `index.${mpSpec.cssSuffix}`), content, 'utf8');
+    return () => {
+        console.log(`   开始编译：${packageName}#${index}`)
+        if (targetPackNames.length && targetPackNames.every(item => item !== currentPackName)) {
+            console.log(`   跳过编译：${packageName}`);
+            return Promise.resolve();
+        }
+        if (!rollupConfig.input.external) {
+            rollupConfig.input.external = [/\@mpkit\//, /\@fe-console\//, /lodash/, /forgiving-xml-parser/, /squirrel-report/]
+        }
+        if (!rollupConfig.input.plugins) {
+            rollupConfig.input.plugins = [];
+        }
+        rollupConfig.input.plugins.push(nodeResolve());
+        rollupConfig.input.plugins.push(rollupReplace({
+            VERSION: version
+        }));
+        rollupConfig.input.plugins.push(rollupCommonjs());
+        rollupConfig.input.plugins.push(rollupJSON());
+        rollupConfig.input.plugins.push(rollupTS({
+            declaration: false
+        }));
+        rollupConfig.input.plugins.push(babel({
+            extensions: ['.ts', '.js'],
+            babelHelpers: 'bundled',
+            include: [
+                'packages/**/*.ts'
+            ],
+            exclude: [
+                'node_modules'
+            ],
+            extends: path.resolve(__dirname, '../.babelrc')
+        }));
+        if (rollupConfig.mini) {
+            rollupConfig.input.plugins.push(uglify({
+                sourcemap: true
+            }));
+        }
+        if (rollupConfig.inclueFx) {
+            delete rollupConfig.input.external;
+        }
+        rollupConfig.output.sourcemap = true;
+        rollupConfig.output.banner = `/*!
+* FeConsole v${version}
+* (c) 2020-${new Date().getFullYear()} imingyu<mingyuhisoft@163.com>
+* Released under the MIT License.
+* Github: https://github.com/imingyu/fe-console/tree/master/packages/${packageName.split(path.sep)[1]}
+*/`;
+        return rollup.rollup(rollupConfig.input).then(res => {
+            return res.write(rollupConfig.output);
+        }).then(() => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    rollupConfig.options && rollupConfig.options.done && rollupConfig.options.done();
+                    resolve();
+                })
+            })
+        }).then(() => {
+            console.log(`   编译成功：${packageName}`);
+        })
+    }
+}).concat(entrys.map((rollupConfig, index) => {
+    console.log(`🌈编译结束，开始转移d.ts`);
+
+    const packageName = getPackageName(rollupConfig.output.file);
+    const currentPackName = packageName.split('/')[1];
+
+    return () => {
+        // 将所有的d.ts移到types目录下
+        if (!specIsMoved[currentPackName]) {
+            specIsMoved[currentPackName] = true;
+            const arr = rollupConfig.input.input.split('/');
+            arr.splice(arr.length - 1, 1);
+            const packageRoot = arr.join('/');
+            const typesOutDir = packageRoot + '/spec';
+            copyFiles(packageRoot, typesOutDir, srcFile => {
+                return srcFile.endsWith('.d.ts') && !srcFile.endsWith('global.d.ts') && !srcFile.endsWith('name.d.ts');
+            }, true, targetFileName => {
+                replaceFileContent(targetFileName, /\.\.\/types/, '@fe-console/types');
+            })
+        }
+        return Promise.resolve();
+    }
+}))).then(() => {
+    console.log(`🌈转移结束，开始复制到根目录的dist中`);
+    const root = path.resolve(__dirname, "../packages");
+    const dist = path.resolve(__dirname, '../dist');
+    if (existsSync(dist)) {
+        rmdirSync(dist);
+    }
+    mkdirSync(dist);
+    readdirSync(root).forEach(dir => {
+        if (dir.indexOf('.') === 0) {
+            return;
+        }
+        const dirDist = path.join(root, dir, 'dist');
+        if (existsSync(dirDist)) {
+            mkdirSync(path.join(dist, dir));
+            copyFiles(dirDist, path.join(dist, dir), '*', false);
+        }
     })
-}
-
-module.exports = () => {
-    console.log(`开始编译`);
-    const distPath = path.resolve(__dirname, `../dist`);
-    const demoPath = path.resolve(__dirname, `../demo/mp-console`);
-    rimraf.sync(distPath);
-    rimraf.sync(demoPath);
-    fs.mkdirSync(path.resolve(__dirname, `../dist`));
-    fs.mkdirSync(path.resolve(__dirname, `../demo/mp-console`));
-
-    files.forEach(item => buildTs(item));
-    Promise.all([{
-        name: 'wechat',
-        expTag: 'wx:',
-        expEvent: 'bind:',
-        cssSuffix: 'wxss',
-        xmlSuffix: 'wxml'
-    }, {
-        name: 'alipay',
-        expTag: 'a:',
-        expEvent: 'bind:',
-        cssSuffix: 'acss',
-        xmlSuffix: 'axml'
-    }, {
-        name: 'smart',
-        expTag: 'swan:',
-        expEvent: 'bind:',
-        cssSuffix: 'css',
-        xmlSuffix: 'swan'
-    }, {
-        name: 'tiktok',
-        expTag: 'tt:',
-        expEvent: 'bind:',
-        cssSuffix: 'ttss',
-        xmlSuffix: 'ttml'
-    }].map(spec => {
-        return buildMP(spec);
-    })).then(() => {
-        copyDir(path.resolve(__dirname, `../dist`), path.resolve(__dirname, `../demo/mp-console`));
-        console.log(`编译结束\n`);
-    })
-}
-var args = process.argv.splice(2);
-if (args.length) {
-    module.exports()
-};
+    console.log(`🌈编译全部成功.`);
+}).catch(err => {
+    console.error(`🔥编译出错：${err.message}`);
+    console.log(err);
+});

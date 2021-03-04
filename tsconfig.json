@@ -4,8 +4,21 @@
         "paths": {
             "@fe-console/*": ["packages/*"]
         },
-        "declaration": true
+        "declaration": true,
+        "lib": ["ES2015"]
     },
-    "include": ["packages/**/*.ts"],
+    "include": [
+        "packages/core/*.ts",
+        "packages/renderer/*.ts",
+        "packages/provider/*.ts",
+        "packages/types/*.ts",
+        "packages/util/*.ts",
+        "packages/core/**/*.ts",
+        "packages/renderer/**/*.ts",
+        "packages/provider/**/*.ts",
+        "packages/types/**/*.ts",
+        "packages/util/**/*.ts",
+        "global.d.ts"
+    ],
     "exclude": ["node_modules", "dist"]
 }

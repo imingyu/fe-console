@@ -1,4 +1,5 @@
 export * from "./storage";
+export * from "./tool";
 export * from "./provider";
 export * from "./util";
 export * from "./core";

@@ -3,7 +3,7 @@ import {
     FcProduct,
     IFcProducer,
 } from "@fe-console/types";
-import { PartialBy } from "@fe-console/types/tool";
+import { PartialBy } from "@fe-console/types";
 import { FcEventEmitter, now } from "@fe-console/util";
 import { uuid } from "@mpkit/util";
 /**

@@ -4,7 +4,11 @@
     "packages/renderer",
     "packages/provider",
     "packages/types",
-    "packages/util"
+    "packages/util",
+    "packages/mp-wechat",
+    "packages/mp-tiktok",
+    "packages/mp-alipay",
+    "packages/mp-smart"
   ],
   "version": "1.0.0"
 }

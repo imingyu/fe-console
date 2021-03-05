@@ -5,6 +5,7 @@
             "@fe-console/*": ["packages/*"]
         },
         "declaration": true,
+        "outDir": "./dist",
         "lib": ["ES2015"]
     },
     "include": [

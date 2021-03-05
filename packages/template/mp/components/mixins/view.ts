@@ -1,4 +1,4 @@
-import { MpViewType } from "@fe-console/types/node_modules/@mpkit/types/spec";
+import { MpViewType } from "@mpkit/types";
 import { MkComponent, MkNative } from "@mpkit/mixin";
 import { diffMpData } from "@mpkit/set-data";
 import { createSetDataMixin } from "./set-data";

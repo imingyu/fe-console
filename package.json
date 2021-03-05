@@ -6,7 +6,9 @@
     "scripts": {
         "build": "node build/clear.js && tsc --emitDeclarationOnly && node --max-old-space-size=2048 build/build.js",
         "clear": "node build/clear.js",
-        "test": "mocha packages/**/test/*.js"
+        "test": "mocha packages/**/test/*.js",
+        "build:template": "node build/template.js",
+        "tsc:mp-wechat": "npx tsc -b packages/mp-wechat"
     },
     "repository": {
         "type": "git",

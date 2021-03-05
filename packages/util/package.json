@@ -1,12 +1,14 @@
 {
-  "name": "util",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "name": "@fe-console/util",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "spec/index.d.ts",
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@fe-console/types": "^1.0.0"
+    }
 }

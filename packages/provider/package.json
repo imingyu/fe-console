@@ -2,7 +2,9 @@
     "name": "@fe-console/provider",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "types": "spec/index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -11,6 +13,8 @@
     "license": "ISC",
     "dependencies": {
         "@mpkit/ebus": "^1.0.17",
-        "@mpkit/util": "^1.0.17"
+        "@mpkit/util": "^1.0.17",
+        "@fe-console/types": "^1.0.0",
+        "@fe-console/util": "^1.0.0"
     }
 }

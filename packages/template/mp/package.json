@@ -11,6 +11,11 @@
     "dependencies": {
         "@mpkit/set-data": "^1.0.17",
         "@mpkit/mixin": "^1.0.17",
-        "@mpkit/types": "^1.0.17"
+        "@mpkit/types": "^1.0.17",
+        "@fe-console/types": "^1.0.0",
+        "@fe-console/util": "^1.0.0",
+        "@fe-console/core": "^1.0.0",
+        "@fe-console/provider": "^1.0.0",
+        "@fe-console/renderer": "^1.0.0"
     }
 }

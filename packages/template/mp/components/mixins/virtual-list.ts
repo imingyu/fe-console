@@ -1,6 +1,4 @@
 import { MpViewType } from "@mpkit/types";
-import { getMpInitLifeName, uuid, getMpPlatform } from "@mpkit/util";
-import { FcEventHandler, FcMpViewContextBase } from "@fe-console/types";
 const isVisableStatus = (status) => {
     return status !== "hide" && status !== "weak" && status !== "recovery";
 };

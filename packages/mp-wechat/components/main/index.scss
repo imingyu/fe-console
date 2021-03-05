@@ -1,0 +1,201 @@
+$tab-bar-bg:rgb(243, 243, 243);
+$tab-bar-color:rgb(51, 51, 51);
+$tab-bar-height:80rpx;
+$tab-bar-brcolor:rgb(204, 204, 204);
+$tab-bar-item-active-brcolor:rgb(26, 115, 234);
+$cr-string:rgb(196, 26, 22);
+$cr-fold:rgb(114, 114, 114);
+$attr-margin:14rpx;
+$fold-size:12rpx;
+
+.mpc-hand {
+    position: fixed;
+    bottom: 100rpx;
+    right: 100rpx;
+    border-radius: 50%;
+    width: 100rpx;
+    height: 100rpx;
+    background-color: #000;
+    color: #fff;
+    font-size: 30rpx;
+    text-align: center;
+    line-height: 100rpx;
+
+    &.is-hide {
+        display: none;
+    }
+}
+
+.mpc-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: rgb(51, 51, 51);
+}
+
+.mpc-modal-body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.mpc-tabs-container {
+    background: $tab-bar-bg;
+    color: $tab-bar-color;
+    border-top: 1px solid $tab-bar-brcolor;
+    border-bottom: 1px solid $tab-bar-brcolor;
+    flex-shrink: 0;
+}
+
+.mpc-tabs-body {
+    height: 100%;
+    flex-shrink: 1;
+}
+
+.mpc-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: -1px;
+}
+
+.mpc-tab {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: $tab-bar-height;
+    line-height: $tab-bar-height;
+    padding: 0 30rpx;
+    text-align: center;
+    border-bottom: 6rpx solid transparent;
+    font-size: 28rpx;
+    transition: border-color .5s;
+
+    &.active {
+        border-bottom-color: $tab-bar-item-active-brcolor;
+    }
+}
+
+.mpc-tabs-panels {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: transform .5s;
+
+    .mpc-tabs-panel {
+        flex-shrink: 0;
+        flex: 1;
+        box-sizing: border-box;
+        padding: 20rpx 0;
+    }
+}
+
+.mpc-item {
+    font-size: 30rpx;
+    padding: 0 20rpx;
+
+    &.is-fold {
+        padding-left: 20rpx+$fold-size+10rpx;
+
+        &::before {
+            left: 20rpx;
+        }
+    }
+}
+
+.is-fold {
+    padding-left: $fold-size+10rpx;
+    position: relative;
+
+    &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: $fold-size;
+        height: $fold-size;
+        overflow: hidden;
+        border: $fold-size solid transparent;
+        border-left-color: $cr-fold;
+        box-sizing: border-box;
+    }
+
+    &.is-open {
+        border-left-color: none;
+        border-top-color: $cr-fold;
+    }
+}
+
+
+.mpc-item-view {
+    &:hover {
+        background-color: rgb(235, 241, 251);
+    }
+
+    &:before {
+        top: 12rpx;
+    }
+
+    .view-head,
+    .view-body,
+    .view-footer {
+        display: inline-block;
+    }
+
+    &.is-open {
+        .view-head {
+            background-color: rgb(207, 232, 252);
+        }
+
+        .view-head,
+        .view-body,
+        .view-footer {
+            display: block;
+        }
+
+        .view-arrow.arrow-end {
+            margin-left: 0;
+        }
+    }
+
+    .view-arrow.arrow-end {
+        margin-left: $attr-margin;
+    }
+
+    .view-part,
+    .attr-part {
+        display: inline-block;
+    }
+
+    .view-arrow,
+    .attr-equal,
+    .attr-sem {
+        color: rgb(169, 149, 167);
+    }
+
+    .view-tag {
+        color: rgb(140, 29, 134);
+    }
+
+    .view-attr {
+        margin-left: $attr-margin;
+    }
+
+    .attr-name {
+        color: rgb(154, 72, 4);
+    }
+
+    .attr-value {
+        color: rgb(26, 26, 166);
+
+        &.attr-string {
+            color: $cr-string;
+        }
+    }
+}

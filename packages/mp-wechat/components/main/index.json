@@ -1,0 +1,6 @@
+{
+    "component": true,
+    "usingComponents": {
+        "fc-api-reader": "../../reader/api/index"
+    }
+}

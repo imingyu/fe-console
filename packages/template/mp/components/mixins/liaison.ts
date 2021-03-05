@@ -1,7 +1,7 @@
 import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName, uuid, getMpPlatform } from "@mpkit/util";
 import { FcEventHandler, FcMpViewContextBase } from "@fe-console/types";
-import { once, emit, on, off } from "../../ebus";
+import { once, emit, on, off } from "../../common/ebus";
 export const createLiaisonMixin = (() => {
     const viewMap: any = {};
     return (type: MpViewType, tid: string) => {

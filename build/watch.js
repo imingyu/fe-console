@@ -3,12 +3,32 @@ const _build = require('./build-export');
 var path = require('path');
 
 let timer;
+let running;
+let queue = [];
 const build = () => {
+    if (running) {
+        queue.push(1);
+        return;
+    }
     if (timer) {
         clearTimeout(timer);
     }
     timer = setTimeout(() => {
-        _build();
+        console.log('开始编译');
+        running = true;
+        _build().then(() => {
+            running = false;
+            if (queue.length) {
+                queue = [];
+                build();
+            }
+        }).catch(() => {
+            running = false;
+            if (queue.length) {
+                queue = [];
+                build();
+            }
+        })
     }, 500);
 }
 

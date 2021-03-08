@@ -1,7 +1,8 @@
-.mpc-hand {
+.fc-hand {
   position: fixed;
   bottom: 100rpx;
   right: 100rpx;
+  z-index: 500;
   border-radius: 50%;
   width: 100rpx;
   height: 100rpx;
@@ -12,20 +13,25 @@
   line-height: 100rpx;
 }
 
-.mpc-hand.is-hide {
+.fc-hand.is-hide {
   display: none;
 }
 
-.mpc-modal {
+.fc-modal {
   position: fixed;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
   bottom: 0;
-  color: #333333;
+  color: #5e5e5e;
+  z-index: 1000;
 }
 
-.mpc-modal-body {
+.fc-modal.is-full {
+  top: 0;
+}
+
+.fc-modal-body {
   position: absolute;
   left: 0;
   right: 0;
@@ -36,30 +42,142 @@
   flex-direction: column;
 }
 
-.mpc-tabs-container {
+.fc-tabs-container {
   background: #f3f3f3;
   color: #333333;
   border-top: 1px solid #cccccc;
   border-bottom: 1px solid #cccccc;
-  flex-shrink: 0;
+  color: #5e5e5e;
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
 }
 
-.mpc-tabs-body {
+.fc-tabs-scroll {
+  width: 610rpx;
+}
+
+.fc-tabs-action {
+  width: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+}
+
+.fc-tabs-action::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 15rpx;
+  width: 1rpx;
+  height: 40rpx;
+  background-color: #cccccc;
+}
+
+.fc-tabs-action-right::after {
+  right: auto;
+  left: 0;
+}
+
+.fc-tabs-zoom,
+.fc-tabs-close {
+  position: relative;
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.fc-tabs-zoom:before, .fc-tabs-zoom:after,
+.fc-tabs-zoom .fc-ic-arrow-1,
+.fc-tabs-zoom .fc-ic-arrow-2,
+.fc-tabs-close:before,
+.fc-tabs-close:after,
+.fc-tabs-close .fc-ic-arrow-1,
+.fc-tabs-close .fc-ic-arrow-2 {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+}
+
+.fc-tabs-zoom.fc-ic-compress:before, .fc-tabs-zoom.fc-ic-compress:after,
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-1,
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-2, .fc-tabs-zoom.fc-ic-expand:before, .fc-tabs-zoom.fc-ic-expand:after,
+.fc-tabs-zoom.fc-ic-expand .fc-ic-arrow-1,
+.fc-tabs-zoom.fc-ic-expand .fc-ic-arrow-2 {
+  width: 40%;
+  height: 40%;
+  border: 4rpx solid #5e5e5e;
+}
+
+.fc-tabs-zoom.fc-ic-compress:before, .fc-tabs-zoom.fc-ic-compress:after,
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-1,
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-2 {
+  transform: rotate(180deg);
+}
+
+.fc-tabs-zoom.fc-ic-compress:before, .fc-tabs-zoom.fc-ic-expand:before {
+  top: 0;
+  left: 0;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.fc-tabs-zoom.fc-ic-compress:after, .fc-tabs-zoom.fc-ic-expand:after {
+  right: 0;
+  top: 0;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-1,
+.fc-tabs-zoom.fc-ic-expand .fc-ic-arrow-1 {
+  left: 0;
+  bottom: 0;
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+
+.fc-tabs-zoom.fc-ic-compress .fc-ic-arrow-2,
+.fc-tabs-zoom.fc-ic-expand .fc-ic-arrow-2 {
+  right: 0;
+  bottom: 0;
+  border-top-color: transparent;
+  border-left-color: transparent;
+}
+
+.fc-tabs-close.fc-ic-close:before, .fc-tabs-close.fc-ic-close:after {
+  width: 100%;
+  top: 50%;
+  background-color: #5e5e5e;
+  margin-top: -2rpx;
+  height: 4rpx;
+}
+
+.fc-tabs-close.fc-ic-close:before {
+  transform: rotate(45deg);
+}
+
+.fc-tabs-close.fc-ic-close:after {
+  transform: rotate(135deg);
+}
+
+.fc-tabs-body {
   height: 100%;
   flex-shrink: 1;
 }
 
-.mpc-tabs {
+.fc-tabs {
   display: flex;
   flex-wrap: nowrap;
   margin-bottom: -1px;
 }
 
-.mpc-tab {
+.fc-tab {
   box-sizing: border-box;
   flex-shrink: 0;
-  height: 80rpx;
-  line-height: 80rpx;
+  height: 70rpx;
+  line-height: 70rpx;
   padding: 0 30rpx;
   text-align: center;
   border-bottom: 6rpx solid transparent;
@@ -67,11 +185,11 @@
   transition: border-color .5s;
 }
 
-.mpc-tab.active {
+.fc-tab.active {
   border-bottom-color: #1a73ea;
 }
 
-.mpc-tabs-panels {
+.fc-tabs-panels {
   display: flex;
   flex-wrap: nowrap;
   overflow: hidden;
@@ -79,23 +197,23 @@
   transition: transform .5s;
 }
 
-.mpc-tabs-panels .mpc-tabs-panel {
+.fc-tabs-panels .fc-tabs-panel {
   flex-shrink: 0;
   flex: 1;
   box-sizing: border-box;
   padding: 20rpx 0;
 }
 
-.mpc-item {
+.fc-item {
   font-size: 30rpx;
   padding: 0 20rpx;
 }
 
-.mpc-item.is-fold {
+.fc-item.is-fold {
   padding-left: 42rpx;
 }
 
-.mpc-item.is-fold::before {
+.fc-item.is-fold::before {
   left: 20rpx;
 }
 
@@ -122,65 +240,65 @@
   border-top-color: #727272;
 }
 
-.mpc-item-view:hover {
+.fc-item-view:hover {
   background-color: #ebf1fb;
 }
 
-.mpc-item-view:before {
+.fc-item-view:before {
   top: 12rpx;
 }
 
-.mpc-item-view .view-head,
-.mpc-item-view .view-body,
-.mpc-item-view .view-footer {
+.fc-item-view .view-head,
+.fc-item-view .view-body,
+.fc-item-view .view-footer {
   display: inline-block;
 }
 
-.mpc-item-view.is-open .view-head {
+.fc-item-view.is-open .view-head {
   background-color: #cfe8fc;
 }
 
-.mpc-item-view.is-open .view-head,
-.mpc-item-view.is-open .view-body,
-.mpc-item-view.is-open .view-footer {
+.fc-item-view.is-open .view-head,
+.fc-item-view.is-open .view-body,
+.fc-item-view.is-open .view-footer {
   display: block;
 }
 
-.mpc-item-view.is-open .view-arrow.arrow-end {
+.fc-item-view.is-open .view-arrow.arrow-end {
   margin-left: 0;
 }
 
-.mpc-item-view .view-arrow.arrow-end {
+.fc-item-view .view-arrow.arrow-end {
   margin-left: 14rpx;
 }
 
-.mpc-item-view .view-part,
-.mpc-item-view .attr-part {
+.fc-item-view .view-part,
+.fc-item-view .attr-part {
   display: inline-block;
 }
 
-.mpc-item-view .view-arrow,
-.mpc-item-view .attr-equal,
-.mpc-item-view .attr-sem {
+.fc-item-view .view-arrow,
+.fc-item-view .attr-equal,
+.fc-item-view .attr-sem {
   color: #a995a7;
 }
 
-.mpc-item-view .view-tag {
+.fc-item-view .view-tag {
   color: #8c1d86;
 }
 
-.mpc-item-view .view-attr {
+.fc-item-view .view-attr {
   margin-left: 14rpx;
 }
 
-.mpc-item-view .attr-name {
+.fc-item-view .attr-name {
   color: #9a4804;
 }
 
-.mpc-item-view .attr-value {
+.fc-item-view .attr-value {
   color: #1a1aa6;
 }
 
-.mpc-item-view .attr-value.attr-string {
+.fc-item-view .attr-value.attr-string {
   color: #c41a16;
 }

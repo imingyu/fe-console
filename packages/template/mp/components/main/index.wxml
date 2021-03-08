@@ -1,18 +1,25 @@
-<view class="mpc-hand" bind:tap="toggleVisable">Mpc</view>
-<view wx:if="{{visable || mounted}}" class="mpc-modal {{visable?'is-show':''}}" bind:tap="closeModal">
-    <view class="mpc-modal-body" catch:tap="noop">
-        <view class="mpc-tabs-container">
-            <scroll-view scroll-x>
-                <view class="mpc-tabs">
-                    <view class="mpc-tab {{activeTabIndex===index?'active':''}}" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value" bind:tap="setTab" data-tab="{{index}}">{{tab.name}}</view>
-                </view>
-            </scroll-view>
+<view class="fc-hand" bindtap="toggleVisable">Mpc</view>
+<view wx:if="{{visable || mounted}}" class="fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
+    <view class="fc-tabs-container">
+        <view class="fc-tabs-action" bindtap="toggleZoom">
+            <view class="fc-tabs-zoom fc-ic-{{fullScreen?'compress':'expand'}}">
+                <view class="fc-ic-arrow-1"></view>
+                <view class="fc-ic-arrow-2"></view>
+            </view>
         </view>
-        <view class="mpc-tabs-body">
-            <view class="mpc-tabs-panels" style="width:{{tabs.length*100}}%;transform: translateX(-{{(activeTabIndex/tabs.length)*100}}%);">
-                <view class="mpc-tabs-panel panel-{{tab.value}}" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value">
-                    <fc-api-reader wx:if="{{tab.value==='api'}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
-                </view>
+        <scroll-view scroll-x class="fc-tabs-scroll">
+            <view class="fc-tabs">
+                <view class="fc-tab {{activeTabIndex===index?'active':''}}" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value" bind:tap="setTab" data-tab="{{index}}">{{tab.name}}</view>
+            </view>
+        </scroll-view>
+        <view class="fc-tabs-action fc-tabs-action-right" bindtap="close">
+            <view class="fc-tabs-close fc-ic-close"></view>
+        </view>
+    </view>
+    <view class="fc-tabs-body">
+        <view class="fc-tabs-panels" style="width:{{tabs.length*100}}%;transform: translateX(-{{(activeTabIndex/tabs.length)*100}}%);">
+            <view class="fc-tabs-panel panel-{{tab.value}}" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value">
+                <fc-api-reader wx:if="{{tab.value==='api'}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
             </view>
         </view>
     </view>

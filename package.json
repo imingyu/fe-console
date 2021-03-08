@@ -7,8 +7,10 @@
         "build": "node build/clear.js && tsc --emitDeclarationOnly && node --max-old-space-size=2048 build/build.js",
         "clear": "node build/clear.js",
         "test": "mocha packages/**/test/*.js",
-        "build:template": "node build/template.js",
-        "tsc:mp-wechat": "npx tsc -b packages/mp-wechat"
+        "render:mp-wechat": "node build/render.js wechat",
+        "tsc:mp-wechat": "npx tsc -b packages/mp-wechat",
+        "fill:mp-wechat": "node build/fill.js wechat",
+        "npm:mp-wechat": "npm run render:mp-wechat && npm run tsc:mp-wechat && npm run fill:mp-wechat && node build/demo.js"
     },
     "repository": {
         "type": "git",

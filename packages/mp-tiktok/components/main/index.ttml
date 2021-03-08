@@ -1,4 +1,4 @@
-<view class="mpc-hand {{!visable?'is-hide':''}}" bind:tap="toggleVisable">Mpc</view>
+<view class="mpc-hand" bind:tap="toggleVisable">Mpc</view>
 <view tt:if="{{visable || mounted}}" class="mpc-modal {{visable?'is-show':''}}" bind:tap="closeModal">
     <view class="mpc-modal-body" catch:tap="noop">
         <view class="mpc-tabs-container">

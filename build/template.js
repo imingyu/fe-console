@@ -8,6 +8,7 @@ const templatePackRoot = path.join(packagesRoot, 'template');;
 const templateSourceDir = path.join(templatePackRoot, 'mp');
 const MpXmlTranslator = require('@mpkit/mpxml-translator');
 const MpXmlParser = require('@mpkit/mpxml-parser');
+const renderSass = require('./sass');
 templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
 
 const platformMap = {
@@ -17,92 +18,109 @@ const platformMap = {
     tiktok: '字节跳动'
 }
 
+const cssFileSuffixMap = {
+    wechat: '.wxss',
+    alipay: '.acss',
+    smart: '.css',
+    tiktok: '.ttss'
+}
+
 const compiledTpls = {};
 
 const renderPackage = (platform) => {
-    const packRoot = path.join(packagesRoot, `mp-${platform}`);
-    const tplDir = path.join(packRoot, 'tpl');
-    replaceDir(templateSourceDir, packRoot);
-    const spec = MpXmlParser.mpViewSyntaxSpec[platform];
-    writeFile(path.join(packRoot, 'platform.js'), `module.exports = ${JSON.stringify(spec, null, 4)}`);
-    const renderData = {
-        platform,
-        platformText: platformMap[platform],
-        MethodExecStatus0: 'Unknown',
-        MethodExecStatus1: 'Executed',
-        MethodExecStatus2: 'Success',
-        MethodExecStatus3: 'Fail',
-    }
-    // {{data.status===1?'<%= MethodExecStatus1 %>':data.status===2?'<%= MethodExecStatus2 %>':data.status===3?'<%= MethodExecStatus3 %>':'<%= MethodExecStatus0 %>'}}
-    fs.readdirSync(tplDir).forEach(item => {
-        const fileName = path.join(tplDir, item);
-        if (junk.is(item) || !fileName.endsWith('.wxml')) {
-            return;
+    return new Promise((resolve, reject) => {
+        const packRoot = path.join(packagesRoot, `mp-${platform}`);
+        const tplDir = path.join(packRoot, 'tpl');
+        replaceDir(templateSourceDir, packRoot);
+        const spec = MpXmlParser.mpViewSyntaxSpec[platform];
+        writeFile(path.join(packRoot, 'platform.js'), `module.exports = ${JSON.stringify(spec, null, 4)}`);
+        const renderData = {
+            platform,
+            platformText: platformMap[platform],
+            MethodExecStatus0: 'Unknown',
+            MethodExecStatus1: 'Executed',
+            MethodExecStatus2: 'Success',
+            MethodExecStatus3: 'Fail',
         }
-        const orgFileName = fileName.replace(packRoot, templatePackRoot);
-        if (!compiledTpls[orgFileName]) {
-            compiledTpls[orgFileName] = template(readFile(fileName));
-        }
-        const tplName = item.substr(0, item.lastIndexOf('.')).split('_')[1];
-        renderData[tplName] = compiledTpls[orgFileName](renderData);
-    });
-    rmDir(tplDir);
-    renderTemplate(platform, packRoot, renderData);
-    if (platform === 'wechat') {
-        const dir = path.resolve(__dirname, '../demo/fe-console')
-        if (fs.existsSync(dir)) {
-            replaceDir(path.join(packRoot, 'dist'), dir);
-        }
-    }
+        fs.readdirSync(tplDir).forEach(item => {
+            const fileName = path.join(tplDir, item);
+            if (junk.is(item) || !fileName.endsWith('.wxml')) {
+                return;
+            }
+            const orgFileName = fileName.replace(packRoot, templatePackRoot);
+            if (!compiledTpls[orgFileName]) {
+                compiledTpls[orgFileName] = template(readFile(fileName));
+            }
+            const tplName = item.substr(0, item.lastIndexOf('.')).split('_')[1];
+            renderData[tplName] = compiledTpls[orgFileName](renderData);
+        });
+        rmDir(tplDir);
+        renderTemplate(platform, packRoot, renderData).then(resolve).catch(reject);
+    })
 }
 
+const renderFile = (platform, fileName, renderData) => {
+    return new Promise((resolve, reject) => {
+        const packRoot = path.join(packagesRoot, `mp-${platform}`);
+        const isXml = fileName.endsWith('.wxml');
+        const isScss = fileName.endsWith('.scss');
+        if (isXml || fileName.endsWith('.json') || isScss || fileName.endsWith('.ts') || fileName.endsWith('.js')) {
+            const orgFileName = fileName.replace(packRoot, templatePackRoot);
+            if (!compiledTpls[orgFileName]) {
+                compiledTpls[orgFileName] = template(readFile(fileName));
+            }
+            const newContent = compiledTpls[orgFileName](renderData);
+            if ((!isXml && !isScss) || !newContent) {
+                writeFile(fileName, newContent);
+                return resolve();
+            }
+            const spec = MpXmlParser.mpViewSyntaxSpec[platform];
+            if (isScss) {
+                writeFile(fileName, newContent);
+                renderSass(fileName).then((cssContent) => {
+                    writeFile(fileName.substr(0, fileName.lastIndexOf('.')) + (spec.cssFileSuffix || cssFileSuffixMap[platform]), cssContent);
+                    resolve();
+                }).catch(reject);
+                return;
+            }
+            try {
+                writeFile(fileName, MpXmlTranslator.translateXml(newContent, 'wechat', platform, {
+                    allowStartTagBoundaryNearSpace(
+                        xml,
+                        cursor
+                    ) {
+                        return 'right';
+                    },
+                }));
+                if (!fileName.endsWith(spec.xmlFileSuffix)) {
+                    fs.renameSync(fileName, fileName.substr(0, fileName.lastIndexOf('.')) + spec.xmlFileSuffix);
+                }
+                resolve();
+            } catch (error) {
+                error.fileName = fileName;
+                reject(error);
+            }
+        }
+    })
+}
+
+
 const renderTemplate = (platform, dir, renderData) => {
-    const packRoot = path.join(packagesRoot, `mp-${platform}`);
-    fs.readdirSync(dir).forEach(item => {
-        const isMpDir = item === 'mp';
+    return Promise.all(fs.readdirSync(dir).map(item => {
         if (junk.is(item)) {
-            return;
+            return Promise.resolve();
         }
         const fileName = path.join(dir, item);
         const stat = fs.statSync(fileName);
         if (stat.isFile()) {
-            // TODO:处理wxs等文件
-            const isXml = fileName.endsWith('.wxml');
-            if (isXml || fileName.endsWith('.json') || fileName.endsWith('.scss') || fileName.endsWith('.wxss') || fileName.endsWith('.ts') || fileName.endsWith('.js')) {
-                const orgFileName = fileName.replace(packRoot, templatePackRoot);
-                if (!compiledTpls[orgFileName]) {
-                    compiledTpls[orgFileName] = template(readFile(fileName));
-                }
-                const newContent = compiledTpls[orgFileName](renderData);
-                if (!isXml || !newContent) {
-                    writeFile(fileName, newContent);
-                    return;
-                }
-                try {
-                    writeFile(fileName, MpXmlTranslator.translateXml(newContent, 'wechat', platform, {
-                        allowStartTagBoundaryNearSpace(
-                            xml,
-                            cursor
-                        ) {
-                            return 'right';
-                        },
-                    }));
-                    const spec = MpXmlParser.mpViewSyntaxSpec[platform];
-                    if (!fileName.endsWith(spec.xmlFileSuffix)) {
-                        fs.renameSync(fileName, fileName.substr(0, fileName.lastIndexOf('.')) + spec.xmlFileSuffix);
-                    }
-                } catch (error) {
-                    error.fileName = fileName;
-                    console.log(newContent)
-                    console.error(error);
-                }
-            }
+            renderFile(platform, fileName, renderData);
         } else if (stat.isDirectory()) {
-            renderTemplate(platform, fileName, renderData);
+            return renderTemplate(platform, fileName, renderData);
+        } else {
+            return Promise.resolve();
         }
-    });
+    }));
 }
 
-for (let platform in platformMap) {
-    renderPackage(platform);
-}
+exports.renderPackage = renderPackage;
+exports.platformMap = platformMap;

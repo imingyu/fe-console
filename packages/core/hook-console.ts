@@ -14,6 +14,7 @@ export const hookConsole = (producer: IFcProducer<FcConsoleProduct>) => {
                         category: key,
                         request: args,
                     });
+                    return method.apply(this, args);
                 };
             }
         });

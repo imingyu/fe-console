@@ -2,12 +2,14 @@
     "name": "@fe-console/mp-smart",
     "version": "1.0.0",
     "description": "百度小程序控制台辅助开发工具",
-    "main": "dist/index.cjs.js",
-    "module": "dist/index.esm.js",
-    "types": "spec/index.d.ts",
+    "main": "dist/npm/index.js",
     "keywords": [],
     "author": "imingyu<mingyuhisoft@163.com>",
     "license": "MIT",
+    "miniprogram": "dist/npm",
+    "files": [
+        "dist"
+    ],
     "dependencies": {
         "@mpkit/set-data": "^1.0.17",
         "@mpkit/mixin": "^1.0.17",

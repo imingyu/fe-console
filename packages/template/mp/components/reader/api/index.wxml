@@ -1,4 +1,4 @@
-<view wx:if="{{ active }}" class="reader re-api virtual-list-container">
+<view wx:if="{{ active }}" class="reader re-api virtual-list-container cid-{{$cid}} pid-{{$pid}}">
     <%= VirtualListStart %>
     <fc-api-renderer
         wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}"

@@ -29,6 +29,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
             }
         },
         $vlUpdateShowList(scrollTop) {},
+        $vlPushItem(item) {},
         // resetVlList() {
         //     if (list && list.length) {
         //         // 判断是否需要重置设置

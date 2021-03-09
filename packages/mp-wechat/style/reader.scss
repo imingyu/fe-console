@@ -1,0 +1,77 @@
+@import './var.scss';
+
+.fc-reader {
+    height: 100%;
+    position: relative;
+}
+
+.fc-reader-bar {
+    height: $tab-bar-height - 30rpx;
+    font-size: 18rpx;
+    border-bottom: 2px solid $tab-bar-brcolor;
+}
+
+.fc-reader-th {
+    height: $tab-bar-height;
+    font-size: 22rpx;
+    border-bottom: 1px solid $tab-bar-brcolor;
+    .fc-col{
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.fc-reader-bar,
+.fc-reader-th {
+    box-sizing: border-box;
+    background-color: $tab-bar-bg;
+    color: $cr-tabs-text;
+}
+
+.fc-reader-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    .fc-col {
+        padding: 6rpx 10rpx;
+        border-right: 1px solid $tab-bar-brcolor;
+
+        &.is-last-col {
+            border-right: none;
+        }
+    }
+}
+
+.fc-row-even {
+    background-color: $row-even-bg;
+}
+.fc-row-odd {
+    background-color: $row-odd-bg;
+}
+
+.fc-row-even,
+.fc-row-odd {
+    display: block;
+}
+
+.fc-reader-scroll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    &.has-th {
+        top: ($tab-bar-height);
+    }
+
+    &.has-bar {
+        top: ($tab-bar-height - 30rpx);
+    }
+
+    &.has-th.has-bar {
+        top: ($tab-bar-height - 30rpx) + ($tab-bar-height);
+    }
+}

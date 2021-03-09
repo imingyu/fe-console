@@ -17,7 +17,7 @@ FcMpComponent(
     {
         data: {},
         methods: {
-            addMaterial(data: FcMpApiProduct): FcMpApiMaterial {
+            addMaterial(data: Partial<FcMpApiProduct>): FcMpApiMaterial {
                 if (!this.$vlAllList) {
                     this.$vlAllList = [];
                 }
@@ -43,8 +43,9 @@ FcMpComponent(
                     material.endTime = data.endTime;
                 }
                 if (!readyItem) {
-                    this.$vlAllList.push(material);
+                    this.$vlPushItem(material);
                 }
+                return material;
             },
         },
         [getMpInitLifeName(MpViewType.Component)]() {

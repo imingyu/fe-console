@@ -46,6 +46,9 @@ export const getObserver = (() => {
                         localStorager.on("data", (type, data) => {
                             observer.emit("data", data);
                         });
+                        localStorager.on("change", (type, data) => {
+                            observer.emit("change", data);
+                        });
                     }
                 } else {
                     let url = Array.isArray(item) ? item[0] : item;

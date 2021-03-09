@@ -1,13 +1,22 @@
-<view wx:if="{{ active }}" class="reader re-api virtual-list-container">
-    <scroll-view class="vl-list-scroll" scroll-y bindscroll="onVlScroll" bindtouchstart="onVlScroll" bindtouchend="onVlTouchEnd" bindtouchmove="onVlTouchMove" bindtouchcancel="onVlTouchCancel" bindscrolltoupper="onVlScrollToUpper" bindscrolltolower="onVlScrollToLower">
-    <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
-        <view class="vl-list">
-            <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" wx:if="{{ $vlStatus[$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlStatus[$vlItem.id] || 'none' }}" style="height:{{ $vlItem.$vlHeight || $vlItemHeight || 0 }}px;">
-    <fc-api-renderer wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}" data="{{ $vlItem }}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
-    </fc-api-renderer>
+<view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
+    <view class="fc-reader-bar">TODO：筛选栏
     </view>
+    <view class="fc-reader-row fc-reader-th">
+        <view class="fc-col fc-api-col fc-col-1">Name</view>
+        <view class="fc-col fc-api-col fc-col-2">Status</view>
+        <view class="fc-col fc-api-col fc-col-3">Type</view>
+        <view class="fc-col fc-api-col fc-col-4">Initiator</view>
+        <view class="fc-col fc-api-col fc-col-5 is-last-col">Time</view>
+    </view>
+    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar">
+        <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
+    <view class="vl-list">
+        <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" wx:if="{{ $vlStatus['s'+$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}" style="height:{{$vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]+'px'):'auto'}};">
+            <fc-api-renderer wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}" class="fc-row-{{$vlItemIndex%2?'even':'odd'}}" data="{{ $vlItem }}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
+        </fc-api-renderer>
+            </view>
 </view>
 <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
-</scroll-view>
 
-</view>
+            </scroll-view>
+        </view>

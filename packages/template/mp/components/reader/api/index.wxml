@@ -1,12 +1,24 @@
-<view wx:if="{{ active }}" class="reader re-api virtual-list-container cid-{{$cid}} pid-{{$pid}}">
-    <%= VirtualListStart %>
-    <fc-api-renderer
-        wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}"
-        data="{{ $vlItem }}"
-        parentCid="{{ $cid }}"
-        parentTid="{{ $tid }}"
-        data-id="{{ $vlItem.id }}"
-    >
-    </fc-api-renderer>
-    <%= VirtualListEnd %>
-</view>
+<view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
+    <view class="fc-reader-bar">TODO：筛选栏
+    </view>
+    <view class="fc-reader-row fc-reader-th">
+        <view class="fc-col fc-api-col fc-col-1">Name</view>
+        <view class="fc-col fc-api-col fc-col-2">Status</view>
+        <view class="fc-col fc-api-col fc-col-3">Type</view>
+        <view class="fc-col fc-api-col fc-col-4">Initiator</view>
+        <view class="fc-col fc-api-col fc-col-5 is-last-col">Time</view>
+    </view>
+    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar">
+        <%= VirtualListStart %>
+            <fc-api-renderer
+            wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}"
+            class="fc-row-{{$vlItemIndex%2?'even':'odd'}}"
+            data="{{ $vlItem }}"
+            parentCid="{{ $cid }}"
+            parentTid="{{ $tid }}"
+            data-id="{{ $vlItem.id }}"
+        >
+        </fc-api-renderer>
+            <%= VirtualListEnd %>
+            </scroll-view>
+        </view>

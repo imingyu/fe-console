@@ -2,4 +2,3 @@
 </view>
 <view class="mp-list-placeholder is-end"
       style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
-</scroll-view>

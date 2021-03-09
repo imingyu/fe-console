@@ -1,19 +1,10 @@
-<scroll-view class="vl-list-scroll"
-             scroll-y
-    <%= (platform==='alipay'?'onScroll="onVlScroll"':'bindscroll="onVlScroll"') %>
-    <%= (platform==='alipay'?'onTouchStart="onVlTouchStart"':'bindtouchstart="onVlScroll"') %>
-    <%= (platform==='alipay'?'onTouchEnd="onVlTouchEnd"':'bindtouchend="onVlTouchEnd"') %>
-    <%= (platform==='alipay'?'onTouchMove="onVlTouchMove"':'bindtouchmove="onVlTouchMove"') %>
-    <%= (platform==='alipay'?'onTouchCancel="onVlTouchCancel"':'bindtouchcancel="onVlTouchCancel"') %>
-    <%= (platform==='alipay'?'onScrollToUpper="onVlScrollToUpper"':'bindscrolltoupper="onVlScrollToUpper"') %>
-    <%= (platform==='alipay'?'onScrollToLower="onVlScrollToLower"':'bindscrolltolower="onVlScrollToLower"') %>>
-    <view class="vl-list-placeholder is-start"
-          style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
-        <view class="vl-list">
-            <view wx:for="{{ $vlShowList }}"
-                wx:for-item="$vlItem"
-                wx:for-index="$vlItemIndex"
-                wx:key="id"
-                wx:if="{{ $vlStatus[$vlItem.id] !== 'recovery'}}"
-                class="vl-item-container status-{{ $vlStatus[$vlItem.id] || 'none' }}"
-                style="height:{{ $vlItem.$vlHeight || $vlItemHeight || 0 }}px;">
+<view class="vl-list-placeholder is-start"
+        style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
+    <view class="vl-list">
+        <view wx:for="{{ $vlShowList }}"
+            wx:for-item="$vlItem"
+            wx:for-index="$vlItemIndex"
+            wx:key="id"
+            wx:if="{{ $vlStatus['s'+$vlItem.id] !== 'recovery'}}"
+            class="vl-item-container status-{{ $vlStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}"
+            style="height:{{$vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]+'px'):'auto'}};">

@@ -1,0 +1,89 @@
+.fc-reader {
+  height: 100%;
+  position: relative;
+}
+
+.fc-reader-bar {
+  height: 30rpx;
+  font-size: 18rpx;
+  border-bottom: 2px solid #cccccc;
+}
+
+.fc-reader-th {
+  height: 60rpx;
+  font-size: 22rpx;
+  border-bottom: 1px solid #cccccc;
+}
+
+.fc-reader-th .fc-col {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.fc-reader-bar,
+.fc-reader-th {
+  box-sizing: border-box;
+  background-color: #f3f3f3;
+  color: #5e5e5e;
+}
+
+.fc-reader-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.fc-reader-row .fc-col {
+  padding: 6rpx 10rpx;
+  border-right: 1px solid #cccccc;
+}
+
+.fc-reader-row .fc-col.is-last-col {
+  border-right: none;
+}
+
+.fc-row-even {
+  background-color: #f5f5f5;
+}
+
+.fc-row-odd {
+  background-color: #fff;
+}
+
+.fc-row-even,
+.fc-row-odd {
+  display: block;
+}
+
+.fc-reader-scroll {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.fc-reader-scroll.has-th {
+  top: 60rpx;
+}
+
+.fc-reader-scroll.has-bar {
+  top: 30rpx;
+}
+
+.fc-reader-scroll.has-th.has-bar {
+  top: 90rpx;
+}
+
+.fc-api-col {
+  width: 17.5%;
+  box-sizing: border-box;
+  padding: 6rpx 4rpx;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.fc-api-col.fc-col-1 {
+  width: 30%;
+}

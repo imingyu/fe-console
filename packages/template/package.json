@@ -1,7 +1,7 @@
 {
     "name": "@fe-console/template",
-    "version": "0.0.0",
-    "description": "types",
+    "version": "1.0.0",
+    "description": "template",
     "author": "imingyu <mingyuhisoft@163.com>",
     "homepage": "https://github.com/imingyu/fe-console/tree/master/packages/types",
     "license": "MIT",
@@ -30,6 +30,11 @@
         "@mpkit/mixin": "^1.0.17",
         "@mpkit/set-data": "^1.0.17",
         "@mpkit/types": "^1.0.17",
-        "@mpkit/util": "^1.0.17"
+        "@mpkit/util": "^1.0.17",
+        "@fe-console/types": "^1.0.0",
+        "@fe-console/util": "^1.0.0",
+        "@fe-console/core": "^1.0.0",
+        "@fe-console/provider": "^1.0.0",
+        "@fe-console/renderer": "^1.0.0"
     }
 }

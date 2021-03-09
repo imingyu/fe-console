@@ -54,11 +54,11 @@
 }
 
 .fc-tabs-scroll {
-  width: 610rpx;
+  width: 630rpx;
 }
 
 .fc-tabs-action {
-  width: 70rpx;
+  width: 60rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,8 +176,8 @@
 .fc-tab {
   box-sizing: border-box;
   flex-shrink: 0;
-  height: 70rpx;
-  line-height: 70rpx;
+  height: 60rpx;
+  line-height: 60rpx;
   padding: 0 30rpx;
   text-align: center;
   border-bottom: 6rpx solid transparent;
@@ -195,6 +195,7 @@
   overflow: hidden;
   box-sizing: border-box;
   transition: transform .5s;
+  height: 100%;
 }
 
 .fc-tabs-panels .fc-tabs-panel {
@@ -202,6 +203,17 @@
   flex: 1;
   box-sizing: border-box;
   padding: 20rpx 0;
+  height: 100%;
+  position: relative;
+}
+
+.fc-tabs-panels .tab-panel-reader {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .fc-item {

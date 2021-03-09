@@ -6,8 +6,5 @@
         "target": "ES6",
         "moduleResolution": "Node",
         "outDir": "./dist/npm",
-        "paths": {
-            "@fe-console/*": ["../../*"]
-        },
     }
 }

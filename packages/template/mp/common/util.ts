@@ -51,8 +51,8 @@ export const getMpComponentInsidePage = (component: any): Promise<any> => {
     });
 };
 
-export const createIntersectionObserver = (vm, options) => {
-    const isAlipay = "<%= (paktform==='alipay'?'1':'') %>";
+export const createIntersectionObserver = (vm, options?: any) => {
+    const isAlipay = "<%= (platform==='alipay'?'1':'') %>";
     return new Promise((resolve, reject) => {
         if (isAlipay) {
             getMpComponentInsidePage(vm).then((page) => {
@@ -79,5 +79,33 @@ export const createIntersectionObserver = (vm, options) => {
         }
     }).then((ctx: any) => {
         return ctx.createIntersectionObserver(options);
+    });
+};
+
+export const createSelectorQuery = (vm) => {
+    const isAlipay = "<%= (platform==='alipay'?'1':'') %>";
+    return new Promise((resolve, reject) => {
+        if (isAlipay) {
+            getMpComponentInsidePage(vm).then((page) => {
+                if (!page) {
+                    return reject(new Error("无法创建SelectorQuery"));
+                }
+                resolve({
+                    createSelectorQuery(...args) {
+                        const name = `csq_${uuid()}`;
+                        page[name] = function () {
+                            return my.createSelectorQuery.apply(my, args);
+                        };
+                        const res = page[name]();
+                        delete page[name];
+                        return res;
+                    },
+                });
+            });
+        } else {
+            resolve(vm);
+        }
+    }).then((ctx: any) => {
+        return ctx.createSelectorQuery();
     });
 };

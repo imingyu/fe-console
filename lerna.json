@@ -5,6 +5,7 @@
     "packages/provider",
     "packages/types",
     "packages/util",
+    "packages/template",
     "packages/mp-wechat",
     "packages/mp-tiktok",
     "packages/mp-alipay",

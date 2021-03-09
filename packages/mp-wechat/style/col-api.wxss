@@ -1,0 +1,11 @@
+.fc-api-col {
+  width: 17.5%;
+  box-sizing: border-box;
+  padding: 6rpx 4rpx;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.fc-api-col.fc-col-1 {
+  width: 30%;
+}

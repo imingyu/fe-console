@@ -134,12 +134,24 @@
     overflow: hidden;
     box-sizing: border-box;
     transition: transform .5s;
+    height: 100%;
 
     .fc-tabs-panel {
         flex-shrink: 0;
         flex: 1;
         box-sizing: border-box;
         padding: 20rpx 0;
+        height: 100%;
+        position: relative;
+    }
+
+    .tab-panel-reader {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
     }
 }
 

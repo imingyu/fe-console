@@ -1,8 +1,8 @@
-<view a:if="{{ active }}" class="reader re-api virtual-list-container">
-    <scroll-view class="vl-list-scroll" scroll-y onScroll="onVlScroll" onTouchStart="onVlTouchStart" onTouchEnd="onVlTouchEnd" onTouchMove="onVlTouchMove" onTouchCancel="onVlTouchCancel" onScrollToUpper="onVlScrollToUpper" onScrollToLower="onVlScrollToLower">
+<view a:if="{{ active }}" class="reader re-api virtual-list-container cid-{{$cid}} pid-{{$pid}}">
+    <scroll-view class="vl-list-scroll">
     <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
         <view class="vl-list">
-            <view a:for="{{ $vlShowList }}" a:for-item="$vlItem" a:for-index="$vlItemIndex" a:key="id" a:if="{{ $vlStatus[$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlStatus[$vlItem.id] || 'none' }}" style="height:{{ $vlItem.$vlHeight || $vlItemHeight || 0 }}px;">
+            <view a:for="{{ $vlShowList }}" a:for-item="$vlItem" a:for-index="$vlItemIndex" a:key="id" a:if="{{ $vlStatus['s'+$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlStatus['s'+$vlItem.id] || 'none' }}" style="height:{{ $vlItem.$vlHeight || $vlItemHeight['s'+$vlItem.id] || 0 }}px;">
     <fc-api-renderer a:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}" data="{{ $vlItem }}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
     </fc-api-renderer>
     </view>

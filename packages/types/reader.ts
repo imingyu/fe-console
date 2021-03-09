@@ -2,13 +2,14 @@ import { FcMethodExecStatus } from "./core";
 import { FcMpApiProduct } from "./mp";
 
 export interface FcMpApiMaterial<T = any, K = any, S = any> {
+    id: string;
     type: string;
     name: string;
     desc?: string;
     status: FcMethodExecStatus;
     statusDesc?: string;
     startTime: number;
-    endTime: number;
+    endTime?: number;
     coverImg?: string;
     request?: T;
     response?: K;

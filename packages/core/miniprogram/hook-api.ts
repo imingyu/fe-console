@@ -14,6 +14,7 @@ import { MpApiVar, MpPlatform } from "@mpkit/types";
 import { now } from "@fe-console/util";
 
 const hookSocketMethod = (
+    producer: IFcProducer<FcMpApiProduct>,
     hookState: FcMpHookInfo,
     name: string,
     args,
@@ -37,9 +38,11 @@ const hookSocketMethod = (
     if (typeof args[0] === "object" && args[0]) {
         const { success, fail } = args[0];
         args[0].success = (...s) => {
-            product.endTime = now();
-            product.status = FcMethodExecStatus.Success;
-            product.response = s;
+            producer.change(id, {
+                endTime: now(),
+                status: FcMethodExecStatus.Success,
+                response: s,
+            });
             if (name === "close" || name === "closeSocket") {
                 const index = hookState.socketTasks
                     ? hookState.socketTasks.findIndex(
@@ -53,14 +56,13 @@ const hookSocketMethod = (
             return success && success.apply(null, s);
         };
         args[0].fail = (...s) => {
-            product.endTime = now();
-            product.status = FcMethodExecStatus.Fail;
-            product.response = s;
+            producer.change(id, {
+                endTime: now(),
+                status: FcMethodExecStatus.Fail,
+                response: s,
+            });
             return fail && fail.apply(null, s);
         };
-    }
-    if (taskHookInfo[3]) {
-        taskHookInfo[3].children.push(product);
     }
     product.execEndTime = now();
     return product;
@@ -74,15 +76,25 @@ const hookSocketTask = (
 ) => {
     const { send, close } = socketTask;
     socketTask.send = function (...args) {
-        const product = hookSocketMethod(hookState, "send", args, taskHookInfo);
+        const product = hookSocketMethod(
+            producer,
+            hookState,
+            "send",
+            args,
+            taskHookInfo
+        );
         producer.create(product);
         const res = send.apply(this, args);
-        product.execEndTime = product.endTime = now();
-        product.result = res;
+        producer.change(product.id, {
+            endTime: now(),
+            execEndTime: now(),
+            result: res,
+        });
         return res;
     };
     socketTask.close = function (...args) {
         const product = hookSocketMethod(
+            producer,
             hookState,
             "close",
             args,
@@ -90,8 +102,11 @@ const hookSocketTask = (
         );
         producer.create(product);
         const res = close.apply(this, args);
-        product.execEndTime = now();
-        product.result = res;
+        producer.change(product.id, {
+            endTime: now(),
+            execEndTime: now(),
+            result: res,
+        });
         return res;
     };
     socketListenerNames.forEach((name) => {
@@ -105,7 +120,6 @@ const hookSocketTask = (
                 request: res,
                 status: FcMethodExecStatus.Executed,
             };
-            taskHookInfo[3].children.push(product);
             producer.create(product);
         });
     });
@@ -132,7 +146,6 @@ const findCurrentHookTask = (
             request: args,
             status: FcMethodExecStatus.Executed,
             time: now(),
-            children: [],
         };
         hookState.socketTasks.push([
             id,
@@ -141,7 +154,6 @@ const findCurrentHookTask = (
             product,
         ]);
         activeTask = hookState.socketTasks[hookState.socketTasks.length - 1];
-        hookState.productMap[id] = product;
         producer.create(product);
     }
     return activeTask;
@@ -163,7 +175,14 @@ export const hookMpApi = (
                     id
                 );
                 producer.create(
-                    hookSocketMethod(hookState, name, args, activeTask, id)
+                    hookSocketMethod(
+                        producer,
+                        hookState,
+                        name,
+                        args,
+                        activeTask,
+                        id
+                    )
                 );
                 return;
             }
@@ -175,9 +194,7 @@ export const hookMpApi = (
                 status: FcMethodExecStatus.Executed,
                 time: now(),
             };
-            hookState.productMap[id] = product;
             if (name === "connectSocket") {
-                product.children = [];
                 if (!hookState.socketTasks) {
                     hookState.socketTasks = [];
                 }
@@ -194,10 +211,10 @@ export const hookMpApi = (
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
-            if (hookState.productMap[id]) {
-                hookState.productMap[id].execEndTime = now();
-                hookState.productMap[id].result = result;
-            }
+            producer.change(id, {
+                execEndTime: now(),
+                result,
+            });
             if (name === "connectSocket") {
                 const hookTask = hookState.socketTasks
                     ? hookState.socketTasks.find((item) => item[0] === id)
@@ -212,24 +229,20 @@ export const hookMpApi = (
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
-            if (hookState.productMap[id]) {
-                hookState.productMap[id].endTime = now();
-                hookState.productMap[id].response = res;
-                hookState.productMap[id].status = success
+            producer.change(id, {
+                endTime: now(),
+                response: res,
+                status: success
                     ? FcMethodExecStatus.Success
-                    : FcMethodExecStatus.Fail;
-                delete hookState.productMap[id];
-            }
+                    : FcMethodExecStatus.Fail,
+            });
         },
         catch(name, args, error, errType, id) {
-            if (hookState.productMap[id]) {
-                hookState.productMap[id].endTime = now();
-                hookState.productMap[id].response = [error, errType];
-                hookState.productMap[id].status = FcMethodExecStatus.Fail;
-                setTimeout(() => {
-                    delete hookState.productMap[id];
-                });
-            }
+            producer.change(id, {
+                endTime: now(),
+                response: [error, errType],
+                status: FcMethodExecStatus.Fail,
+            });
         },
     });
     if (PALTFORM === MpPlatform.wechat) {

@@ -11,7 +11,6 @@ import { MpViewType, MpMethodHook } from "@mpkit/types";
 import { uuid, getMpInitLifeName, getMpViewType } from "@mpkit/util";
 
 export const hookMpView = (
-    hookState: FcMpHookInfo,
     producer: IFcProducer<FcMpViewProduct>
 ) => {
     const isEvent = (obj) =>
@@ -32,7 +31,6 @@ export const hookMpView = (
                 request: args,
                 status: FcMethodExecStatus.Executed,
             };
-            hookState.productMap[id] = product;
             producer.create(product);
             if (isEvent(args[0])) {
                 const wrapDetail = args[0].detail;
@@ -42,40 +40,37 @@ export const hookMpView = (
                     wrapDetail._mpcWrap
                 ) {
                     args[0].detail = wrapDetail.orgDetail;
-                    product.eventTriggerPid = wrapDetail.id;
-                    if (hookState.productMap[wrapDetail.id]) {
-                        (hookState.productMap[
-                            wrapDetail.id
-                        ] as FcMpViewProduct).eventHandlePid = id;
-                    }
+                    producer.change(id, {
+                        eventTriggerPid: wrapDetail.id,
+                    });
+                    producer.change(wrapDetail.id, {
+                        eventHandlePid: id,
+                    });
                 }
             }
         },
         after(name, args, result, id) {
-            if (hookState.productMap[id]) {
-                const product = hookState.productMap[id] as FcMpViewProduct;
-                product.execEndTime = now();
-                product.result = result;
-                if (result && typeof result === "object" && "then" in result) {
-                    result.then((res) => {
-                        product.result = res;
-                        product.endTime = now();
-                        product.status = FcMethodExecStatus.Success;
-                        delete hookState.productMap[id];
+            if (result && typeof result === "object" && "then" in result) {
+                result.then((res) => {
+                    producer.change(id, {
+                        status: FcMethodExecStatus.Success,
+                        result: res,
+                        endTime: now(),
                     });
-                } else {
-                    delete hookState.productMap[id];
-                }
+                });
+            } else {
+                producer.change(id, {
+                    result,
+                    endTime: now(),
+                });
             }
         },
         catch(name, args, error, errType, id) {
-            if (hookState.productMap[id]) {
-                const product = hookState.productMap[id] as FcMpViewProduct;
-                product.status = FcMethodExecStatus.Fail;
-                product.result = [error, errType];
-                product.endTime = now();
-                delete hookState.productMap[id];
-            }
+            producer.change(id, {
+                status: FcMethodExecStatus.Fail,
+                result: [error, errType],
+                endTime: now(),
+            });
         },
     };
     MixinStore.addHook(MpViewType.App, viewHook);
@@ -102,7 +97,6 @@ export const hookMpView = (
                     status: FcMethodExecStatus.Executed,
                     eventTriggerView: this,
                 };
-                hookState.productMap[id] = product;
                 producer.create(product);
                 return this.$nativeTriggerEvent.apply(this, args);
             };
@@ -120,17 +114,14 @@ export const hookMpView = (
                 request: args,
                 status: FcMethodExecStatus.Executed,
             };
-            hookState.productMap[id] = product;
             producer.create(product);
             rewriteTrigger.call(this);
         },
         after(name, args, result, id) {
-            if (hookState.productMap[id]) {
-                const product = hookState.productMap[id] as FcMpViewProduct;
-                product.execEndTime = now();
-                product.result = result;
-                delete hookState.productMap[id];
-            }
+            producer.change(id, {
+                execEndTime: now(),
+                result,
+            });
         },
     };
     MixinStore.addHook(MpViewType.App, {

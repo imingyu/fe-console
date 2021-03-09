@@ -1,21 +1,21 @@
-<view class="renderer rd-api sz-{{size}}">
-    <view class="rd-col col-1">
+<view class="fc-renderer fc-rd-api sz-{{size}}">
+    <view class="fc-rd-col fc-rd-col-1">
         <view class="f-title">{{data.name}}</view>
         <view v-if="{{data.desc}}" class="f-desc">{{data.desc}}</view>
     </view>
-    <view class="rd-col col-2">
+    <view class="fc-rd-col fc-rd-col-2">
         <view class="f-status">
             {{data.status===1?'<%= MethodExecStatus1 %>':data.status===2?'<%= MethodExecStatus2 %>':data.status===3?'<%= MethodExecStatus3 %>':'<%= MethodExecStatus0 %>'}}
         </view>
         <view v-if="{{data.statusDesc}}" class="f-desc">{{data.statusDesc}}</view>
     </view>
-    <view class="rd-col col-3">
+    <view class="fc-rd-col fc-rd-col-3">
         <view class="f-type">{{data.type}}</view>
     </view>
-    <view class="rd-col col-4">
+    <view class="fc-rd-col fc-rd-col-4">
         <!-- TODO:initiator -->
     </view>
-    <view class="rd-col col-5">
+    <view class="fc-rd-col fc-rd-col-5">
         <view class="f-time level-{{timeLevel}}">{{timeVal}}{{timeUnit}}</view>
     </view>
 </view>

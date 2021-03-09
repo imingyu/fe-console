@@ -26,11 +26,9 @@ import { hookMpApi } from "./hook-api";
 import { hookConsole } from "../hook-console";
 
 export const FcMpProducerRunHandler = (producer: FcMpProducer) => {
-    const hookState: FcMpHookInfo = {
-        productMap: {},
-    };
+    const hookState: FcMpHookInfo = {};
     hookMpApi(hookState, producer as IFcProducer<FcMpApiProduct>);
-    hookMpView(hookState, producer as IFcProducer<FcMpViewProduct>);
+    hookMpView(producer as IFcProducer<FcMpViewProduct>);
     hookConsole(producer as IFcProducer<FcConsoleProduct>);
 };
 

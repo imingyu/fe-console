@@ -5,4 +5,5 @@ export * from "./util";
 export * from "./core";
 export * from "./mp";
 export * from "./renderer";
+export * from "./reader";
 export * from "./template";

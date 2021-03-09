@@ -13,7 +13,6 @@ export interface FcMpApiProduct<T = any, K = any>
     type: FcProductType.MpApi;
     result?: any;
     execEndTime?: number;
-    children?: FcMpApiProduct<T, K>[];
 }
 
 export interface FcMpViewProduct
@@ -52,7 +51,7 @@ export type FcMpSocketTaskHookInfo<T = any, K = any> = [
 
 export interface FcMpHookInfo {
     socketTasks?: Array<FcMpSocketTaskHookInfo>;
-    productMap: { [prop: string]: FcMpApiProduct | FcMpViewProduct };
+    productMap?: { [prop: string]: FcMpApiProduct | FcMpViewProduct };
 }
 export interface FcMpViewContextBase<T = any> {
     $tid: string;

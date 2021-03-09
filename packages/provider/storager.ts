@@ -1,3 +1,4 @@
+import { isEmptyObject } from "@mpkit/util";
 import {
     FcProduct,
     FcStoragerFilter,
@@ -22,6 +23,11 @@ export abstract class FcStoragerImpl<T extends FcProduct = FcProduct>
     push(data: T) {
         this.emit("data", data);
     }
+    change(id: string, data?: Partial<T>) {
+        data = data || ({} as Partial<T>);
+        data.id = id;
+        this.emit("change", data as T);
+    }
     destory() {
         this.emit("destory");
     }
@@ -34,15 +40,33 @@ export class FcMemoryStoragerImpl<
     T extends FcProduct = FcProduct
 > extends FcStoragerImpl<T> {
     protected list: T[] = [];
+    protected indexIdMap: { [prop: string]: number } = {};
     constructor() {
         super();
     }
     push(data: T) {
+        this.indexIdMap[data.id] = this.list.length;
         this.list.push(data);
         super.push(data);
     }
+    change(id: string, data?: Partial<T>) {
+        let item =
+            id in this.indexIdMap ? this.list[this.indexIdMap[id]] : null;
+        if (!item) {
+            const index = this.list.findIndex((it) => it.id === id);
+            if (index !== -1) {
+                this.indexIdMap[id] = index;
+                item = this.list[index];
+            }
+        }
+        if (item && !isEmptyObject(data)) {
+            Object.assign(item, data);
+        }
+        super.change(id, data);
+    }
     destory() {
         this.list.splice(0, this.list.length);
+        this.indexIdMap = {};
         super.destory();
     }
 }
@@ -57,5 +81,11 @@ export abstract class FcNetworkStoragerImpl<
     push(data: T): Promise<any> {
         super.push(data);
         return this.request(data);
+    }
+    change(id: string, data?: Partial<T>) {
+        super.change(id, data);
+        data = data || ({} as Partial<T>);
+        data.id = id;
+        return this.request(data as T);
     }
 }

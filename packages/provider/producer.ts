@@ -16,6 +16,11 @@ export abstract class FcProducerImpl<T extends FcProduct = FcProduct>
         super();
         run(this);
     }
+    change(id: string, data?: Partial<T>) {
+        data = data || ({} as Partial<T>);
+        data.id = id;
+        this.emit("change", data as T);
+    }
     create(data: PartialBy<T, "id" | "time">) {
         if (!data.id) {
             data.id = uuid();

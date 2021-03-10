@@ -1,11 +1,15 @@
+@import './var.scss';
 .fc-api-col {
     width: 17.5%;
-    box-sizing: border-box;
-    padding: 6rpx 4rpx;
-    flex-grow: 0;
-    flex-shrink: 0;
+    height: $ht-renderer-api;
 
     &.fc-col-1 {
         width: 30%;
+    }
+    &.fc-col-2 {
+        width: 20%;
+    }
+    &.fc-col-3 {
+        width: 15%;
     }
 }

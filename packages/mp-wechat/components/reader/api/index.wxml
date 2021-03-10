@@ -1,7 +1,6 @@
 <view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
-    <view class="fc-reader-bar">TODO：筛选栏
-    </view>
-    <view class="fc-reader-row fc-reader-th">
+    <filter-bar categorys="{{categoryList}}" activeCategory="{{activeCategory}}" filter clear parentCid="{{$cid}}" parentTid="{{$tid}}"></filter-bar>
+    <view class="fc-reader-row fc-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}}">
         <view class="fc-col fc-api-col fc-col-1">Name</view>
         <view class="fc-col fc-api-col fc-col-2">Status</view>
         <view class="fc-col fc-api-col fc-col-3">Type</view>
@@ -11,12 +10,13 @@
     <scroll-view scroll-y class="fc-reader-scroll has-th has-bar">
         <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
     <view class="vl-list">
-        <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" wx:if="{{ $vlStatus['s'+$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}" style="height:{{$vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]+'px'):'auto'}};">
-            <fc-api-renderer wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}" class="fc-row-{{$vlItemIndex%2?'even':'odd'}}" data="{{ $vlItem }}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
+        <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlItemStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}" style="height:{{!$vlItemStaticHeight?($vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]):'auto'):''}};">
+            <fc-api-renderer wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}" class="fc-row-{{$vlItemIndex%2===0?'even':'odd'}}" data="{{ $vlItem }}" border="{{false}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
         </fc-api-renderer>
             </view>
 </view>
 <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
 
+            <view class="fc-reader-row-placeholder"></view>
             </scroll-view>
         </view>

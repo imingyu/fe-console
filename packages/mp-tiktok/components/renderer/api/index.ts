@@ -15,6 +15,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
             type: Number,
             value: 1,
         },
+        selected: Boolean,
     },
     data: {
         timeLevel: "",

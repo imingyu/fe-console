@@ -1,6 +1,7 @@
 {
     "component": true,
     "usingComponents": {
-        "fc-api-renderer": "../../renderer/api/index"
+        "fc-api-renderer": "../../renderer/api/index",
+        "filter-bar": "../../filter-bar/index"
     }
 }

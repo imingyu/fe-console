@@ -5,6 +5,6 @@
             wx:for-item="$vlItem"
             wx:for-index="$vlItemIndex"
             wx:key="id"
-            wx:if="{{ $vlStatus['s'+$vlItem.id] !== 'recovery'}}"
-            class="vl-item-container status-{{ $vlStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}"
-            style="height:{{$vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]+'px'):'auto'}};">
+            wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'recovery'}}"
+            class="vl-item-container status-{{ $vlItemStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}"
+            style="height:{{!$vlItemStaticHeight?($vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]):'auto'):''}};">

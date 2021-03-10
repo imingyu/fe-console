@@ -1,7 +1,8 @@
-<view class="fc-hand cid-{{$cid}} tid-{{$tid}}" bindtap="toggleVisable">Mpc</view>
+<view class="fc-hand cid-{{$cid}} tid-{{$tid}} {{visable?'is-hide':''}}" <%= bindEvent('tap') %>="toggleVisable">Mpc</view>
+<!-- TODO:iPhoneX等全面屏适配 -->
 <view wx:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
     <view class="fc-tabs-container">
-        <view class="fc-tabs-action" bindtap="toggleZoom">
+        <view class="fc-tabs-action" <%= bindEvent('tap') %>="toggleZoom">
             <view class="fc-tabs-zoom fc-ic-{{fullScreen?'compress':'expand'}}">
                 <view class="fc-ic-arrow-1"></view>
                 <view class="fc-ic-arrow-2"></view>
@@ -12,7 +13,7 @@
                 <view class="fc-tab {{activeTabIndex===index?'active':''}}" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value" bind:tap="setTab" data-tab="{{index}}">{{tab.name}}</view>
             </view>
         </scroll-view>
-        <view class="fc-tabs-action fc-tabs-action-right" bindtap="close">
+        <view class="fc-tabs-action fc-tabs-action-right" <%= bindEvent('tap') %>="close">
             <view class="fc-tabs-close fc-ic-close"></view>
         </view>
     </view>

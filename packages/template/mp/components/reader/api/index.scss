@@ -1,2 +1,15 @@
+@import '../../../style/var.scss';
 @import '../../../style/reader.scss';
 @import '../../../style/col-api.scss';
+
+.fc-reader-row-placeholder {
+    height: $ht-renderer-api;
+}
+
+.fc-re-api {
+    background-color: $bg-reader-api;
+}
+
+.fc-api-col {
+    border-right-color: transparent;
+}

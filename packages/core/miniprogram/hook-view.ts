@@ -5,14 +5,12 @@ import {
     FcProductType,
     IFcProducer,
 } from "@fe-console/types";
-import { now } from "@fe-console/util";
+import { now, $$getStack } from "@fe-console/util";
 import { MkApp, MkPage, MkComponent, MixinStore } from "@mpkit/mixin";
 import { MpViewType, MpMethodHook } from "@mpkit/types";
 import { uuid, getMpInitLifeName, getMpViewType } from "@mpkit/util";
 
-export const hookMpView = (
-    producer: IFcProducer<FcMpViewProduct>
-) => {
+export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
     const isEvent = (obj) =>
         typeof obj === "object" &&
         obj &&
@@ -30,6 +28,7 @@ export const hookMpView = (
                 time: now(),
                 request: args,
                 status: FcMethodExecStatus.Executed,
+                stack: $$getStack(),
             };
             producer.create(product);
             if (isEvent(args[0])) {
@@ -96,6 +95,7 @@ export const hookMpView = (
                     request: args,
                     status: FcMethodExecStatus.Executed,
                     eventTriggerView: this,
+                stack: $$getStack(),
                 };
                 producer.create(product);
                 return this.$nativeTriggerEvent.apply(this, args);
@@ -113,6 +113,7 @@ export const hookMpView = (
                 time: now(),
                 request: args,
                 status: FcMethodExecStatus.Executed,
+                stack: $$getStack(),
             };
             producer.create(product);
             rewriteTrigger.call(this);

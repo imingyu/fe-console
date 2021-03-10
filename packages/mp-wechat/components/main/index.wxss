@@ -19,34 +19,27 @@
 
 .fc-modal {
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 0;
   right: 0;
   bottom: 0;
-  color: #5e5e5e;
   z-index: 1000;
+  display: none;
+}
+
+.fc-modal.is-show {
+  display: block;
 }
 
 .fc-modal.is-full {
   top: 0;
 }
 
-.fc-modal-body {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 70%;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-}
-
 .fc-tabs-container {
   background: #f3f3f3;
-  color: #333333;
-  border-top: 1px solid #cccccc;
-  border-bottom: 1px solid #cccccc;
+  color: #5e5e5e;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   color: #5e5e5e;
   position: relative;
   display: flex;
@@ -54,11 +47,11 @@
 }
 
 .fc-tabs-scroll {
-  width: 630rpx;
+  width: 610rpx;
 }
 
 .fc-tabs-action {
-  width: 60rpx;
+  width: 70rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,9 +64,9 @@
   position: absolute;
   right: 0;
   top: 15rpx;
+  bottom: 15rpx;
   width: 1rpx;
-  height: 40rpx;
-  background-color: #cccccc;
+  background-color: #ccc;
 }
 
 .fc-tabs-action-right::after {
@@ -84,8 +77,8 @@
 .fc-tabs-zoom,
 .fc-tabs-close {
   position: relative;
-  width: 30rpx;
-  height: 30rpx;
+  width: 35rpx;
+  height: 35rpx;
 }
 
 .fc-tabs-zoom:before, .fc-tabs-zoom:after,
@@ -176,9 +169,9 @@
 .fc-tab {
   box-sizing: border-box;
   flex-shrink: 0;
-  height: 60rpx;
-  line-height: 60rpx;
-  padding: 0 30rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  padding: 0 20rpx;
   text-align: center;
   border-bottom: 6rpx solid transparent;
   font-size: 28rpx;
@@ -214,103 +207,4 @@
   left: 0;
   right: 0;
   bottom: 0;
-}
-
-.fc-item {
-  font-size: 30rpx;
-  padding: 0 20rpx;
-}
-
-.fc-item.is-fold {
-  padding-left: 42rpx;
-}
-
-.fc-item.is-fold::before {
-  left: 20rpx;
-}
-
-.is-fold {
-  padding-left: 22rpx;
-  position: relative;
-}
-
-.is-fold:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 12rpx;
-  height: 12rpx;
-  overflow: hidden;
-  border: 12rpx solid transparent;
-  border-left-color: #727272;
-  box-sizing: border-box;
-}
-
-.is-fold.is-open {
-  border-left-color: none;
-  border-top-color: #727272;
-}
-
-.fc-item-view:hover {
-  background-color: #ebf1fb;
-}
-
-.fc-item-view:before {
-  top: 12rpx;
-}
-
-.fc-item-view .view-head,
-.fc-item-view .view-body,
-.fc-item-view .view-footer {
-  display: inline-block;
-}
-
-.fc-item-view.is-open .view-head {
-  background-color: #cfe8fc;
-}
-
-.fc-item-view.is-open .view-head,
-.fc-item-view.is-open .view-body,
-.fc-item-view.is-open .view-footer {
-  display: block;
-}
-
-.fc-item-view.is-open .view-arrow.arrow-end {
-  margin-left: 0;
-}
-
-.fc-item-view .view-arrow.arrow-end {
-  margin-left: 14rpx;
-}
-
-.fc-item-view .view-part,
-.fc-item-view .attr-part {
-  display: inline-block;
-}
-
-.fc-item-view .view-arrow,
-.fc-item-view .attr-equal,
-.fc-item-view .attr-sem {
-  color: #a995a7;
-}
-
-.fc-item-view .view-tag {
-  color: #8c1d86;
-}
-
-.fc-item-view .view-attr {
-  margin-left: 14rpx;
-}
-
-.fc-item-view .attr-name {
-  color: #9a4804;
-}
-
-.fc-item-view .attr-value {
-  color: #1a1aa6;
-}
-
-.fc-item-view .attr-value.attr-string {
-  color: #c41a16;
 }

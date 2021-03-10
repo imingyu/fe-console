@@ -1,7 +1,6 @@
 <view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
-    <view class="fc-reader-bar">TODO：筛选栏
-    </view>
-    <view class="fc-reader-row fc-reader-th">
+    <filter-bar categorys="{{categoryList}}" activeCategory="{{activeCategory}}" filter clear parentCid="{{$cid}}" parentTid="{{$tid}}"></filter-bar>
+    <view class="fc-reader-row fc-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}}">
         <view class="fc-col fc-api-col fc-col-1">Name</view>
         <view class="fc-col fc-api-col fc-col-2">Status</view>
         <view class="fc-col fc-api-col fc-col-3">Type</view>
@@ -11,14 +10,16 @@
     <scroll-view scroll-y class="fc-reader-scroll has-th has-bar">
         <%= VirtualListStart %>
             <fc-api-renderer
-            wx:if="{{ $vlStatus[$vlItem.id] !== 'weak' }}"
-            class="fc-row-{{$vlItemIndex%2?'even':'odd'}}"
+            wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}"
+            class="fc-row-{{$vlItemIndex%2===0?'even':'odd'}}"
             data="{{ $vlItem }}"
+            border="{{false}}"
             parentCid="{{ $cid }}"
             parentTid="{{ $tid }}"
             data-id="{{ $vlItem.id }}"
         >
         </fc-api-renderer>
             <%= VirtualListEnd %>
+            <view class="fc-reader-row-placeholder"></view>
             </scroll-view>
         </view>

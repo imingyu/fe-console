@@ -1,0 +1,22 @@
+@import '../../../style/var.scss';
+@import '../../../style/reader.scss';
+@import '../../../style/col-api.scss';
+
+.fc-rd-api {
+    &.is-selected {
+        background-color: $bg-renderer-row-active;
+        color: $cr-renderer-row-active;
+    }
+
+    .fc-text-primary {
+        font-size: $sz-th-bar - 2rpx;
+        height: ($sz-th-bar - 2rpx) * 1.2;
+    }
+
+    .fc-text-muted {
+        font-size: $sz-th-bar - 4rpx;
+        opacity: .7;
+        height: ($sz-th-bar - 4rpx) * 1.2;
+        margin-top: 6rpx;
+    }
+}

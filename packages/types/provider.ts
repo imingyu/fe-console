@@ -1,5 +1,5 @@
 import { PartialBy } from "./tool";
-import { IFcEventEmitter } from "./util";
+import { FcStackInfo, IFcEventEmitter } from "./util";
 export interface FcProductOptionalProps {
     time?: number;
     id?: string;
@@ -11,6 +11,7 @@ export interface FcProduct {
     time: number;
     /** 如果存在父子关系，子数据需要携带父数据的id */
     parentId?: string;
+    stack?: FcStackInfo[];
     // [prop: string]: any;
 }
 export interface FcWhereProduct<T> extends FcProduct {

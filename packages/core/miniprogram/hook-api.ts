@@ -11,7 +11,7 @@ import {
 import { MixinStore, MkApi } from "@mpkit/mixin";
 import { uuid, getMpPlatform } from "@mpkit/util";
 import { MpApiVar, MpPlatform } from "@mpkit/types";
-import { now } from "@fe-console/util";
+import { $$getStack, now } from "@fe-console/util";
 
 const hookSocketMethod = (
     producer: IFcProducer<FcMpApiProduct>,
@@ -31,6 +31,7 @@ const hookSocketMethod = (
         status: FcMethodExecStatus.Executed,
         request: args,
         parentId,
+        stack: $$getStack(),
     };
     if (!args.length || !args[0] || typeof args[0] !== "object") {
         args[0] = {};
@@ -119,6 +120,7 @@ const hookSocketTask = (
                 parentId: taskHookInfo[0],
                 request: res,
                 status: FcMethodExecStatus.Executed,
+                stack: $$getStack(),
             };
             producer.create(product);
         });
@@ -132,9 +134,11 @@ const findCurrentHookTask = (
     args,
     id
 ) => {
-    let activeTask = hookState.socketTasks.find(
-        (item) => item[1] !== FcMpSocketTaskStatus.Unknown
-    );
+    let activeTask = hookState.socketTasks
+        ? hookState.socketTasks.find(
+              (item) => item[1] !== FcMpSocketTaskStatus.Unknown
+          )
+        : null;
     if (
         (!activeTask && !hookState.socketTasks) ||
         !hookState.socketTasks.length
@@ -146,7 +150,11 @@ const findCurrentHookTask = (
             request: args,
             status: FcMethodExecStatus.Executed,
             time: now(),
+            stack: $$getStack(),
         };
+        if (!hookState.socketTasks) {
+            hookState.socketTasks = [];
+        }
         hookState.socketTasks.push([
             id,
             FcMpSocketTaskStatus.Unknown,
@@ -166,6 +174,7 @@ export const hookMpApi = (
     const PALTFORM = getMpPlatform();
     MixinStore.addHook("Api", {
         before(name, args, handler, id) {
+            const stack = $$getStack();
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 const activeTask = findCurrentHookTask(
                     hookState,
@@ -193,6 +202,7 @@ export const hookMpApi = (
                 request: args,
                 status: FcMethodExecStatus.Executed,
                 time: now(),
+                stack,
             };
             if (name === "connectSocket") {
                 if (!hookState.socketTasks) {
@@ -222,7 +232,9 @@ export const hookMpApi = (
                 if (hookTask) {
                     hookTask[2] = result;
                 }
-                hookSocketTask(hookState, result, hookTask, producer);
+                if (result) {
+                    hookSocketTask(hookState, result, hookTask, producer);
+                }
             }
         },
         complete(name, args, res, success, id) {
@@ -231,7 +243,7 @@ export const hookMpApi = (
             }
             producer.change(id, {
                 endTime: now(),
-                response: res,
+                response: [res],
                 status: success
                     ? FcMethodExecStatus.Success
                     : FcMethodExecStatus.Fail,

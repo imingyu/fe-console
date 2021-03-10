@@ -27,24 +27,24 @@ export const createVirtualListMixin = (type: MpViewType) => {
             }
             if (!readyItem) {
                 this.$vlAllList.push(item);
-                if (typeof this.$vlStartIndex === "undefined") {
+            }
+            if (typeof this.$vlStartIndex === "undefined") {
+                this.$vlTrySetShowList(
+                    0,
+                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
+                );
+            } else if (this.$vlStartIndex === 0) {
+                if (
+                    this.data.$vlShowList.length !==
+                    this.$vlAllList.slice(
+                        this.$vlStartIndex,
+                        this.$vlEndIndex + 1
+                    ).length
+                ) {
                     this.$vlTrySetShowList(
                         0,
                         this.data.$vlPageSize + this.data.$vlBufferSize - 1
                     );
-                } else if (this.$vlStartIndex === 0) {
-                    if (
-                        this.data.$vlShowList.length !==
-                        this.$vlAllList.slice(
-                            this.$vlStartIndex,
-                            this.$vlEndIndex + 1
-                        ).length
-                    ) {
-                        this.$vlTrySetShowList(
-                            0,
-                            this.data.$vlPageSize + this.data.$vlBufferSize - 1
-                        );
-                    }
                 }
             }
         },
@@ -78,43 +78,85 @@ export const createVirtualListMixin = (type: MpViewType) => {
                     if (!this.$vlItemUIObserver) {
                         this.$vlItemUIObserver = {};
                     }
-                    if (!this.$vIitemDomQuery) {
-                        this.$vIitemDomQuery = {};
+                    if (!this.$vlItemDomQuery) {
+                        this.$vlItemDomQuery = {};
                     }
-                    if (!this.$vlItemDomSizeReayd) {
-                        this.$vlItemDomSizeReayd = {};
+                    if (!this.$vlItemDomSizeReady) {
+                        this.$vlItemDomSizeReady = {};
                     }
                     if (!this.$vlItemUIObserver[item.id]) {
                         this.$vlItemUIObserver[item.id] = [
                             item.index,
                             createIntersectionObserver(this),
                         ];
-                        this.$vlItemUIObserver[item.id][1].then((res) => {
-                            this.$vlItemUIObserver[item.id][2] = res;
-                            res.relativeToViewport().observe(
-                                `.vl-item-${item.id}`,
-                                (res) => {
-                                    this.$vlOnItemVisableChange(item, res);
-                                }
-                            );
+                        this.$vlItemUIObserver[item.id][1].then((obs) => {
+                            if (
+                                this.$vlItemUIObserver &&
+                                this.$vlItemUIObserver[item.id]
+                            ) {
+                                this.$vlItemUIObserver[item.id][2] = obs;
+                                obs.relativeToViewport().observe(
+                                    `.vl-item-${item.id}`,
+                                    (res) => {
+                                        if (
+                                            this.$vlItemUIObserver &&
+                                            this.$vlItemUIObserver[item.id] &&
+                                            this.data.$vlShowList.find(
+                                                (it) => it.id === item.id
+                                            )
+                                        ) {
+                                            this.$vlOnItemVisableChange(
+                                                item,
+                                                res
+                                            );
+                                        }
+                                    }
+                                );
+                            } else {
+                                obs.disconnect();
+                            }
                         });
                     }
-                    if (!this.$vIitemDomQuery[item.id]) {
-                        this.$vlItemDomSizeReayd[item.id] = false;
-                        createSelectorQuery(this).then((res) => {
-                            this.$vIitemDomQuery[item.id] = res;
-                            this.$vIitemDomQuery[item.id]
-                                .select(`.vl-item-${item.id}`)
-                                .boundingClientRect();
-                            this.$vIitemDomQuery[item.id].exec((res) => {
-                                delete this.$vIitemDomQuery[item.id];
-                                this.$vlItemDomSizeReayd[item.id] = true;
-                                this.$vlPushRenderQueue({
-                                    [`$vlItemHeight.s${item.id}`]: res[0]
-                                        .height,
-                                });
+                    if (!this.$vlItemDomQuery[item.id]) {
+                        this.$vlItemDomSizeReady[item.id] = false;
+                        if (!this.data.$vlItemStaticHeight) {
+                            createSelectorQuery(this).then((query) => {
+                                if (
+                                    this.$vlItemDomQuery &&
+                                    this.$vlItemDomQuery[item.id]
+                                ) {
+                                    this.$vlItemDomQuery[item.id] = query;
+                                    this.$vlItemDomQuery[item.id]
+                                        .select(`.vl-item-${item.id}`)
+                                        .boundingClientRect();
+                                    this.$vlItemDomQuery[item.id].exec(
+                                        (res) => {
+                                            if (
+                                                this.$vlItemDomQuery &&
+                                                this.$vlItemDomQuery[item.id]
+                                            ) {
+                                                delete this.$vlItemDomQuery[
+                                                    item.id
+                                                ];
+                                                this.$vlItemDomSizeReady[
+                                                    item.id
+                                                ] = true;
+                                                this.$vlPushRenderQueue({
+                                                    [`$vlItemHeight.s${item.id}`]: res[0]
+                                                        .height,
+                                                });
+                                            }
+                                        }
+                                    );
+                                }
                             });
-                        });
+                        } else {
+                            this.$vlItemDomSizeReady[item.id] = true;
+                            this.$vlPushRenderQueue({
+                                [`$vlItemHeight.s${item.id}`]: this.data
+                                    .$vlItemStaticHeight,
+                            });
+                        }
                     }
                 });
             });
@@ -128,8 +170,13 @@ export const createVirtualListMixin = (type: MpViewType) => {
                 data[`$vlItemStatus.s${item.id}`] = "hide";
             }
             if (
-                this.$vlEndIndex - item.index <= this.data.$vlBufferSize &&
-                res.intersectionRatio > 0
+                (this.$vlEndIndex - item.index <= this.data.$vlBufferSize &&
+                    res.intersectionRatio > 0) ||
+                this.data.$vlShowList.length !==
+                    this.$vlAllList.slice(
+                        this.$vlStartIndex,
+                        this.$vlEndIndex + 1
+                    ).length
             ) {
                 return this.$vlTrySetShowList(
                     this.$vlEndIndex + 1,
@@ -157,7 +204,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
                 }
                 this.$vlCheckAndFireRenderTimer = setTimeout(() => {
                     this.$vlExecUpdate();
-                });
+                }, 200);
             }
         },
         $vlExecUpdate() {
@@ -242,7 +289,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
             let $vlEndPlaceholderHeight = 0;
             rows.forEach((item) => {
                 if (item.index < firstShowIndex - this.data.$vlBufferSize) {
-                    if (this.$vlItemDomSizeReayd[item.id]) {
+                    if (this.$vlItemDomSizeReady[item.id]) {
                         $vlItemStatus[`s${item.id}`] = "weak";
                         if (
                             item.index <
@@ -282,7 +329,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
                         item.index >
                         lastShowIndex + this.data.$vlBufferSize
                     ) {
-                        if (this.$vlItemDomSizeReayd[item.id]) {
+                        if (this.$vlItemDomSizeReady[item.id]) {
                             $vlItemStatus[`s${item.id}`] = "weak";
                             if (
                                 item.index >
@@ -338,29 +385,6 @@ export const createVirtualListMixin = (type: MpViewType) => {
                     data[`$vlItemStatus.${prop}`] = $vlItemStatus[prop];
                 }
             }
-            data.renderCount = rows.filter(
-                (item) => item.status === "render"
-            ).length;
-            data.showCount = rows.filter(
-                (item) => item.status === "show"
-            ).length;
-            data.hideCount = rows.filter(
-                (item) => item.status === "hide"
-            ).length;
-            data.weakCount = rows.filter(
-                (item) => item.status === "weak"
-            ).length;
-            data.recoveryCount = rows.filter(
-                (item) => item.status === "recovery"
-            ).length;
-            console.log(`render data=`, {
-                firstShowIndex,
-                lastShowIndex,
-                orgItemStatus,
-                rows,
-                data,
-                vm: this,
-            });
         },
         $vlMergeData(queue) {
             const data: any = {};
@@ -411,6 +435,9 @@ export const createVirtualListMixin = (type: MpViewType) => {
             delete this.$vlRenderQueue;
             delete this.$vlStartIndex;
             delete this.$vlEndIndex;
+            delete this.$vlIndexMapItemList;
+            delete this.$vlItemDomSizeReady;
+            delete this.$vlItemDomQuery;
             if (this.$vlItemUIObserver) {
                 Object.keys(this.$vlItemUIObserver).forEach((key) => {
                     this.$vlItemUIObserver[key][2].disconnect();
@@ -448,6 +475,8 @@ export const createVirtualListMixin = (type: MpViewType) => {
             $vlItemStatus: {},
             // 每项高度（也可在list.item中给出$vlHeight字段）
             $vlItemHeight: {},
+            // 可以指定是否需要计算item高度避免频繁计算
+            $vlItemStaticHeight: 0,
             $vlStartPlaceholderHeight: 0,
             $vlEndPlaceholderHeight: 0,
             // 每页显示多少条数据

@@ -11,7 +11,7 @@
     }
 }
 
-@mixin ic-close($color:$cr-tabs-text, $width:4rpx) {
+@mixin ic-close($color:$cr-tab-head, $width:4rpx) {
 
     &.fc-ic-close:before,
     &.fc-ic-close:after {
@@ -31,7 +31,7 @@
     }
 }
 
-@mixin ic-clear($color:$cr-tabs-text, $width:4rpx) {
+@mixin ic-clear($color:$cr-tab-head, $width:4rpx) {
 
     &.fc-ic-clear:before {
         width: 100%;
@@ -50,7 +50,7 @@
     }
 }
 
-@mixin ic-expand-compress($color:$cr-tabs-text, $width:4rpx) {
+@mixin ic-expand-compress($color:$cr-tab-head, $width:4rpx) {
 
     &.fc-ic-compress:before,
     &.fc-ic-compress:after,

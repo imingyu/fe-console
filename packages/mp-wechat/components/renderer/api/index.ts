@@ -11,10 +11,15 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
                 this.computeTime();
             },
         },
+        border: {
+            type: Boolean,
+            value: true,
+        },
         size: {
             type: Number,
             value: 1,
         },
+        selected: Boolean,
     },
     data: {
         timeLevel: "",

@@ -11,52 +11,187 @@ import {
     FcProductType,
 } from "@fe-console/types";
 import { FcMpApiMaterial } from "@fe-console/types";
+import { ApiCategoryMap, ApiCategoryList } from "../../../common/category";
 FcMpComponent(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
     createVirtualListMixin(MpViewType.Component),
     {
-        data: {},
+        properties: {
+            active: {
+                type: Boolean,
+                value: false,
+            },
+        },
+        data: {
+            categoryList: ApiCategoryList,
+            activeCategory: "all",
+        },
         methods: {
-            addMaterial(data: Partial<FcMpApiProduct>): FcMpApiMaterial {
-                if (!this.$vlAllList) {
-                    this.$vlAllList = [];
-                }
-                const readyItem: FcMpApiMaterial = this.$vlAllList.find(
-                    (item) => item.id === data.id
-                );
-                const material: FcMpApiMaterial = readyItem || {
+            addMaterial(data: Partial<FcMpApiProduct>) {
+                const material: Partial<FcMpApiMaterial> = {
                     id: data.id,
-                    // TODO: 对API进行分类
-                    type: data.category,
-                    name: data.category,
-                    status: data.status,
-                    startTime: data.time,
-                    initiator: {
-                        type: "",
-                    },
-                    result: data.result,
                 };
+                if ("category" in data) {
+                    material.name = data.category;
+                    material.type = ApiCategoryMap[data.category] || "other";
+                }
                 if (
-                    data.status === FcMethodExecStatus.Success ||
-                    data.status === FcMethodExecStatus.Fail
+                    (
+                        data.category ||
+                        this.materialMark[data.id] ||
+                        ""
+                    ).endsWith("Sync") &&
+                    "execEndTime" in data &&
+                    !material.endTime
                 ) {
+                    material.endTime = data.execEndTime;
+                }
+                if ("time" in data) {
+                    material.startTime = data.time;
+                }
+                if ("result" in data) {
+                    material.result = data.result;
+                }
+                if ("status" in data) {
+                    material.status = data.status;
+                }
+                if ("endTime" in data) {
                     material.endTime = data.endTime;
                 }
-                if (!readyItem) {
-                    this.$vlPushItem(material);
+                if ("request" in data) {
+                    material.request = data.request;
                 }
-                return material;
+                if ("response" in data) {
+                    material.response = data.response;
+                }
+                if (
+                    !material.statusDesc &&
+                    data.status === FcMethodExecStatus.Fail &&
+                    data.response &&
+                    data.response.length &&
+                    data.response[0] &&
+                    data.response[0].errMsg
+                ) {
+                    const arr = data.response[0].errMsg.split(":fail");
+                    if (arr.length > 1) {
+                        material.statusDesc = arr[1].trim();
+                    } else {
+                        material.statusDesc = data.response[0].errMsg;
+                    }
+                }
+                if (!this.categoryMaterialMap) {
+                    this.categoryMaterialMap = {};
+                }
+                const readyItem = this.categoryMaterialMap.all
+                    ? this.categoryMaterialMap.all.find(
+                          (item) => item.id === material.id
+                      )
+                    : null;
+                if (readyItem) {
+                    Object.assign(readyItem, material);
+                }
+                if (material.type || readyItem) {
+                    if (
+                        !this.categoryMaterialMap[
+                            material.type || readyItem.type
+                        ]
+                    ) {
+                        this.categoryMaterialMap[
+                            material.type || readyItem.type
+                        ] = [];
+                    }
+                    if (
+                        this.categoryMaterialMap[
+                            material.type || readyItem.type
+                        ].length
+                    ) {
+                        const typeReadyItem = this.categoryMaterialMap[
+                            material.type || readyItem.type
+                        ]
+                            ? this.categoryMaterialMap[
+                                  material.type || readyItem.type
+                              ].find((item) => item.id === material.id)
+                            : null;
+                        if (typeReadyItem) {
+                            Object.assign(readyItem, material);
+                        }
+                    } else {
+                        this.categoryMaterialMap[material.type].push(material);
+                    }
+                }
+                this.$vlAddItem(material);
+            },
+            clearMaterial() {
+                const activeCategory = this.data.activeCategory;
+                if (activeCategory === "all") {
+                    this.data.categoryList.forEach((item) => {
+                        this.categoryMaterialMap[item] = [];
+                    });
+                    this.categoryMaterialMap["all"] = [];
+                    this.categoryMaterialMap["other"] = [];
+                } else {
+                    this.categoryMaterialMap[activeCategory] = [];
+                    this.categoryMaterialMap["all"] = this.categoryMaterialMap[
+                        "all"
+                    ].filter((item) => item.type === activeCategory);
+                }
+                this.$vlClear();
+                this.$vlAllList = this.categoryMaterialMap[activeCategory];
+                this.$vlTrySetShowList(
+                    0,
+                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
+                );
+            },
+            changeCategory(activeCategory) {
+                this.setData({
+                    activeCategory,
+                });
+                this.$vlClear();
+                this.$vlAllList = this.categoryMaterialMap[activeCategory];
+                this.$vlTrySetShowList(
+                    0,
+                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
+                );
             },
         },
         [getMpInitLifeName(MpViewType.Component)]() {
+            (global as any).ssd = this;
+            this.categoryMaterialMap = {
+                all: [],
+                other: [],
+            };
+            this.data.categoryList.forEach((item) => {
+                this.categoryMaterialMap[item] = [];
+            });
+
             const observer: FcMpMemoryObserver = getObserver();
             if (observer) {
                 observer.on("data", (type, data) => {
                     if (data.type === FcProductType.MpApi) {
-                        this.$vlPushItem(data);
+                        if (!this.materialMark) {
+                            this.materialMark = {};
+                        }
+                        this.materialMark[data.id] = data.category;
+                        this.addMaterial(data);
+                    }
+                });
+                observer.on("change", (type, data) => {
+                    if (this.materialMark && this.materialMark[data.id]) {
+                        this.addMaterial(data);
                     }
                 });
             }
+
+            this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
+                if (data.child.$tid === "fc-filter-bar") {
+                    type = data.type;
+                    if (type === "category") {
+                        this.changeCategory(data.data);
+                    } else if (type === "clear") {
+                        this.clearMaterial();
+                    }
+                }
+            });
         },
     }
 );

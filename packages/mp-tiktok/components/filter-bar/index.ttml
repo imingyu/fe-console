@@ -1,0 +1,20 @@
+<view class="fc-filter-bar {{clear?'has-clear':''}} {{remove ?'has-remove':''}}">
+    <scroll-view scroll-x class="fc-filter-main">
+        <view class="fc-filter-items">
+            <input tt:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" bindconfirm="onFilterConfirm" />
+            <block tt:if="{{categorys && categorys.length}}">
+                <view class="fc-filter-category-br"></view>
+                <view class="fc-filter-category {{activeCategory==='all' || !activeCategory?'active':''}}" bindtap="tapCategory" data-val="all">All</view>
+                <view class="fc-filter-category {{activeCategory===item?'active':''}}" tt:for="{{categorys}}" bindtap="tapCategory" data-val="{{item}}" tt:="item">{{categoryMap[item]}}</view>
+            </block>
+        </view>
+    </scroll-view>
+    <view tt:if="{{remove || clear}}" class="fc-filter-actions">
+        <view tt:if="{{clear}}" class="fc-filter-action" bindtap="onClear">
+            <view class="fc-filter-clear fc-ic-clear"></view>
+        </view>
+        <view tt:if="{{remove}}" class="fc-filter-action" bindtap="onRemove">
+            <view class="fc-filter-remove fc-ic-close"></view>
+        </view>
+    </view>
+</view>

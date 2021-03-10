@@ -10,8 +10,31 @@ import {
     FcConsoleProduct,
     FcMpApiProduct,
     IFcStorager,
+    PartialBy,
 } from "@fe-console/types";
 import MpConfig from "../config";
+
+interface FcMpProductFilter {
+    (data: Partial<MpProduct>): boolean;
+}
+type MpProduct = FcMpApiProduct | FcMpViewProduct | FcConsoleProduct;
+class FcMpFilterProducer extends FcMpProducer {
+    constructor(public filter: FcMpProductFilter) {
+        super();
+    }
+    change(id: string, data?: Partial<MpProduct>) {
+        data = data || ({} as Partial<MpProduct>);
+        data.id = id;
+        if (this.filter(data)) {
+            super.change(id, data);
+        }
+    }
+    create(data: PartialBy<MpProduct, "id" | "time">): MpProduct | undefined {
+        if (this.filter(data as Partial<MpProduct>)) {
+            return super.create(data);
+        }
+    }
+}
 
 export const getObserver = (() => {
     type ObserverMap = {
@@ -23,7 +46,7 @@ export const getObserver = (() => {
         };
     };
     let observerMap: ObserverMap;
-    let producer: FcMpProducer;
+    let producer: FcMpFilterProducer;
     let localStorager: FcMpMemoryStorager;
     return (): FcMpMemoryObserver | undefined => {
         if (
@@ -32,7 +55,12 @@ export const getObserver = (() => {
             MpConfig.observer &&
             MpConfig.observer.length
         ) {
-            producer = new FcMpProducer();
+            producer = new FcMpFilterProducer((data): boolean => {
+                if (typeof MpConfig.productFilter === "function") {
+                    return MpConfig.productFilter(data);
+                }
+                return true;
+            });
             observerMap = {};
             MpConfig.observer.map((item) => {
                 if (item === "local") {
@@ -45,6 +73,9 @@ export const getObserver = (() => {
                         };
                         localStorager.on("data", (type, data) => {
                             observer.emit("data", data);
+                        });
+                        localStorager.on("change", (type, data) => {
+                            observer.emit("change", data);
                         });
                     }
                 } else {
@@ -61,6 +92,11 @@ export const getObserver = (() => {
             producer.on("data", (type, data) => {
                 for (let prop in observerMap) {
                     observerMap[prop].storager.emit("data", data);
+                }
+            });
+            producer.on("change", (type, data) => {
+                for (let prop in observerMap) {
+                    observerMap[prop].storager.emit("change", data);
                 }
             });
         }

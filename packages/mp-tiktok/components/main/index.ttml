@@ -1,5 +1,5 @@
-<view class="fc-hand" bindtap="toggleVisable">Mpc</view>
-<view tt:if="{{visable || mounted}}" class="fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
+<view class="fc-hand cid-{{$cid}} tid-{{$tid}} {{visable?'is-hide':''}}" bindtap="toggleVisable">Mpc</view>
+<view tt:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
     <view class="fc-tabs-container">
         <view class="fc-tabs-action" bindtap="toggleZoom">
             <view class="fc-tabs-zoom fc-ic-{{fullScreen?'compress':'expand'}}">
@@ -19,7 +19,7 @@
     <view class="fc-tabs-body">
         <view class="fc-tabs-panels" style="width:{{tabs.length*100}}%;transform: translateX(-{{(activeTabIndex/tabs.length)*100}}%);">
             <view class="fc-tabs-panel panel-{{tab.value}}" tt:for="{{tabs}}" tt:for-item="tab" tt:="value">
-                <fc-api-reader tt:if="{{tab.value==='api'}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
+                <fc-api-reader class="tab-panel-reader" tt:if="{{tab.value==='api'}}" active="{{tab.value==='api' && activeTabIndex===index}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
             </view>
         </view>
     </view>

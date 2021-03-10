@@ -22,46 +22,39 @@
 
 .fc-modal {
     position: fixed;
-    top: 50%;
+    top: 40%;
     left: 0;
     right: 0;
     bottom: 0;
-    color: $cr-text;
     z-index: 1000;
+    display: none;
+    &.is-show{
+        display: block;
+    }
 
     &.is-full {
         top: 0;
     }
 }
 
-.fc-modal-body {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 70%;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-}
 
 .fc-tabs-container {
-    background: $tab-bar-bg;
-    color: $tab-bar-color;
-    border-top: 1px solid $tab-bar-brcolor;
-    border-bottom: 1px solid $tab-bar-brcolor;
-    color: $cr-tabs-text;
+    background: $bg-tab-head;
+    color: $cr-tab-head;
+    border-top: 1px solid $bg-tab-border;
+    border-bottom: 1px solid $bg-tab-border;
+    color: $cr-tab-head;
     position: relative;
     display: flex;
     flex-wrap: nowrap;
 }
 
 .fc-tabs-scroll {
-    width: 750rpx - $tab-bar-height - $tab-bar-height;
+    width: 750rpx - $ht-tab-bar - $ht-tab-bar;
 }
 
 .fc-tabs-action {
-    width: $tab-bar-height;
+    width: $ht-tab-bar;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,9 +66,9 @@
         position: absolute;
         right: 0;
         top: 15rpx;
+        bottom: 15rpx;
         width: 1rpx;
-        height: 40rpx;
-        background-color: $tab-bar-brcolor;
+        background-color: $bg-tab-border;
     }
 }
 
@@ -89,8 +82,8 @@
 .fc-tabs-zoom,
 .fc-tabs-close {
     @include fc-ic;
-    width: 30rpx;
-    height: 30rpx;
+    width: $ht-tab-bar / 2;
+    height: $ht-tab-bar / 2;
 }
 
 .fc-tabs-zoom {
@@ -115,16 +108,16 @@
 .fc-tab {
     box-sizing: border-box;
     flex-shrink: 0;
-    height: $tab-bar-height;
-    line-height: $tab-bar-height;
-    padding: 0 30rpx;
+    height: $ht-tab-bar;
+    line-height: $ht-tab-bar;
+    padding: 0 20rpx;
     text-align: center;
     border-bottom: 6rpx solid transparent;
     font-size: 28rpx;
     transition: border-color .5s;
 
     &.active {
-        border-bottom-color: $tab-bar-item-active-brcolor;
+        border-bottom-color: $bg-tab-border-active;
     }
 }
 
@@ -152,109 +145,5 @@
         left: 0;
         right: 0;
         bottom: 0;
-    }
-}
-
-.fc-item {
-    font-size: 30rpx;
-    padding: 0 20rpx;
-
-    &.is-fold {
-        padding-left: 20rpx+$fold-size+10rpx;
-
-        &::before {
-            left: 20rpx;
-        }
-    }
-}
-
-.is-fold {
-    padding-left: $fold-size+10rpx;
-    position: relative;
-
-    &:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: $fold-size;
-        height: $fold-size;
-        overflow: hidden;
-        border: $fold-size solid transparent;
-        border-left-color: $cr-fold;
-        box-sizing: border-box;
-    }
-
-    &.is-open {
-        border-left-color: none;
-        border-top-color: $cr-fold;
-    }
-}
-
-
-.fc-item-view {
-    &:hover {
-        background-color: rgb(235, 241, 251);
-    }
-
-    &:before {
-        top: 12rpx;
-    }
-
-    .view-head,
-    .view-body,
-    .view-footer {
-        display: inline-block;
-    }
-
-    &.is-open {
-        .view-head {
-            background-color: rgb(207, 232, 252);
-        }
-
-        .view-head,
-        .view-body,
-        .view-footer {
-            display: block;
-        }
-
-        .view-arrow.arrow-end {
-            margin-left: 0;
-        }
-    }
-
-    .view-arrow.arrow-end {
-        margin-left: $attr-margin;
-    }
-
-    .view-part,
-    .attr-part {
-        display: inline-block;
-    }
-
-    .view-arrow,
-    .attr-equal,
-    .attr-sem {
-        color: rgb(169, 149, 167);
-    }
-
-    .view-tag {
-        color: rgb(140, 29, 134);
-    }
-
-    .view-attr {
-        margin-left: $attr-margin;
-    }
-
-    .attr-name {
-        color: rgb(154, 72, 4);
-    }
-
-    .attr-value {
-        color: rgb(26, 26, 166);
-
-        &.attr-string {
-            color: $cr-string;
-        }
     }
 }

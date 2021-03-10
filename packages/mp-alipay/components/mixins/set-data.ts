@@ -1,8 +1,6 @@
 import { MpViewType } from "@mpkit/types";
 import { MkSetDataPerformer, diffMpData, openMpData } from "@mpkit/set-data";
-import {
-    getMpInitLifeName,
-} from "@mpkit/util";
+import { getMpInitLifeName, isEmptyObject } from "@mpkit/util";
 import { FcMpViewContextBase } from "@fe-console/types";
 const performer = new MkSetDataPerformer();
 export const createSetDataMixin = (type: MpViewType) => {
@@ -24,11 +22,29 @@ export const createSetDataMixin = (type: MpViewType) => {
             });
         },
     };
+    const rewriteUndefinedProp = (data) => {
+        for (let prop in data) {
+            const type = typeof data[prop];
+            if (type === "undefined") {
+                data[prop] = null;
+            } else if (Array.isArray(data)) {
+                data[prop].forEach((item, index) => {
+                    rewriteUndefinedProp[item];
+                    if (typeof item === "undefined") {
+                        data[index] = null;
+                    }
+                });
+            } else if (type === "object" && data[prop] && isEmptyObject(data[prop])) {
+                rewriteUndefinedProp(data[prop]);
+            }
+        }
+    };
     const mixin: any = {
         [getMpInitLifeName(type)](this: FcMpViewContextBase) {
             if (!this.$mkDiffSetDataBeforeValue) {
                 this.$mkDiffSetDataBeforeValue = this.setData;
                 this.setData = function (data, callback) {
+                    rewriteUndefinedProp(data);
                     return performer.exec(this, data, callback);
                 };
             }

@@ -1,0 +1,143 @@
+.fc-reader {
+  height: 100%;
+  position: relative;
+}
+
+.fc-reader-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  color: #5e5e5e;
+}
+
+.fc-reader-row.fc-status-3 {
+  color: red;
+}
+
+.fc-reader-row.is-selected .fc-col {
+  border-right-color: #fff;
+}
+
+.fc-reader-row .fc-col {
+  box-sizing: border-box;
+  flex-grow: 0;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 6rpx 10rpx;
+  border-right: 1px solid #ccc;
+  line-height: 1.2;
+}
+
+.fc-reader-row .fc-col.is-last-col {
+  border-right: none;
+}
+
+.fc-reader-row .fc-col.fc-col-right {
+  align-items: flex-end;
+}
+
+.fc-reader-row.fc-nowrap .fc-text-primary,
+.fc-reader-row.fc-nowrap .fc-text-muted {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.fc-reader-th {
+  box-sizing: border-box;
+  height: 70rpx;
+  font-size: 26rpx;
+  border-bottom: 1px solid #ccc;
+  background-color: #f3f3f3;
+  color: #5e5e5e;
+}
+
+.fc-reader-th.has-data.has-bar .fc-col:after {
+  top: 60rpx;
+}
+
+.fc-reader-th.has-data .fc-col {
+  padding-right: 0;
+}
+
+.fc-reader-th.has-data .fc-col.is-last-col:after {
+  display: none;
+}
+
+.fc-reader-th.has-data .fc-col:after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  margin-top: 2px;
+  margin-right: -1px;
+  background-color: #ccc;
+  top: 0;
+  bottom: 0;
+  justify-self: flex-end;
+  align-self: flex-end;
+}
+
+.fc-reader-th .fc-col {
+  height: 100%;
+  align-items: flex-start;
+}
+
+.fc-row-even {
+  background-color: #f5f5f5;
+}
+
+.fc-row-odd {
+  background-color: #fff;
+}
+
+.fc-row-even,
+.fc-row-odd {
+  display: block;
+}
+
+.fc-reader-scroll {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 2px;
+}
+
+.fc-reader-scroll.has-th {
+  top: 70rpx;
+}
+
+.fc-reader-scroll.has-bar {
+  top: 60rpx;
+}
+
+.fc-reader-scroll.has-th.has-bar {
+  top: 130rpx;
+}
+
+.fc-api-col {
+  width: 17.5%;
+  height: 80rpx;
+}
+
+.fc-api-col.fc-col-1 {
+  width: 30%;
+}
+
+.fc-api-col.fc-col-2 {
+  width: 20%;
+}
+
+.fc-api-col.fc-col-3 {
+  width: 15%;
+}
+
+.fc-reader-row-placeholder {
+  height: 80rpx;
+}

@@ -110,14 +110,14 @@ if (MpRunConfig) {
         producer.on("data", (type, data) => {
             for (let prop in observerMap) {
                 if (observerMap[prop].storager) {
-                    observerMap[prop].storager.emit("data", data);
+                    observerMap[prop].storager.push(data);
                 }
             }
         });
         producer.on("change", (type, data) => {
             for (let prop in observerMap) {
                 if (observerMap[prop].storager) {
-                    observerMap[prop].storager.emit("change", data);
+                    observerMap[prop].storager.change(data.id, data);
                 }
             }
         });

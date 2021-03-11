@@ -127,6 +127,32 @@
     margin-top: 2px;
     z-index: 5;
 
+    &.fc-show-detail {
+        right: 70%;
+    }
+
+    &.has-th {
+        top: $ht-th-bar;
+    }
+
+    &.has-bar {
+        top: $ht-filter-bar;
+    }
+
+    &.has-th.has-bar {
+        top: $ht-th-bar + $ht-filter-bar;
+    }
+}
+
+.fc-reader-detail-container {
+    position: absolute;
+    top: 0;
+    left: 30%;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    display: block;
+
     &.has-th {
         top: $ht-th-bar;
     }

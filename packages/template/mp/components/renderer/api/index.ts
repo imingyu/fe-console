@@ -11,15 +11,12 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
                 this.computeTime();
             },
         },
-        border: {
-            type: Boolean,
-            value: true,
-        },
         size: {
             type: Number,
             value: 1,
         },
         selected: Boolean,
+        outerClass: String,
     },
     data: {
         timeLevel: "",
@@ -27,9 +24,11 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
         timeUnit: "",
     },
     methods: {
+        tap() {
+            this.$fcDispatch("tap", this.$fcGetProp("data", {}).id);
+        },
         computeTime(this: FcMpViewContextBase) {
-            const { startTime, endTime } =
-                this['<%= (platform==="alipay"?"props":"data") %>'].data || {};
+            const { startTime, endTime } = this.$fcGetProp("data", {});
             if (startTime && endTime) {
                 const total: number = endTime - startTime;
                 let timeUnit;

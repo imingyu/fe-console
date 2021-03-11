@@ -9,7 +9,7 @@ import {
     FcMpViewProduct,
     FcProductType,
 } from "@fe-console/types";
-import { FcMpApiMaterial } from "@fe-console/types";
+import { FcMpApiMaterial, FcMpViewContextBase } from "@fe-console/types";
 import { getApiCategoryList } from "../../../configure/index";
 import { convertApiMaterial } from "../../../common/material";
 FcMpComponent(
@@ -25,6 +25,7 @@ FcMpComponent(
         data: {
             categoryList: getApiCategoryList(),
             activeCategory: "all",
+            detailMaterial: null,
         },
         methods: {
             addMaterial(data: Partial<FcMpApiProduct>) {
@@ -219,6 +220,22 @@ FcMpComponent(
                     );
                 }
             },
+            tapMaterial(this: FcMpViewContextBase, id: string) {
+                console.log(`tapMaterial.id=`, id);
+                debugger;
+
+                this.$fcObserver
+                    .call(id)
+                    .then((res) => {
+                        console.log(`tapMaterial.res=`, res);
+                        this.setData({
+                            detailMaterial: {},
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(`tapMaterial.err=`, err);
+                    });
+            },
             changeCategory(activeCategory) {
                 this.setData({
                     activeCategory,
@@ -266,6 +283,11 @@ FcMpComponent(
                         this.clearMaterial();
                     } else if (type === "filter") {
                         this.filterMaterial(data.data);
+                    }
+                } else if (data.child.$tid === "fc-api-renderer") {
+                    type = data.type;
+                    if (type === "tap") {
+                        this.tapMaterial(data.data);
                     }
                 }
             });

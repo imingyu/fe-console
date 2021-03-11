@@ -60,14 +60,14 @@ export const createSetDataMixin = (type: MpViewType) => {
                     return performer.exec(this, data, callback);
                 };
             }
-            if (this.$fcObserver) {
+            if (this.$fcObserver && this.onFcObserverEvent) {
                 this.$fcObserverHandler = observerHandler.bind(this);
                 this.$fcObserver.on("data", this.$fcObserverHandler);
                 this.$fcObserver.on("change", this.$fcObserverHandler);
             }
         },
         [destoryLife]() {
-            if (this.$fcObserver) {
+            if (this.$fcObserver && this.$fcObserverHandler) {
                 this.$fcObserver.off("data", this.$fcObserverHandler);
                 this.$fcObserver.off("change", this.$fcObserverHandler);
                 delete this.$fcObserverHandler;

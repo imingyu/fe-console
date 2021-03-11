@@ -4,7 +4,7 @@
             <input tt:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" bindconfirm="onFilterConfirm" />
             <block tt:if="{{categorys && categorys.length}}">
                 <view class="fc-filter-category-br"></view>
-                <view class="fc-filter-category {{activeCategory===item.value?'active':''}}" tt:for="{{categorys}}" bindtap="tapCategory" data-val="{{item.value}}" tt:="item.value">{{categoryMap[item.text]}}</view>
+                <view class="fc-filter-category {{activeCategory===item.value?'active':''}}" tt:for="{{categorys}}" bindtap="tapCategory" data-val="{{item.value}}" tt:="value">{{item.text}}</view>
             </block>
         </view>
     </scroll-view>

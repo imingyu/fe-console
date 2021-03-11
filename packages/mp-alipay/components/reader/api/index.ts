@@ -9,10 +9,8 @@ import {
     FcMpViewProduct,
     FcProductType,
 } from "@fe-console/types";
-import { FcMpApiMaterial } from "@fe-console/types";
-import {
-    getApiCategoryList,
-} from "../../../configure/index";
+import { FcMpApiMaterial, FcMpViewContextBase } from "@fe-console/types";
+import { getApiCategoryList } from "../../../configure/index";
 import { convertApiMaterial } from "../../../common/material";
 FcMpComponent(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
@@ -25,8 +23,9 @@ FcMpComponent(
             },
         },
         data: {
-            categoryList: [],
+            categoryList: getApiCategoryList(),
             activeCategory: "all",
+            detailMaterial: null,
         },
         methods: {
             addMaterial(data: Partial<FcMpApiProduct>) {
@@ -53,20 +52,20 @@ FcMpComponent(
                         ? readyItem.type
                         : "";
                     if (this.filterKeyword) {
-                        const filterFields = [
+                        const filterFields: string[] = [
                             material.name
                                 ? material.name
-                                : readyItem
+                                : readyItem && readyItem.name
                                 ? readyItem.name
                                 : "",
                             material.desc
                                 ? material.desc
-                                : readyItem
+                                : readyItem && readyItem.desc
                                 ? readyItem.desc
                                 : "",
                             material.statusDesc
                                 ? material.statusDesc
-                                : readyItem
+                                : readyItem && readyItem.statusDesc
                                 ? readyItem.statusDesc
                                 : "",
                         ];
@@ -210,27 +209,32 @@ FcMpComponent(
                 );
             },
             clearMaterial() {
+                this.initMaterialCategoryMap(true);
                 if (this.filterKeyword) {
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.FilterMaterialCategoryMap
-                    );
                     this.reloadVlList(
                         this.FilterMaterialCategoryMap[this.data.activeCategory]
                     );
                 } else {
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.NormalMaterialCategoryMap
-                    );
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.FilterMaterialCategoryMap
-                    );
                     this.reloadVlList(
                         this.NormalMaterialCategoryMap[this.data.activeCategory]
                     );
                 }
+            },
+            tapMaterial(this: FcMpViewContextBase, id: string) {
+                console.log(`tapMaterial.id=`, id);
+                debugger;
+
+                this.$fcObserver
+                    .call(id)
+                    .then((res) => {
+                        console.log(`tapMaterial.res=`, res);
+                        this.setData({
+                            detailMaterial: {},
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(`tapMaterial.err=`, err);
+                    });
             },
             changeCategory(activeCategory) {
                 this.setData({
@@ -250,7 +254,10 @@ FcMpComponent(
                 type: string,
                 data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
             ) {
-                if (data.type === FcProductType.MpApi) {
+                if (
+                    data.type === FcProductType.MpApi ||
+                    (this.materialMark && this.materialMark[data.id])
+                ) {
                     if (!this.materialMark) {
                         this.materialMark = {};
                     }
@@ -264,7 +271,9 @@ FcMpComponent(
             },
         },
         [getMpInitLifeName(MpViewType.Component)]() {
-            this.refreshCategory();
+            setTimeout(() => {
+                this.refreshCategory();
+            }, 400);
             this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
                 if (data.child.$tid === "fc-filter-bar") {
                     type = data.type;
@@ -274,6 +283,11 @@ FcMpComponent(
                         this.clearMaterial();
                     } else if (type === "filter") {
                         this.filterMaterial(data.data);
+                    }
+                } else if (data.child.$tid === "fc-api-renderer") {
+                    type = data.type;
+                    if (type === "tap") {
+                        this.tapMaterial(data.data);
                     }
                 }
             });

@@ -20,18 +20,13 @@ export abstract class FcObserverImpl<
     ): Promise<R> {
         return (this.connected ? Promise.resolve() : this.connect()).then(
             () => {
-                new Promise((resolve, reject) => {
-                    this.storager.emit("Request", ({
-                        where,
-                        id: eid,
-                        time: now(),
-                    } as unknown) as S);
+                return new Promise((resolve, reject) => {
                     let timer = setTimeout(() => {
                         reject(new Error("Timeout"));
                     }, timeout);
                     this.storager.once(`Response.${eid}`, (type, data) => {
                         timer && clearTimeout(timer);
-                        resolve(data);
+                        resolve(data as unknown as R);
                     });
                     this.storager.once(
                         `Response.Error.${eid}`,
@@ -44,6 +39,11 @@ export abstract class FcObserverImpl<
                             );
                         }
                     );
+                    this.storager.emit("Request", ({
+                        where,
+                        id: eid,
+                        time: now(),
+                    } as unknown) as S);
                 });
             }
         ) as Promise<R>;

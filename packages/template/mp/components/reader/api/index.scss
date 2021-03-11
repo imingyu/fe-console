@@ -13,3 +13,20 @@
 .fc-api-col {
     border-right-color: transparent;
 }
+
+.fc-api-reader-th.fc-show-detail {
+    .fc-col-1 {
+        width: 100%;
+    }
+
+    .fc-col-2,
+    .fc-col-3,
+    .fc-col-4,
+    .fc-col-5 {
+        display: none;
+
+        &:after {
+            display: none;
+        }
+    }
+}

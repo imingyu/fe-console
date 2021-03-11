@@ -4,7 +4,7 @@
             <input a:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" onConfirm="onFilterConfirm" />
             <block a:if="{{categorys && categorys.length}}">
                 <view class="fc-filter-category-br"></view>
-                <view class="fc-filter-category {{activeCategory===item.value?'active':''}}" a:for="{{categorys}}" onTap="tapCategory" data-val="{{item.value}}" a:key="item.value">{{categoryMap[item.text]}}</view>
+                <view class="fc-filter-category {{activeCategory===item.value?'active':''}}" a:for="{{categorys}}" onTap="tapCategory" data-val="{{item.value}}" a:key="value">{{item.text}}</view>
             </block>
         </view>
     </scroll-view>

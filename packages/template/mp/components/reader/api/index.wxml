@@ -1,25 +1,26 @@
 <view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
     <filter-bar categorys="{{categoryList}}" activeCategory="{{activeCategory}}" filter clear parentCid="{{$cid}}" parentTid="{{$tid}}"></filter-bar>
-    <view class="fc-reader-row fc-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}}">
+    <view class="fc-reader-row fc-reader-th fc-api-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}} {{detailMaterial?'fc-show-detail':''}}">
         <view class="fc-col fc-api-col fc-col-1">Name</view>
         <view class="fc-col fc-api-col fc-col-2">Status</view>
         <view class="fc-col fc-api-col fc-col-3">Type</view>
         <view class="fc-col fc-api-col fc-col-4">Initiator</view>
         <view class="fc-col fc-api-col fc-col-5 is-last-col">Time</view>
     </view>
-    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar">
+    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar {{detailMaterial?'fc-show-detail':''}}">
         <%= VirtualListStart %>
             <fc-api-renderer
             wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}"
             class="fc-row-{{$vlItemIndex%2===0?'even':'odd'}}"
             data="{{ $vlItem }}"
-            border="{{false}}"
+            outerClass="{{detailMaterial?'fc-show-detail':''}} fc-not-border"
             parentCid="{{ $cid }}"
             parentTid="{{ $tid }}"
             data-id="{{ $vlItem.id }}"
         >
         </fc-api-renderer>
             <%= VirtualListEnd %>
-            <view class="fc-reader-row-placeholder"></view>
-            </scroll-view>
-        </view>
+        <view class="fc-reader-row-placeholder"></view>
+    </scroll-view>
+    <fc-api-detail wx:if="{{detailMaterial}}" data="{{detailMaterial}}" class="fc-reader-detail-container has-th has-bar"></fc-api-detail>
+</view>

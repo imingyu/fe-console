@@ -117,6 +117,10 @@
   z-index: 5;
 }
 
+.fc-reader-scroll.fc-show-detail {
+  right: 70%;
+}
+
 .fc-reader-scroll.has-th {
   top: 70rpx;
 }
@@ -126,6 +130,28 @@
 }
 
 .fc-reader-scroll.has-th.has-bar {
+  top: 130rpx;
+}
+
+.fc-reader-detail-container {
+  position: absolute;
+  top: 0;
+  left: 30%;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  display: block;
+}
+
+.fc-reader-detail-container.has-th {
+  top: 70rpx;
+}
+
+.fc-reader-detail-container.has-bar {
+  top: 60rpx;
+}
+
+.fc-reader-detail-container.has-th.has-bar {
   top: 130rpx;
 }
 
@@ -156,4 +182,22 @@
 
 .fc-api-col {
   border-right-color: transparent;
+}
+
+.fc-api-reader-th.fc-show-detail .fc-col-1 {
+  width: 100%;
+}
+
+.fc-api-reader-th.fc-show-detail .fc-col-2,
+.fc-api-reader-th.fc-show-detail .fc-col-3,
+.fc-api-reader-th.fc-show-detail .fc-col-4,
+.fc-api-reader-th.fc-show-detail .fc-col-5 {
+  display: none;
+}
+
+.fc-api-reader-th.fc-show-detail .fc-col-2:after,
+.fc-api-reader-th.fc-show-detail .fc-col-3:after,
+.fc-api-reader-th.fc-show-detail .fc-col-4:after,
+.fc-api-reader-th.fc-show-detail .fc-col-5:after {
+  display: none;
 }

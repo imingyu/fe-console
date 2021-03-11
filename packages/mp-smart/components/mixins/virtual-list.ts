@@ -6,6 +6,7 @@ import { MpViewType } from "@mpkit/types";
 const isVisableStatus = (status) => {
     return status !== "hide" && status !== "weak" && status !== "recovery";
 };
+// TODO: 有BUG，向showList中插入数据的时候，有index不连续的情况
 export const createVirtualListMixin = (type: MpViewType) => {
     const methods = {
         $vlAddItem(item) {
@@ -48,18 +49,22 @@ export const createVirtualListMixin = (type: MpViewType) => {
                 }
             }
         },
-        $vlTrySetShowList($vlStartIndex, $vlEndIndex, data) {
+        $vlTrySetShowList(startIndex, endIndex, data) {
             data = data || {};
             if (!this.$vlIndexMapItemList) {
                 this.$vlIndexMapItemList = [];
             }
             const list = this.$vlAllList;
-            this.$vlStartIndex = $vlStartIndex;
-            this.$vlEndIndex = $vlEndIndex;
+            this.$vlStartIndex = startIndex;
+            this.$vlEndIndex = endIndex;
             const $vlShowList = list.slice(
                 this.$vlStartIndex,
                 this.$vlEndIndex + 1
             );
+            console.log(
+                `startIndex=${startIndex}, endIndex=${endIndex}, oldLen=${this.data.$vlShowList.length}, len=${$vlShowList.length}`
+            );
+
             const reanderAfterHandler = [];
             $vlShowList.forEach((item, index) => {
                 if (data.$vlItemStatus) {
@@ -67,7 +72,7 @@ export const createVirtualListMixin = (type: MpViewType) => {
                 } else {
                     data[`$vlItemStatus.s${item.id}`] = "render";
                 }
-                item.index = $vlStartIndex + index;
+                item.index = startIndex + index;
                 this.$vlIndexMapItemList[item.index] = item;
                 if (data.$vlShowList) {
                     data.$vlShowList[item.index] = item;
@@ -170,19 +175,27 @@ export const createVirtualListMixin = (type: MpViewType) => {
                 data[`$vlItemStatus.s${item.id}`] = "hide";
             }
             if (
-                (this.$vlEndIndex - item.index <= this.data.$vlBufferSize &&
-                    res.intersectionRatio > 0) ||
-                this.data.$vlShowList.length !==
-                    this.$vlAllList.slice(
-                        this.$vlStartIndex,
-                        this.$vlEndIndex + 1
-                    ).length
+                this.$vlEndIndex - item.index <= this.data.$vlBufferSize &&
+                res.intersectionRatio > 0
             ) {
                 return this.$vlTrySetShowList(
                     this.$vlEndIndex + 1,
                     this.$vlEndIndex +
                         this.data.$vlPageSize +
                         this.data.$vlBufferSize,
+                    data
+                );
+            } else if (
+                this.data.$vlShowList.length !==
+                this.$vlAllList.slice(this.$vlStartIndex, this.$vlEndIndex + 1)
+                    .length
+            ) {
+                return this.$vlTrySetShowList(
+                    this.$vlStartIndex,
+                    this.$vlStartIndex +
+                        this.data.$vlPageSize +
+                        this.data.$vlBufferSize -
+                        1,
                     data
                 );
             }

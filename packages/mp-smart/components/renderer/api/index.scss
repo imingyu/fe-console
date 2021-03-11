@@ -8,6 +8,19 @@
         color: $cr-renderer-row-active;
     }
 
+    &.fc-show-detail {
+        .fc-col-1 {
+            width: 100%;
+        }
+
+        .fc-col-2,
+        .fc-col-3,
+        .fc-col-4,
+        .fc-col-5 {
+            display: none;
+        }
+    }
+
     .fc-text-primary {
         font-size: $sz-th-bar - 2rpx;
         height: ($sz-th-bar - 2rpx) * 1.2;

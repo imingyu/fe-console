@@ -62,7 +62,7 @@ export interface FcMpViewContextBase<T = any> {
     setData(data: any, callback?: Function): void;
     $fcEvents?: { [prop: string]: FcEventHandler[] };
     $fcUnDispatchEvents?: Array<[string, any, FcMpViewContextBase]>;
-    $fcGetProp<T = any>(prop: string): T;
+    $fcGetProp(prop: string, defaultVal?:any): any;
     /** 向父组件（不限层级）广播数据 */
     $fcDispatch(type: string, data: any, root: FcMpViewContextBase);
     $fcGetParentTid(): string;

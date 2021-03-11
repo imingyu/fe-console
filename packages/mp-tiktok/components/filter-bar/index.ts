@@ -22,9 +22,6 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-filter-bar"), {
         activeCategory: String,
         categorys: Array,
     },
-    data: {
-        categoryMap: {},
-    },
     methods: {
         onFilterConfirm(e) {
             const text = e.detail.value;

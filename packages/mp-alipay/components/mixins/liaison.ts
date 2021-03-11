@@ -60,10 +60,14 @@ export const createLiaisonMixin = (() => {
                 }
                 this.$fcUnDispatchEvents.push([type, data, root]);
             },
-            $fcGetProp<T = any>(prop: string): T {
-                return this['props'][
+            $fcGetProp(prop: string, defaultVal?: any): any {
+                const res = this['props'][
                     prop
-                ] as T;
+                ];
+                if (typeof res === "undefined" || res === null) {
+                    return defaultVal;
+                }
+                return res;
             },
             $fcGetParentTid(): string {
                 return this.$fcGetProp("parentTid");

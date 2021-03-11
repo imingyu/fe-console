@@ -10,7 +10,7 @@ export class FcEventEmitter<T = any> implements IFcEventEmitter<T> {
     }
     once(type: string, _handler: FcEventHandler<T>) {
         const handler = (...args) => {
-            _handler.apply(args);
+            _handler.apply(null, args);
             this.off(type, handler);
         };
         this.on(type, handler);

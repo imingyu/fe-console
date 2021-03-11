@@ -84,9 +84,10 @@ export class FcMpProducer extends FcProducerImpl<
             id:
                 | string
                 | Partial<FcMpApiProduct | FcMpViewProduct | FcConsoleProduct>,
-            type?: FcProductType
+            type?: FcProductType,
+            context?: any
         ): boolean => {
-            return this.filter(id, type);
+            return this.filter(id, type, context);
         };
 
         hook[0] &&
@@ -103,8 +104,13 @@ export class FcMpProducer extends FcProducerImpl<
         id:
             | string
             | Partial<FcMpApiProduct | FcMpViewProduct | FcConsoleProduct>,
-        type?: FcProductType
+        type?: FcProductType,
+        context?: any
     ): boolean {
+        // 强制忽略fc-console相关组件产生的数据原料，避免发生死循环
+        if (context && context.$fcComponent) {
+            return false;
+        }
         if (!this.options) {
             return true;
         }

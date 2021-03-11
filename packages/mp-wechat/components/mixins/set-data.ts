@@ -52,6 +52,7 @@ export const createSetDataMixin = (type: MpViewType) => {
             : "onUnload";
     const mixin: any = {
         [getMpInitLifeName(type)](this: FcMpViewContextBase) {
+            this.$fcComponent = true;
             if (!this.$mkDiffSetDataBeforeValue) {
                 this.$mkDiffSetDataBeforeValue = this.setData;
                 this.setData = function (data, callback) {
@@ -59,14 +60,14 @@ export const createSetDataMixin = (type: MpViewType) => {
                     return performer.exec(this, data, callback);
                 };
             }
-            if (this.$fcObserver) {
+            if (this.$fcObserver && this.onFcObserverEvent) {
                 this.$fcObserverHandler = observerHandler.bind(this);
                 this.$fcObserver.on("data", this.$fcObserverHandler);
                 this.$fcObserver.on("change", this.$fcObserverHandler);
             }
         },
         [destoryLife]() {
-            if (this.$fcObserver) {
+            if (this.$fcObserver && this.$fcObserverHandler) {
                 this.$fcObserver.off("data", this.$fcObserverHandler);
                 this.$fcObserver.off("change", this.$fcObserverHandler);
                 delete this.$fcObserverHandler;

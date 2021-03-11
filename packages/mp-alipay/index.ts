@@ -99,14 +99,23 @@ if (MpRunConfig) {
             }
         });
 
+        producer.on("data", (type, data) => {
+            for (let prop in observerMap) {
+                if (observerMap[prop].storager) {
+                    observerMap[prop].storager.emit("data", data);
+                }
+            }
+        });
+        producer.on("change", (type, data) => {
+            for (let prop in observerMap) {
+                if (observerMap[prop].storager) {
+                    observerMap[prop].storager.emit("change", data);
+                }
+            }
+        });
+
         for (let prop in observerMap) {
             if (observerMap[prop].storager) {
-                producer.on("data", (type, data) => {
-                    observerMap[prop].storager.emit("data", data);
-                });
-                producer.on("change", (type, data) => {
-                    observerMap[prop].storager.emit("change", data);
-                });
                 observerMap[prop].storager.on("data", (t, data) => {
                     observerMap[prop].observer &&
                         observerMap[prop].observer.emit("data", data);

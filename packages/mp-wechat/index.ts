@@ -19,19 +19,27 @@ import {
 if (MpRunConfig) {
     let MpObserver: FcMpMemoryObserver;
     const setFcValues = (target: any) => {
+        if ("$fcRunConfig" in target) {
+            return;
+        }
         if (typeof Object.defineProperties === "function") {
-            Object.defineProperties(target, {
-                $fcRunConfig: {
-                    get() {
-                        return MpRunConfig;
+            try {
+                Object.defineProperties(target, {
+                    $fcRunConfig: {
+                        get() {
+                            return MpRunConfig;
+                        },
                     },
-                },
-                $fcObserver: {
-                    get() {
-                        return MpObserver;
+                    $fcObserver: {
+                        get() {
+                            return MpObserver;
+                        },
                     },
-                },
-            });
+                });
+            } catch (error) {
+                console.log(target);
+                console.error(error);
+            }
         } else {
             target.$fcRunConfig = MpRunConfig;
             target.$fcObserver = MpObserver;
@@ -99,21 +107,28 @@ if (MpRunConfig) {
             }
         });
 
-        for (let prop in observerMap) {
-            if (observerMap[prop].storager) {
-                producer.on("data", (type, data) => {
+        producer.on("data", (type, data) => {
+            for (let prop in observerMap) {
+                if (observerMap[prop].storager) {
                     observerMap[prop].storager.emit("data", data);
-                });
-                producer.on("change", (type, data) => {
+                }
+            }
+        });
+        producer.on("change", (type, data) => {
+            for (let prop in observerMap) {
+                if (observerMap[prop].storager) {
                     observerMap[prop].storager.emit("change", data);
-                });
+                }
+            }
+        });
+
+        for (let prop in observerMap) {
+            if (observerMap[prop].storager && observerMap[prop].observer) {
                 observerMap[prop].storager.on("data", (t, data) => {
-                    observerMap[prop].observer &&
-                        observerMap[prop].observer.emit("data", data);
+                    observerMap[prop].observer.emit("data", data);
                 });
                 observerMap[prop].storager.on("change", (t, data) => {
-                    observerMap[prop].observer &&
-                        observerMap[prop].observer.emit("change", data);
+                    observerMap[prop].observer.emit("change", data);
                 });
             }
         }

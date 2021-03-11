@@ -5,7 +5,6 @@ import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName } from "@mpkit/util";
 import {
     FcConsoleProduct,
-    FcMethodExecStatus,
     FcMpApiProduct,
     FcMpViewProduct,
     FcProductType,
@@ -13,9 +12,8 @@ import {
 import { FcMpApiMaterial } from "@fe-console/types";
 import {
     getApiCategoryList,
-    getApiCategoryValue,
 } from "../../../configure/index";
-import { convertApiMaterial } from "common/material";
+import { convertApiMaterial } from "../../../common/material";
 FcMpComponent(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
     createVirtualListMixin(MpViewType.Component),
@@ -46,7 +44,7 @@ FcMpComponent(
                         material,
                         this.NormalMaterialCategoryMap
                     );
-                    const readyItem = this.NormalMaterialCategoryMap.find(
+                    const readyItem = this.NormalMaterialCategoryMap.all.find(
                         (t) => t.id === material.id
                     );
                     const category = material.type
@@ -267,7 +265,6 @@ FcMpComponent(
         },
         [getMpInitLifeName(MpViewType.Component)]() {
             this.refreshCategory();
-            (global as any).ssd = this;
             this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
                 if (data.child.$tid === "fc-filter-bar") {
                     type = data.type;

@@ -20,16 +20,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-filter-bar"), {
             value: false,
         },
         activeCategory: String,
-        categorys: {
-            type: Array,
-            value: [],
-            observer(val) {
-                this.setCategory(val);
-            },
-        },
-    },
-    data: {
-        categoryMap: {},
+        categorys: Array,
     },
     methods: {
         onFilterConfirm(e) {
@@ -44,20 +35,6 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-filter-bar"), {
         },
         tapCategory(e) {
             this.$fcDispatch("category", e.currentTarget.dataset.val);
-        },
-        setCategory(categorys) {
-            this.setData({
-                categoryMap: categorys.reduce((sum, item: string) => {
-                    if (item === "xhr") {
-                        sum[item] = "XHR";
-                    } else if (item === "ws") {
-                        sum[item] = "WS";
-                    } else {
-                        sum[item] = item[0].toUpperCase() + item.substr(1);
-                    }
-                    return sum;
-                }, {}),
-            });
         },
     },
 });

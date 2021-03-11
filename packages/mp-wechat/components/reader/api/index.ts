@@ -5,17 +5,13 @@ import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName } from "@mpkit/util";
 import {
     FcConsoleProduct,
-    FcMethodExecStatus,
     FcMpApiProduct,
     FcMpViewProduct,
     FcProductType,
 } from "@fe-console/types";
 import { FcMpApiMaterial } from "@fe-console/types";
-import {
-    getApiCategoryList,
-    getApiCategoryValue,
-} from "../../../configure/index";
-import { convertApiMaterial } from "common/material";
+import { getApiCategoryList } from "../../../configure/index";
+import { convertApiMaterial } from "../../../common/material";
 FcMpComponent(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
     createVirtualListMixin(MpViewType.Component),
@@ -27,7 +23,7 @@ FcMpComponent(
             },
         },
         data: {
-            categoryList: [],
+            categoryList: getApiCategoryList(),
             activeCategory: "all",
         },
         methods: {
@@ -46,7 +42,7 @@ FcMpComponent(
                         material,
                         this.NormalMaterialCategoryMap
                     );
-                    const readyItem = this.NormalMaterialCategoryMap.find(
+                    const readyItem = this.NormalMaterialCategoryMap.all.find(
                         (t) => t.id === material.id
                     );
                     const category = material.type
@@ -55,20 +51,20 @@ FcMpComponent(
                         ? readyItem.type
                         : "";
                     if (this.filterKeyword) {
-                        const filterFields = [
+                        const filterFields: string[] = [
                             material.name
                                 ? material.name
-                                : readyItem
+                                : readyItem && readyItem.name
                                 ? readyItem.name
                                 : "",
                             material.desc
                                 ? material.desc
-                                : readyItem
+                                : readyItem && readyItem.desc
                                 ? readyItem.desc
                                 : "",
                             material.statusDesc
                                 ? material.statusDesc
-                                : readyItem
+                                : readyItem && readyItem.statusDesc
                                 ? readyItem.statusDesc
                                 : "",
                         ];
@@ -212,23 +208,12 @@ FcMpComponent(
                 );
             },
             clearMaterial() {
+                this.initMaterialCategoryMap(true);
                 if (this.filterKeyword) {
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.FilterMaterialCategoryMap
-                    );
                     this.reloadVlList(
                         this.FilterMaterialCategoryMap[this.data.activeCategory]
                     );
                 } else {
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.NormalMaterialCategoryMap
-                    );
-                    this.initMaterialCategoryMap(
-                        true,
-                        this.FilterMaterialCategoryMap
-                    );
                     this.reloadVlList(
                         this.NormalMaterialCategoryMap[this.data.activeCategory]
                     );
@@ -252,7 +237,10 @@ FcMpComponent(
                 type: string,
                 data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
             ) {
-                if (data.type === FcProductType.MpApi) {
+                if (
+                    data.type === FcProductType.MpApi ||
+                    (this.materialMark && this.materialMark[data.id])
+                ) {
                     if (!this.materialMark) {
                         this.materialMark = {};
                     }
@@ -266,8 +254,9 @@ FcMpComponent(
             },
         },
         [getMpInitLifeName(MpViewType.Component)]() {
-            this.refreshCategory();
-            (global as any).ssd = this;
+            setTimeout(() => {
+                this.refreshCategory();
+            }, 400);
             this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
                 if (data.child.$tid === "fc-filter-bar") {
                     type = data.type;

@@ -52,6 +52,7 @@ export const createSetDataMixin = (type: MpViewType) => {
             : "onUnload";
     const mixin: any = {
         [getMpInitLifeName(type)](this: FcMpViewContextBase) {
+            this.$fcComponent = true;
             if (!this.$mkDiffSetDataBeforeValue) {
                 this.$mkDiffSetDataBeforeValue = this.setData;
                 this.setData = function (data, callback) {

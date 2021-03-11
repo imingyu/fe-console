@@ -4,7 +4,7 @@
             <input wx:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" bindconfirm="onFilterConfirm" />
             <block wx:if="{{categorys && categorys.length}}">
                 <view class="fc-filter-category-br"></view>
-                <view class="fc-filter-category {{activeCategory===item?'active':''}}" wx:for="{{categorys}}" bindtap="tapCategory" data-val="{{item}}" wx:key="item">{{categoryMap[item]}}</view>
+                <view class="fc-filter-category {{activeCategory===item.value?'active':''}}" wx:for="{{categorys}}" bindtap="tapCategory" data-val="{{item.value}}" wx:key="value">{{item.text}}</view>
             </block>
         </view>
     </scroll-view>

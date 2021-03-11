@@ -23,7 +23,7 @@ export const hookMpView = (
         obj.currentTarget;
     const viewHook: MpMethodHook = {
         before(name, args, handler, id) {
-            if (!filter || filter(id, FcProductType.MpView)) {
+            if (!filter || filter(id, FcProductType.MpView, this)) {
                 const product: FcMpViewProduct = {
                     id,
                     type: FcProductType.MpView,
@@ -44,7 +44,7 @@ export const hookMpView = (
                     wrapDetail._mpcWrap
                 ) {
                     args[0].detail = wrapDetail.orgDetail;
-                    if (!filter || filter(id, FcProductType.MpView)) {
+                    if (!filter || filter(id, FcProductType.MpView, this)) {
                         producer.change(id, {
                             eventTriggerPid: wrapDetail.id,
                         });
@@ -52,7 +52,7 @@ export const hookMpView = (
 
                     if (
                         !filter ||
-                        filter(wrapDetail.id, FcProductType.MpView)
+                        filter(wrapDetail.id, FcProductType.MpView, this)
                     ) {
                         producer.change(wrapDetail.id, {
                             eventHandlePid: id,
@@ -62,7 +62,7 @@ export const hookMpView = (
             }
         },
         after(name, args, result, id) {
-            if (filter && !filter(id, FcProductType.MpView)) {
+            if (filter && !filter(id, FcProductType.MpView, this)) {
                 return;
             }
             if (result && typeof result === "object" && "then" in result) {
@@ -81,7 +81,7 @@ export const hookMpView = (
             }
         },
         catch(name, args, error, errType, id) {
-            if (filter && !filter(id, FcProductType.MpView)) {
+            if (filter && !filter(id, FcProductType.MpView, this)) {
                 return;
             }
             producer.change(id, {
@@ -105,7 +105,7 @@ export const hookMpView = (
                     _mpcWrap: true,
                     orgDetail,
                 };
-                if (!filter || filter(id, FcProductType.MpView)) {
+                if (!filter || filter(id, FcProductType.MpView, this)) {
                     const product: FcMpViewProduct = {
                         id,
                         type: FcProductType.MpView,
@@ -139,7 +139,7 @@ export const hookMpView = (
             const targetSpec = mkView(spec);
             const time = now();
             const res = native(targetSpec);
-            if (!filter || filter(id, FcProductType.MpView)) {
+            if (!filter || filter(id, FcProductType.MpView, native)) {
                 const product: FcMpViewProduct = {
                     id,
                     type: FcProductType.MpView,

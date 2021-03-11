@@ -4,7 +4,6 @@
             <input tt:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" bindconfirm="onFilterConfirm" />
             <block tt:if="{{categorys && categorys.length}}">
                 <view class="fc-filter-category-br"></view>
-                <view class="fc-filter-category {{activeCategory==='all' || !activeCategory?'active':''}}" bindtap="tapCategory" data-val="all">All</view>
                 <view class="fc-filter-category {{activeCategory===item?'active':''}}" tt:for="{{categorys}}" bindtap="tapCategory" data-val="{{item}}" tt:="item">{{categoryMap[item]}}</view>
             </block>
         </view>

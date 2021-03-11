@@ -1,7 +1,7 @@
 import {
     FcMethodExecStatus,
-    FcMpHookInfo,
     FcMpViewProduct,
+    FcProductFilter,
     FcProductType,
     IFcProducer,
 } from "@fe-console/types";
@@ -10,7 +10,10 @@ import { MkApp, MkPage, MkComponent, MixinStore } from "@mpkit/mixin";
 import { MpViewType, MpMethodHook } from "@mpkit/types";
 import { uuid, getMpInitLifeName, getMpViewType } from "@mpkit/util";
 
-export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
+export const hookMpView = (
+    producer: IFcProducer<FcMpViewProduct>,
+    filter?: FcProductFilter<FcMpViewProduct>
+) => {
     const isEvent = (obj) =>
         typeof obj === "object" &&
         obj &&
@@ -20,17 +23,19 @@ export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
         obj.currentTarget;
     const viewHook: MpMethodHook = {
         before(name, args, handler, id) {
-            const product: FcMpViewProduct = {
-                id,
-                type: FcProductType.MpView,
-                category: getMpViewType(this),
-                group: name,
-                time: now(),
-                request: args,
-                status: FcMethodExecStatus.Executed,
-                stack: $$getStack(),
-            };
-            producer.create(product);
+            if (!filter || filter(id, FcProductType.MpView)) {
+                const product: FcMpViewProduct = {
+                    id,
+                    type: FcProductType.MpView,
+                    category: getMpViewType(this),
+                    group: name,
+                    time: now(),
+                    request: args,
+                    status: FcMethodExecStatus.Executed,
+                    stack: $$getStack(),
+                };
+                producer.create(product);
+            }
             if (isEvent(args[0])) {
                 const wrapDetail = args[0].detail;
                 if (
@@ -39,16 +44,27 @@ export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
                     wrapDetail._mpcWrap
                 ) {
                     args[0].detail = wrapDetail.orgDetail;
-                    producer.change(id, {
-                        eventTriggerPid: wrapDetail.id,
-                    });
-                    producer.change(wrapDetail.id, {
-                        eventHandlePid: id,
-                    });
+                    if (!filter || filter(id, FcProductType.MpView)) {
+                        producer.change(id, {
+                            eventTriggerPid: wrapDetail.id,
+                        });
+                    }
+
+                    if (
+                        !filter ||
+                        filter(wrapDetail.id, FcProductType.MpView)
+                    ) {
+                        producer.change(wrapDetail.id, {
+                            eventHandlePid: id,
+                        });
+                    }
                 }
             }
         },
         after(name, args, result, id) {
+            if (filter && !filter(id, FcProductType.MpView)) {
+                return;
+            }
             if (result && typeof result === "object" && "then" in result) {
                 result.then((res) => {
                     producer.change(id, {
@@ -65,6 +81,9 @@ export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
             }
         },
         catch(name, args, error, errType, id) {
+            if (filter && !filter(id, FcProductType.MpView)) {
+                return;
+            }
             producer.change(id, {
                 status: FcMethodExecStatus.Fail,
                 result: [error, errType],
@@ -86,71 +105,54 @@ export const hookMpView = (producer: IFcProducer<FcMpViewProduct>) => {
                     _mpcWrap: true,
                     orgDetail,
                 };
-                const product: FcMpViewProduct = {
-                    id,
-                    type: FcProductType.MpView,
-                    category: getMpViewType(this),
-                    group: "triggerEvent",
-                    time: now(),
-                    request: args,
-                    status: FcMethodExecStatus.Executed,
-                    eventTriggerView: this,
-                stack: $$getStack(),
-                };
-                producer.create(product);
+                if (!filter || filter(id, FcProductType.MpView)) {
+                    const product: FcMpViewProduct = {
+                        id,
+                        type: FcProductType.MpView,
+                        category: getMpViewType(this),
+                        group: "triggerEvent",
+                        time: now(),
+                        request: args,
+                        status: FcMethodExecStatus.Executed,
+                        eventTriggerView: this,
+                        stack: $$getStack(),
+                    };
+                    producer.create(product);
+                }
                 return this.$nativeTriggerEvent.apply(this, args);
             };
         }
     }
 
-    const initLifeMixin = {
+    const rewriteTriggerMixin = {
         before(name, args, handler, id) {
-            const product: FcMpViewProduct = {
-                id,
-                type: FcProductType.MpView,
-                category: getMpViewType(this),
-                group: name,
-                time: now(),
-                request: args,
-                status: FcMethodExecStatus.Executed,
-                stack: $$getStack(),
-            };
-            producer.create(product);
             rewriteTrigger.call(this);
         },
-        after(name, args, result, id) {
-            producer.change(id, {
-                execEndTime: now(),
-                result,
-            });
-        },
     };
-    MixinStore.addHook(MpViewType.App, {
-        [getMpInitLifeName(MpViewType.App)]: initLifeMixin,
-    });
-    MixinStore.addHook(MpViewType.Page, {
-        [getMpInitLifeName(MpViewType.Page)]: initLifeMixin,
-    });
     MixinStore.addHook(MpViewType.Component, {
-        [getMpInitLifeName(MpViewType.Component)]: initLifeMixin,
+        [getMpInitLifeName(MpViewType.Component)]: rewriteTriggerMixin,
+        observer: rewriteTriggerMixin,
     });
     const wrapView = (native, mkView, type: MpViewType) => {
         return (spec) => {
             const id = uuid();
             const targetSpec = mkView(spec);
-            const product: FcMpViewProduct = {
-                id,
-                type: FcProductType.MpView,
-                category: type,
-                group: "$register$",
-                time: now(),
-                request: [spec, targetSpec],
-                status: FcMethodExecStatus.Executed,
-            };
-            producer.create(product);
+            const time = now();
             const res = native(targetSpec);
-            product.execEndTime = now();
-            product.result = res;
+            if (!filter || filter(id, FcProductType.MpView)) {
+                const product: FcMpViewProduct = {
+                    id,
+                    type: FcProductType.MpView,
+                    category: type,
+                    group: "$register$",
+                    time,
+                    request: [spec, targetSpec],
+                    execEndTime: now(),
+                    result: res,
+                    status: FcMethodExecStatus.Executed,
+                };
+                producer.create(product);
+            }
             return res;
         };
     };

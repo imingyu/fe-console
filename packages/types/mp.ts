@@ -1,10 +1,12 @@
 import { MpViewType } from "@mpkit/types";
 import {
     FcCommonProduct,
+    FcConsoleProduct,
+    FcProducerOptions,
     FcProductType,
-    FcRequestProduct,
     FcResponseProduct,
 } from "./core";
+import { IFcObserver } from "./provider";
 import { FcEventHandler } from "./util";
 
 export interface FcMpApiProduct<T = any, K = any>
@@ -45,8 +47,7 @@ export enum FcMpSocketTaskStatus {
 export type FcMpSocketTaskHookInfo<T = any, K = any> = [
     string,
     FcMpSocketTaskStatus,
-    FcMpSocketTask?,
-    FcMpApiProduct<T, K>?
+    FcMpSocketTask?
 ];
 
 export interface FcMpHookInfo {
@@ -70,9 +71,34 @@ export interface FcMpViewContextBase<T = any> {
     $fcOnce(this: FcMpViewContextBase, name: string, handler: FcEventHandler);
     $fcEmit(this: FcMpViewContextBase, name: string, data?: any);
     $fcOff(this: FcMpViewContextBase, name: string, handler?: FcEventHandler);
+    $fcObserver?: IFcObserver<
+        string,
+        FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+    >;
     [prop: string]: any;
 }
 
 export interface FcMpViewMethod<T = any> {
     (this: T & FcMpViewContextBase);
+}
+
+export interface FcMpApiCategoryMap {
+    [prop: string]: string | FcMpApiCategoryGetter;
+}
+export interface FcMpApiCategoryGetter {
+    (product: Partial<FcMpApiProduct>): string;
+}
+
+export interface FcMpApiCategoryInfo {
+    text: string;
+    value: string;
+}
+
+export interface FcMpRunConfig {
+    observer?: string[];
+    producerOptions?: FcProducerOptions<
+        FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+    >;
+    apiCategoryGetter: FcMpApiCategoryMap | FcMpApiCategoryGetter;
+    apiCategoryList: Array<string | FcMpApiCategoryInfo>;
 }

@@ -9,9 +9,14 @@ import {
     FcMpApiProduct,
     FcMpHookInfo,
     FcMpViewProduct,
+    FcProducerOptions,
+    FcProducerRange,
+    FcProductType,
     FcStoragerRequest,
     IFcProducer,
+    PartialBy,
 } from "@fe-console/types";
+import { now } from "@fe-console/util";
 import {
     DataLevel,
     FailAction,
@@ -21,22 +26,158 @@ import {
     SwallowStrategyMode,
 } from "squirrel-report";
 import { MkApi } from "@mpkit/mixin";
+import { uuid } from "@mpkit/util";
 import { hookMpView } from "./hook-view";
 import { hookMpApi } from "./hook-api";
 import { hookConsole } from "../hook-console";
 
-export const FcMpProducerRunHandler = (producer: FcMpProducer) => {
-    const hookState: FcMpHookInfo = {};
-    hookMpApi(hookState, producer as IFcProducer<FcMpApiProduct>);
-    hookMpView(producer as IFcProducer<FcMpViewProduct>);
-    hookConsole(producer as IFcProducer<FcConsoleProduct>);
-};
-
+/**
+ * 小程序数据生成者，可通过options配置数据生产范围
+ */
 export class FcMpProducer extends FcProducerImpl<
     FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
 > {
-    constructor() {
-        super(FcMpProducerRunHandler);
+    constructor(public options?: FcProducerOptions) {
+        super();
+        const hookState: FcMpHookInfo = {};
+        const producer = this;
+        const hook = [1, 1, 1];
+        if (options && !options.immutable) {
+            // 只有不可变时，才酌情注入监控代码
+            if (typeof options.range === "undefined" || !("range" in options)) {
+                // undefiend|不设置=代表监控系统中所有可被监控的范围
+            } else if (Array.isArray(options.range)) {
+                if (!options.range.length) {
+                    // 空数组=所有都不监控
+                    hook[0] = hook[1] = hook[2] = 0;
+                } else {
+                    hook[0] = hook[1] = hook[2] = 0;
+                    options.range.forEach((item) => {
+                        const range: FcProducerRange =
+                            typeof item === "object" && item
+                                ? (item as FcProducerRange)
+                                : null;
+                        if (range) {
+                            if (range.type === FcProductType.MpApi) {
+                                hook[0] = range.disabled ? 0 : 1;
+                            } else if (item === FcProductType.MpView) {
+                                hook[1] = range.disabled ? 0 : 1;
+                            } else if (item === FcProductType.Console) {
+                                hook[2] = range.disabled ? 0 : 1;
+                            }
+                        } else if (item === FcProductType.MpApi) {
+                            hook[0] = 1;
+                        } else if (item === FcProductType.MpView) {
+                            hook[1] = 1;
+                        } else if (item === FcProductType.Console) {
+                            hook[2] = 1;
+                        }
+                    });
+                }
+            } else if (!options.range) {
+                // like false=所有都不监控
+                hook[0] = hook[1] = hook[2] = 0;
+            }
+        }
+
+        const filter = (
+            id:
+                | string
+                | Partial<FcMpApiProduct | FcMpViewProduct | FcConsoleProduct>,
+            type?: FcProductType
+        ): boolean => {
+            return this.filter(id, type);
+        };
+
+        hook[0] &&
+            hookMpApi(
+                hookState,
+                producer as IFcProducer<FcMpApiProduct>,
+                filter
+            );
+        hook[2] && hookMpView(producer as IFcProducer<FcMpViewProduct>, filter);
+        hook[3] &&
+            hookConsole(producer as IFcProducer<FcConsoleProduct>, filter);
+    }
+    filter(
+        id:
+            | string
+            | Partial<FcMpApiProduct | FcMpViewProduct | FcConsoleProduct>,
+        type?: FcProductType
+    ): boolean {
+        if (!this.options) {
+            return true;
+        }
+        const product: Partial<
+            FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+        > =
+            typeof id === "object" && id
+                ? (id as Partial<
+                      FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+                  >)
+                : null;
+        type = product ? product.type : type;
+        if (Array.isArray(this.options.range) && this.options.range.length) {
+            let rangeFilter;
+            for (let i = this.options.range.length - 1; i >= 0; i--) {
+                // 从后向前取，只取一个
+                const item = this.options.range[i];
+                const range: FcProducerRange =
+                    typeof item === "object" && item
+                        ? (item as FcProducerRange)
+                        : null;
+                if (
+                    range &&
+                    range.type === type &&
+                    typeof range.filter === "function"
+                ) {
+                    rangeFilter = range.filter;
+                    break;
+                }
+            }
+            if (rangeFilter && !rangeFilter(id, type)) {
+                return false;
+            }
+        }
+        if (typeof this.options.filter === "function") {
+            return this.options.filter(id as string, type);
+        }
+        return true;
+    }
+    change(
+        id: string,
+        data?: Partial<FcMpApiProduct | FcMpViewProduct | FcConsoleProduct>
+    ) {
+        data =
+            data ||
+            ({} as Partial<
+                FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+            >);
+        data.id = id;
+        if (this.filter(data)) {
+            super.change(id, data);
+        }
+    }
+    create(
+        data: PartialBy<
+            FcMpApiProduct | FcMpViewProduct | FcConsoleProduct,
+            "id" | "time"
+        >
+    ): FcMpApiProduct | FcMpViewProduct | FcConsoleProduct {
+        if (!data.id) {
+            data.id = uuid();
+        }
+        if (!data.time) {
+            data.time = now();
+        }
+        if (
+            this.filter(
+                data as FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+            )
+        ) {
+            return super.create(data);
+        }
+        return data as FcMpApiProduct | FcMpViewProduct | FcConsoleProduct;
     }
 }
 

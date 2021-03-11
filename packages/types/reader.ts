@@ -1,7 +1,7 @@
 import { FcMethodExecStatus } from "./core";
 import { FcMpApiProduct } from "./mp";
 
-export interface FcMpApiMaterial<T = any, K = any, S = any> {
+export interface FcMpApiMaterial {
     id: string;
     type: string;
     name: string;
@@ -10,12 +10,8 @@ export interface FcMpApiMaterial<T = any, K = any, S = any> {
     statusDesc?: string;
     startTime: number;
     endTime?: number;
-    coverImg?: string;
-    request?: T;
-    response?: K;
-    result?: S;
-    initiator: FcInitiator | FcInitiator[];
-    products?: FcMpApiProduct[];
+    initiator: string;
+    initiatorDesc?: string;
 }
 
 export interface FcInitiator {

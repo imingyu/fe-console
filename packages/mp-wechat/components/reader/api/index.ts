@@ -3,15 +3,19 @@ import { createLiaisonMixin } from "../../mixins/liaison";
 import { createVirtualListMixin } from "../../mixins/virtual-list";
 import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName } from "@mpkit/util";
-import { getObserver } from "../../../common/provider";
-import { FcMpMemoryObserver } from "@fe-console/core";
 import {
+    FcConsoleProduct,
     FcMethodExecStatus,
     FcMpApiProduct,
+    FcMpViewProduct,
     FcProductType,
 } from "@fe-console/types";
 import { FcMpApiMaterial } from "@fe-console/types";
-import { ApiCategoryMap, ApiCategoryList } from "../../../common/category";
+import {
+    getApiCategoryList,
+    getApiCategoryValue,
+} from "../../../configure/index";
+import { convertApiMaterial } from "common/material";
 FcMpComponent(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
     createVirtualListMixin(MpViewType.Component),
@@ -23,168 +27,247 @@ FcMpComponent(
             },
         },
         data: {
-            categoryList: ApiCategoryList,
+            categoryList: [],
             activeCategory: "all",
         },
         methods: {
             addMaterial(data: Partial<FcMpApiProduct>) {
-                const material: Partial<FcMpApiMaterial> = {
-                    id: data.id,
-                };
-                if ("category" in data) {
-                    material.name = data.category;
-                    material.type = ApiCategoryMap[data.category] || "other";
-                }
-                if (
-                    (
-                        data.category ||
-                        this.materialMark[data.id] ||
-                        ""
-                    ).endsWith("Sync") &&
-                    "execEndTime" in data &&
-                    !material.endTime
-                ) {
-                    material.endTime = data.execEndTime;
-                }
-                if ("time" in data) {
-                    material.startTime = data.time;
-                }
-                if ("result" in data) {
-                    material.result = data.result;
-                }
-                if ("status" in data) {
-                    material.status = data.status;
-                }
-                if ("endTime" in data) {
-                    material.endTime = data.endTime;
-                }
-                if ("request" in data) {
-                    material.request = data.request;
-                }
-                if ("response" in data) {
-                    material.response = data.response;
-                }
-                if (
-                    !material.statusDesc &&
-                    data.status === FcMethodExecStatus.Fail &&
-                    data.response &&
-                    data.response.length &&
-                    data.response[0] &&
-                    data.response[0].errMsg
-                ) {
-                    const arr = data.response[0].errMsg.split(":fail");
-                    if (arr.length > 1) {
-                        material.statusDesc = arr[1].trim();
+                const material = convertApiMaterial(data, this.$fcRunConfig);
+                material.type && this.refreshCategory(material.type);
+                this.addMaterialToCategory(material);
+            },
+            addMaterialToCategory(
+                material: Partial<FcMpApiMaterial>,
+                map?: any
+            ) {
+                if (!map) {
+                    this.initMaterialCategoryMap();
+                    this.addMaterialToCategory(
+                        material,
+                        this.NormalMaterialCategoryMap
+                    );
+                    const readyItem = this.NormalMaterialCategoryMap.find(
+                        (t) => t.id === material.id
+                    );
+                    const category = material.type
+                        ? material.type
+                        : readyItem
+                        ? readyItem.type
+                        : "";
+                    if (this.filterKeyword) {
+                        const filterFields = [
+                            material.name
+                                ? material.name
+                                : readyItem
+                                ? readyItem.name
+                                : "",
+                            material.desc
+                                ? material.desc
+                                : readyItem
+                                ? readyItem.desc
+                                : "",
+                            material.statusDesc
+                                ? material.statusDesc
+                                : readyItem
+                                ? readyItem.statusDesc
+                                : "",
+                        ];
+                        if (
+                            filterFields.some(
+                                (item) =>
+                                    item === this.filterKeyword ||
+                                    item.indexOf(this.filterKeyword) !== -1
+                            )
+                        ) {
+                            this.addMaterialToCategory(
+                                material,
+                                this.FilterMaterialCategoryMap
+                            );
+                            if (
+                                category === this.data.activeCategory ||
+                                this.data.activeCategory === "all"
+                            ) {
+                                this.$vlAddItem(material);
+                            }
+                        }
                     } else {
-                        material.statusDesc = data.response[0].errMsg;
+                        delete this.FilterMaterialCategoryMap;
+                        if (
+                            category === this.data.activeCategory ||
+                            this.data.activeCategory === "all"
+                        ) {
+                            this.$vlAddItem(material);
+                        }
                     }
+                    return;
                 }
-                if (!this.categoryMaterialMap) {
-                    this.categoryMaterialMap = {};
-                }
-                const readyItem = this.categoryMaterialMap.all
-                    ? this.categoryMaterialMap.all.find(
-                          (item) => item.id === material.id
-                      )
+                this.initMaterialCategoryMap(false, map);
+
+                const readyItem = map.all
+                    ? map.all.find((item) => item.id === material.id)
                     : null;
                 if (readyItem) {
                     Object.assign(readyItem, material);
                 } else {
-                    if (!this.categoryMaterialMap.all) {
-                        this.categoryMaterialMap.all = [];
-                    }
-                    this.categoryMaterialMap.all.push(material);
+                    map.all.push(material);
                 }
                 if (material.type || readyItem) {
                     const category = material.type || readyItem.type;
-                    if (!this.categoryMaterialMap[category]) {
-                        this.categoryMaterialMap[category] = [];
-                    }
-                    if (this.categoryMaterialMap[category].length) {
-                        const typeReadyItem = this.categoryMaterialMap[category]
-                            ? this.categoryMaterialMap[category].find(
-                                  (item) => item.id === material.id
-                              )
-                            : null;
+                    if (map[category].length) {
+                        const typeReadyItem = map[category].find(
+                            (item) => item.id === material.id
+                        );
                         if (typeReadyItem) {
                             Object.assign(typeReadyItem, material);
                         } else {
-                            this.categoryMaterialMap[category].push(material);
+                            map[category].push(material);
                         }
                     } else {
-                        this.categoryMaterialMap[category].push(material);
+                        map[category].push(material);
                     }
                 }
-                const category = material.type
-                    ? material.type
-                    : readyItem
-                    ? readyItem.type
-                    : "";
-                if (
-                    category === this.data.activeCategory ||
-                    this.data.activeCategory === "all"
+            },
+            initMaterialCategoryMap(clear?: boolean, map?: any) {
+                if (!map) {
+                    if (!this.NormalMaterialCategoryMap) {
+                        this.NormalMaterialCategoryMap = {};
+                    }
+                    if (!this.FilterMaterialCategoryMap) {
+                        this.FilterMaterialCategoryMap = {};
+                    }
+                    this.initMaterialCategoryMap(
+                        clear,
+                        this.NormalMaterialCategoryMap
+                    );
+                    this.initMaterialCategoryMap(
+                        clear,
+                        this.FilterMaterialCategoryMap
+                    );
+                    return;
+                }
+                this.data.categoryList.forEach((item) => {
+                    if (!map[item.value] || clear) {
+                        map[item.value] = [];
+                    }
+                });
+            },
+            syncNormalMaterialToFilter() {
+                if (!this.NormalMaterialCategoryMap) {
+                    return;
+                }
+                this.FilterMaterialCategoryMap = Object.keys(
+                    this.NormalMaterialCategoryMap
+                ).reduce((sum, category) => {
+                    sum[category] = this.NormalMaterialCategoryMap[
+                        category
+                    ].filter((item) => {
+                        const filterFields = [
+                            item.name ? item.name : "",
+                            item.desc ? item.desc : "",
+                            item.statusDesc ? item.statusDesc : "",
+                        ];
+                        return filterFields.some(
+                            (item) =>
+                                item === this.filterKeyword ||
+                                item.indexOf(this.filterKeyword) !== -1
+                        );
+                    });
+                    return sum;
+                }, {});
+            },
+            refreshCategory(categoryVal?: string) {
+                if (!categoryVal) {
+                    this.setData({
+                        categoryList: getApiCategoryList(this.$fcRunConfig),
+                    });
+                } else if (
+                    this.data.categoryList.every(
+                        (item) => item.value !== categoryVal
+                    )
                 ) {
-                    this.$vlAddItem(material);
+                    const list = getApiCategoryList();
+                    list.splice(list.length - 2, 0, {
+                        text: categoryVal,
+                        value: categoryVal,
+                    });
+                    this.setData({
+                        categoryList: list,
+                    });
                 }
             },
-            clearMaterial() {
-                const activeCategory = this.data.activeCategory;
-                if (activeCategory === "all") {
-                    this.data.categoryList.forEach((item) => {
-                        this.categoryMaterialMap[item] = [];
-                    });
-                    this.categoryMaterialMap["all"] = [];
-                    this.categoryMaterialMap["other"] = [];
-                } else {
-                    this.categoryMaterialMap[activeCategory] = [];
-                    this.categoryMaterialMap["all"] = this.categoryMaterialMap[
-                        "all"
-                    ].filter((item) => item.type !== activeCategory);
-                }
+            reloadVlList(allList) {
                 this.$vlClear();
-                this.$vlAllList = [...this.categoryMaterialMap[activeCategory]];
+                this.$vlAllList = [...allList];
                 this.$vlTrySetShowList(
                     0,
                     this.data.$vlPageSize + this.data.$vlBufferSize - 1
                 );
+            },
+            filterMaterial(keyword: string) {
+                this.filterKeyword = keyword;
+                this.initMaterialCategoryMap();
+                this.syncNormalMaterialToFilter();
+                this.reloadVlList(
+                    this.FilterMaterialCategoryMap[this.data.activeCategory]
+                );
+            },
+            clearMaterial() {
+                if (this.filterKeyword) {
+                    this.initMaterialCategoryMap(
+                        true,
+                        this.FilterMaterialCategoryMap
+                    );
+                    this.reloadVlList(
+                        this.FilterMaterialCategoryMap[this.data.activeCategory]
+                    );
+                } else {
+                    this.initMaterialCategoryMap(
+                        true,
+                        this.NormalMaterialCategoryMap
+                    );
+                    this.initMaterialCategoryMap(
+                        true,
+                        this.FilterMaterialCategoryMap
+                    );
+                    this.reloadVlList(
+                        this.NormalMaterialCategoryMap[this.data.activeCategory]
+                    );
+                }
             },
             changeCategory(activeCategory) {
                 this.setData({
                     activeCategory,
                 });
-                this.$vlClear();
-                this.$vlAllList = [...this.categoryMaterialMap[activeCategory]];
-                this.$vlTrySetShowList(
-                    0,
-                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
-                );
+                if (this.filterKeyword) {
+                    this.reloadVlList(
+                        this.FilterMaterialCategoryMap[activeCategory]
+                    );
+                } else {
+                    this.reloadVlList(
+                        this.NormalMaterialCategoryMap[activeCategory]
+                    );
+                }
+            },
+            onFcObserverEvent(
+                type: string,
+                data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+            ) {
+                if (data.type === FcProductType.MpApi) {
+                    if (!this.materialMark) {
+                        this.materialMark = {};
+                    }
+                    if (data.category) {
+                        this.materialMark[data.id] = data.category;
+                    } else if (!this.materialMark[data.id]) {
+                        this.materialMark[data.id] = "other";
+                    }
+                    this.addMaterial(data);
+                }
             },
         },
         [getMpInitLifeName(MpViewType.Component)]() {
+            this.refreshCategory();
             (global as any).ssd = this;
-            this.categoryMaterialMap = {};
-            this.data.categoryList.forEach((item) => {
-                this.categoryMaterialMap[item] = [];
-            });
-
-            const observer: FcMpMemoryObserver = getObserver();
-            if (observer) {
-                observer.on("data", (type, data) => {
-                    if (data.type === FcProductType.MpApi) {
-                        if (!this.materialMark) {
-                            this.materialMark = {};
-                        }
-                        this.materialMark[data.id] = data.category;
-                        this.addMaterial(data);
-                    }
-                });
-                observer.on("change", (type, data) => {
-                    if (this.materialMark && this.materialMark[data.id]) {
-                        this.addMaterial(data);
-                    }
-                });
-            }
-
             this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
                 if (data.child.$tid === "fc-filter-bar") {
                     type = data.type;
@@ -192,6 +275,8 @@ FcMpComponent(
                         this.changeCategory(data.data);
                     } else if (type === "clear") {
                         this.clearMaterial();
+                    } else if (type === "filter") {
+                        this.filterMaterial(data.data);
                     }
                 }
             });

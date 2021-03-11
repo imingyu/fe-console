@@ -1,5 +1,4 @@
 import {
-    FcProducerRunHandler,
     FcProduct,
     IFcProducer,
 } from "@fe-console/types";
@@ -12,9 +11,8 @@ import { uuid } from "@mpkit/util";
 export abstract class FcProducerImpl<T extends FcProduct = FcProduct>
     extends FcEventEmitter<T>
     implements IFcProducer<T> {
-    constructor(run: FcProducerRunHandler<T>) {
+    constructor() {
         super();
-        run(this);
     }
     change(id: string, data?: Partial<T>) {
         data = data || ({} as Partial<T>);

@@ -1,4 +1,5 @@
 <view class="fc-hand cid-{{$cid}} tid-{{$tid}} {{visable?'is-hide':''}}" bindtap="toggleVisable">Mpc</view>
+<!-- TODO:iPhoneX等全面屏适配 -->
 <view wx:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
     <view class="fc-tabs-container">
         <view class="fc-tabs-action" bindtap="toggleZoom">

@@ -18,8 +18,12 @@ export interface FcWhereProduct<T> extends FcProduct {
     where: T;
 }
 
-export interface FcProducerRunHandler<T extends FcProduct = FcProduct> {
-    (producer: IFcProducer<T>);
+/**
+ * 数据原料筛选函数，调用时机：1.原料对象创建前（传递原料ID和类型）；2.原料准备送往生成事件（create）前（已创建好的原料对象包含很多信息）；3.原料变化对象创建前（传递原料ID和类型）；4.原料准备送往变化(change)事件前（传递原料的变化对象，一定包含ID，其他字段可能包含）；
+ */
+export interface FcProductFilter<T extends FcProduct = FcProduct, S = number> {
+    (data: Partial<T>): boolean;
+    (id: string, type?: S): boolean;
 }
 export interface IFcProducer<T extends FcProduct = FcProduct>
     extends IFcEventEmitter<T> {

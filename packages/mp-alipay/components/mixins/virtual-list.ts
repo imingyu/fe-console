@@ -27,24 +27,24 @@ export const createVirtualListMixin = (type: MpViewType) => {
             }
             if (!readyItem) {
                 this.$vlAllList.push(item);
-                if (typeof this.$vlStartIndex === "undefined") {
+            }
+            if (typeof this.$vlStartIndex === "undefined") {
+                this.$vlTrySetShowList(
+                    0,
+                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
+                );
+            } else if (this.$vlStartIndex === 0) {
+                if (
+                    this.data.$vlShowList.length !==
+                    this.$vlAllList.slice(
+                        this.$vlStartIndex,
+                        this.$vlEndIndex + 1
+                    ).length
+                ) {
                     this.$vlTrySetShowList(
                         0,
                         this.data.$vlPageSize + this.data.$vlBufferSize - 1
                     );
-                } else if (this.$vlStartIndex === 0) {
-                    if (
-                        this.data.$vlShowList.length !==
-                        this.$vlAllList.slice(
-                            this.$vlStartIndex,
-                            this.$vlEndIndex + 1
-                        ).length
-                    ) {
-                        this.$vlTrySetShowList(
-                            0,
-                            this.data.$vlPageSize + this.data.$vlBufferSize - 1
-                        );
-                    }
                 }
             }
         },

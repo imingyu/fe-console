@@ -5,6 +5,7 @@ import {
     FcMpSocketTask,
     FcMpSocketTaskHookInfo,
     FcMpSocketTaskStatus,
+    FcProductFilter,
     FcProductType,
     IFcProducer,
 } from "@fe-console/types";
@@ -155,12 +156,7 @@ const findCurrentHookTask = (
         if (!hookState.socketTasks) {
             hookState.socketTasks = [];
         }
-        hookState.socketTasks.push([
-            id,
-            FcMpSocketTaskStatus.Unknown,
-            null,
-            product,
-        ]);
+        hookState.socketTasks.push([id, FcMpSocketTaskStatus.Unknown, null]);
         activeTask = hookState.socketTasks[hookState.socketTasks.length - 1];
         producer.create(product);
     }
@@ -169,12 +165,15 @@ const findCurrentHookTask = (
 
 export const hookMpApi = (
     hookState: FcMpHookInfo,
-    producer: IFcProducer<FcMpApiProduct>
+    producer: IFcProducer<FcMpApiProduct>,
+    filter?: FcProductFilter<FcMpApiProduct>
 ): MpApiVar => {
     const PALTFORM = getMpPlatform();
     MixinStore.addHook("Api", {
         before(name, args, handler, id) {
-            const stack = $$getStack();
+            if (filter && !filter(id, FcProductType.MpApi)) {
+                return;
+            }
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 const activeTask = findCurrentHookTask(
                     hookState,
@@ -195,15 +194,6 @@ export const hookMpApi = (
                 );
                 return;
             }
-            const product: FcMpApiProduct = {
-                id,
-                type: FcProductType.MpApi,
-                category: name,
-                request: args,
-                status: FcMethodExecStatus.Executed,
-                time: now(),
-                stack,
-            };
             if (name === "connectSocket") {
                 if (!hookState.socketTasks) {
                     hookState.socketTasks = [];
@@ -212,12 +202,23 @@ export const hookMpApi = (
                     id,
                     FcMpSocketTaskStatus.Connecting,
                     null,
-                    product,
                 ]);
             }
+            const product: FcMpApiProduct = {
+                id,
+                type: FcProductType.MpApi,
+                category: name,
+                request: args,
+                status: FcMethodExecStatus.Executed,
+                time: now(),
+                stack: $$getStack(),
+            };
             producer.create(product);
         },
         after(name, args, result: FcMpSocketTask, id) {
+            if (filter && !filter(id, FcProductType.MpApi)) {
+                return;
+            }
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
@@ -238,6 +239,9 @@ export const hookMpApi = (
             }
         },
         complete(name, args, res, success, id) {
+            if (filter && !filter(id, FcProductType.MpApi)) {
+                return;
+            }
             if (name === "sendSocketMessage" || name === "closeSocket") {
                 return;
             }
@@ -250,6 +254,9 @@ export const hookMpApi = (
             });
         },
         catch(name, args, error, errType, id) {
+            if (filter && !filter(id, FcProductType.MpApi)) {
+                return;
+            }
             producer.change(id, {
                 endTime: now(),
                 response: [error, errType],

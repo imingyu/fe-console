@@ -1,4 +1,7 @@
-export const ApiCategoryMap = {
+import { FcMpApiCategoryInfo } from "@fe-console/types";
+
+export const MpApiOtherCategory = "other";
+export const MpApiCategoryMap = {
     request: "xhr",
     downloadFile: "xhr",
     uploadFile: "xhr",
@@ -45,11 +48,32 @@ export const ApiCategoryMap = {
     openLocation: "user",
 };
 
-export const ApiCategoryList = Object.keys(ApiCategoryMap)
-    .reduce((sum, item) => {
-        if (sum.indexOf(ApiCategoryMap[item]) === -1) {
-            sum.push(ApiCategoryMap[item]);
+export const reportCategoryMapToList = (categoryMap: {
+    [prop: string]: string;
+}): FcMpApiCategoryInfo[] => {
+    return Object.keys(categoryMap).reduce(
+        (sum, item) => {
+            if (!sum.mark[categoryMap[item]]) {
+                const categoryVal = categoryMap[item];
+                sum.mark[categoryVal] = 1;
+                let text;
+                if (categoryVal === "xhr") {
+                    text = "XHR";
+                } else if (categoryVal === "ws") {
+                    text = "WS";
+                } else {
+                    text = categoryVal[0].toUpperCase() + categoryVal.substr(1);
+                }
+                sum.list.push({
+                    text,
+                    value: categoryVal,
+                });
+            }
+            return sum;
+        },
+        {
+            mark: {},
+            list: [] as FcMpApiCategoryInfo[],
         }
-        return sum;
-    }, [])
-    .concat("other");
+    ).list;
+};

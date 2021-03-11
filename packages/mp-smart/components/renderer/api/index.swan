@@ -1,4 +1,4 @@
-<view class="fc-reader-row fc-nowrap fc-status-{{data.status}} fc-renderer fc-rd-api {{selected?'is-selected':''}} sz-{{size}} cid-{{$cid}} tid-{{$tid}}">
+<view class="fc-reader-row fc-nowrap fc-status-{{data.status}} fc-renderer fc-rd-api {{selected?'is-selected':''}} sz-{{size}} cid-{{$cid}} tid-{{$tid}} {{!border?'fc-not-border':''}}">
     <view class="fc-col fc-api-col fc-col-1">
         <view class="fc-text-primary">{{data.name}}</view>
         <view s-if="data.desc" class="fc-text-muted">{{data.desc}}</view>

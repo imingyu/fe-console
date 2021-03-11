@@ -4,7 +4,6 @@
             <input a:if="{{filter}}" type="text" placeholder="{{filterPlaceholder}}" class="fc-filter-input" maxlength="-1" onConfirm="onFilterConfirm" />
             <block a:if="{{categorys && categorys.length}}">
                 <view class="fc-filter-category-br"></view>
-                <view class="fc-filter-category {{activeCategory==='all' || !activeCategory?'active':''}}" onTap="tapCategory" data-val="all">All</view>
                 <view class="fc-filter-category {{activeCategory===item?'active':''}}" a:for="{{categorys}}" onTap="tapCategory" data-val="{{item}}" a:key="item">{{categoryMap[item]}}</view>
             </block>
         </view>

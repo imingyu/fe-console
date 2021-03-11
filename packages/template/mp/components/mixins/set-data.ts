@@ -34,11 +34,22 @@ export const createSetDataMixin = (type: MpViewType) => {
                         data[index] = null;
                     }
                 });
-            } else if (type === "object" && data[prop] && isEmptyObject(data[prop])) {
+            } else if (
+                type === "object" &&
+                data[prop] &&
+                isEmptyObject(data[prop])
+            ) {
                 rewriteUndefinedProp(data[prop]);
             }
         }
     };
+    let observerHandler = function (type, data) {
+        this && this.onFcObserverEvent && this.onFcObserverEvent(type, data);
+    };
+    const destoryLife =
+        type === MpViewType.Component
+            ? '<%= (platform==="alipay"?"didUnmount":"detached") %>'
+            : "onUnload";
     const mixin: any = {
         [getMpInitLifeName(type)](this: FcMpViewContextBase) {
             if (!this.$mkDiffSetDataBeforeValue) {
@@ -47,6 +58,18 @@ export const createSetDataMixin = (type: MpViewType) => {
                     rewriteUndefinedProp(data);
                     return performer.exec(this, data, callback);
                 };
+            }
+            if (this.$fcObserver) {
+                this.$fcObserverHandler = observerHandler.bind(this);
+                this.$fcObserver.on("data", this.$fcObserverHandler);
+                this.$fcObserver.on("change", this.$fcObserverHandler);
+            }
+        },
+        [destoryLife]() {
+            if (this.$fcObserver) {
+                this.$fcObserver.off("data", this.$fcObserverHandler);
+                this.$fcObserver.off("change", this.$fcObserverHandler);
+                delete this.$fcObserverHandler;
             }
         },
     };

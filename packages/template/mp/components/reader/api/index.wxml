@@ -20,7 +20,6 @@
         >
         </fc-api-renderer>
             <%= VirtualListEnd %>
-        <view class="fc-reader-row-placeholder"></view>
     </scroll-view>
     <fc-api-detail wx:if="{{detailMaterial}}" data="{{detailMaterial}}" class="fc-reader-detail-container has-th has-bar"></fc-api-detail>
 </view>

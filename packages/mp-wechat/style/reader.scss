@@ -122,13 +122,13 @@
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
     bottom: 0;
     margin-top: 2px;
     z-index: 5;
+    width: 100%;
 
     &.fc-show-detail {
-        right: 70%;
+        width: 30%;
     }
 
     &.has-th {
@@ -152,16 +152,9 @@
     right: 0;
     z-index: 10;
     display: block;
-
-    &.has-th {
-        top: $ht-th-bar;
-    }
+    background-color: #fff;
 
     &.has-bar {
         top: $ht-filter-bar;
-    }
-
-    &.has-th.has-bar {
-        top: $ht-th-bar + $ht-filter-bar;
     }
 }

@@ -17,6 +17,11 @@
 .fc-api-reader-th.fc-show-detail {
     .fc-col-1 {
         width: 100%;
+
+        &:after {
+            right: auto;
+            left: 30%;
+        }
     }
 
     .fc-col-2,

@@ -1,6 +1,7 @@
 import { FcMpComponent } from "../mixins/view";
 import { createLiaisonMixin } from "../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
+import { getMpInitLifeName } from "@mpkit/util";
 FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-main"), {
     data: {
         visable: true,
@@ -9,38 +10,53 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-main"), {
         activeTabIndex: 2,
         tabs: [
             {
-                name: "全部",
+                text: "全部",
                 value: "all",
             },
             {
-                name: "Console",
+                text: "Console",
                 value: "console",
             },
             {
-                name: "Api",
+                text: "Api",
                 value: "api",
             },
             {
-                name: "网络",
+                text: "网络",
                 value: "network",
             },
             {
-                name: "View",
+                text: "View",
                 value: "view",
             },
             {
-                name: "事件",
+                text: "事件",
                 value: "event",
             },
             {
-                name: "Storage",
+                text: "Storage",
                 value: "storage",
             },
             {
-                name: "系统",
+                text: "系统",
                 value: "system",
             },
         ],
+    },
+    [getMpInitLifeName(MpViewType.Component)]() {
+        this.$fcOn(`Dispatch.${this.$cid}`, (t, data) => {
+            if (
+                data.child.$tid === "fc-tabs" &&
+                data.child.$fcGetProp("tidAlias") === "FcProductTypeTabs"
+            ) {
+                if (data.type === "changeTab") {
+                    console.log(`activeTabIndex=${data.data}`);
+                    this.setData({
+                        activeTabIndex: data.data,
+                    });
+                }
+            }
+        });
     },
     methods: {
         noop() {},

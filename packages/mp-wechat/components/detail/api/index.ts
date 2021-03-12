@@ -4,10 +4,7 @@ import { MpViewType } from "@mpkit/types";
 FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
     properties: {
         data: {
-            type: Object,
-            observer() {
-                this.computeTime();
-            },
+            type: String
         },
     },
     data: {},

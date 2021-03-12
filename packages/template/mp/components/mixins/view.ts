@@ -64,5 +64,6 @@ export const FcMpComponent = (...mixins) => {
         },
     });
     //<%}%>
-    return MkNative.Component(MkComponent.apply(null, mixins));
+    const spec = MkComponent.apply(null, mixins);
+    return MkNative.Component(spec);
 };

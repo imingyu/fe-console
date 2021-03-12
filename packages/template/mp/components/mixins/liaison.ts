@@ -138,6 +138,7 @@ export const createLiaisonMixin = (() => {
             mixin.properties = {
                 parentCid: String,
                 parentTid: String,
+                tidAlias: String,
             };
             mixin.methods = methods;
         } else {

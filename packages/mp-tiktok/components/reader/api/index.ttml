@@ -1,23 +1,22 @@
 <view tt:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
     <filter-bar categorys="{{categoryList}}" activeCategory="{{activeCategory}}" filter clear parentCid="{{$cid}}" parentTid="{{$tid}}"></filter-bar>
-    <view class="fc-reader-row fc-reader-th fc-api-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}} {{detailMaterial?'fc-show-detail':''}}">
+    <view class="fc-reader-row fc-reader-th fc-api-reader-th has-bar {{$vlShowList && $vlShowList.length?'has-data':''}} {{detailMaterialId?'fc-show-detail':''}}">
         <view class="fc-col fc-api-col fc-col-1">Name</view>
         <view class="fc-col fc-api-col fc-col-2">Status</view>
         <view class="fc-col fc-api-col fc-col-3">Type</view>
         <view class="fc-col fc-api-col fc-col-4">Initiator</view>
         <view class="fc-col fc-api-col fc-col-5 is-last-col">Time</view>
     </view>
-    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar {{detailMaterial?'fc-show-detail':''}}">
+    <scroll-view scroll-y class="fc-reader-scroll has-th has-bar {{detailMaterialId?'fc-show-detail':''}}">
         <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
     <view class="vl-list">
         <view tt:for="{{ $vlShowList }}" tt:for-item="$vlItem" tt:for-index="$vlItemIndex" tt:="id" tt:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'recovery'}}" class="vl-item-container status-{{ $vlItemStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}" style="height:{{!$vlItemStaticHeight?($vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]):'auto'):''}};">
-            <fc-api-renderer tt:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}" class="fc-row-{{$vlItemIndex%2===0?'even':'odd'}}" data="{{ $vlItem }}" outerClass="{{detailMaterial?'fc-show-detail':''}} fc-not-border" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
+            <fc-api-renderer tt:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}" class="fc-row-{{$vlItemIndex%2===0?'even':'odd'}}" data="{{ $vlItem }}" outerClass="{{detailMaterialId?'fc-show-detail':''}} fc-not-border" parentCid="{{ $cid }}" parentTid="{{ $tid }}" data-id="{{ $vlItem.id }}">
         </fc-api-renderer>
             </view>
 </view>
 <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
 
-        <view class="fc-reader-row-placeholder"></view>
     </scroll-view>
-    <fc-api-detail tt:if="{{detailMaterial}}" data="{{detailMaterial}}" class="fc-reader-detail-container has-th has-bar"></fc-api-detail>
+    <fc-api-detail tt:if="{{detailMaterialId}}" data="{{detailMaterialId}}" class="fc-reader-detail-container has-th has-bar" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-detail>
 </view>

@@ -1,5 +1,6 @@
 import { FcMethodExecStatus } from "./core";
 import { FcMpApiProduct } from "./mp";
+import { FcNameValue } from "./util";
 
 export interface FcMpApiMaterial {
     id: string;
@@ -20,4 +21,19 @@ export interface FcInitiator {
     method?: string;
     lineNumber?: number;
     column?: number;
+}
+
+export interface FcMpDetailHeader extends FcNameValue<string | number> {
+    decodedValue?: string | number;
+    remark?: string;
+}
+
+export interface FcMpApiDetail {
+    general: FcMpDetailHeader[];
+    requestHeaders?: FcMpDetailHeader[];
+    responseHeaders?: FcMpDetailHeader[];
+    queryString?: string;
+    queryStringParameters?: FcMpDetailHeader[];
+    cookies?: FcNameValue<string | number>[];
+    // arguments
 }

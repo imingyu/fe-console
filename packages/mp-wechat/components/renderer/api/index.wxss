@@ -142,10 +142,13 @@
   z-index: 10;
   display: block;
   background-color: #fff;
+  margin-left: 1px;
+  margin-top: 1px;
 }
 
 .fc-reader-detail-container.has-bar {
   top: 60rpx;
+  margin-top: 2px;
 }
 
 .fc-api-col {

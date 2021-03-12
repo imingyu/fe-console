@@ -1,1 +1,49 @@
-<view class="fc-detail">详情</view>
+<fc-tabs class="fc-detail" tabs="{{tabs}}" active="{{activeTabIndex}}" outerClass="fc-apidetail-tabs" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="FcApiDetailTabs">
+    <view slot="headBefore" class="fc-detail-action" bindtap="close">
+        <view class="fc-detail-close fc-ic-close"></view>
+    </view>
+    <view slot="panel-headers" class="detail-tab-panel">
+        <scroll-view class="detail-scroll" scroll-y>
+            <fc-collapse open="{{headersCollapseOpenState.s1}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse1">
+                <view class="fc-detail-title" slot="head">General</view>
+                <view s-for="detail.general trackBy name" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}">
+                    <block s-if="item.name!=='$$HR$$'">
+                        <view class="fc-headers-name">{{item.name}}</view>
+                        <view s-if="item.name==='Status'" class="fc-headers-val">
+                            {{item.value===1?'Executed':item.value===2?'Success':item.value===3?'Fail':'Unknown'}}
+                            <view s-if="item.remark" class="fc-headers-remark">({{item.remark}})</view>
+                        </view>
+                        <view s-else class="fc-headers-val">{{item.value}}</view>
+                    </block>
+                </view>
+            </fc-collapse>
+            <fc-collapse s-if="detail.responseHeaders" open="{{headersCollapseOpenState.s2}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse2">
+                <view class="fc-detail-title" slot="head">Response Headers</view>
+                <view s-for="detail.responseHeaders trackBy name" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}">
+                    <block s-if="item.name!=='$$HR$$'">
+                        <view class="fc-headers-name">{{item.name}}</view>
+                        <view class="fc-headers-val">{{item.value}}</view>
+                    </block>
+                </view>
+            </fc-collapse>
+            <fc-collapse s-if="detail.requestHeaders" open="{{headersCollapseOpenState.s3}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse3">
+                <view class="fc-detail-title" slot="head">Request Headers</view>
+                <view s-for="detail.requestHeaders trackBy name" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}">
+                    <block s-if="item.name!=='$$HR$$'">
+                        <view class="fc-headers-name">{{item.name}}</view>
+                        <view class="fc-headers-val">{{item.value}}</view>
+                    </block>
+                </view>
+            </fc-collapse>
+            <fc-collapse s-if="detail.queryStringParameters" open="{{headersCollapseOpenState.s4}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse4">
+                <view class="fc-detail-title" slot="head">Query String Parameters</view>
+                <view s-for="detail.queryStringParameters trackBy name" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}">
+                    <block s-if="item.name!=='$$HR$$'">
+                        <view class="fc-headers-name">{{item.name}}</view>
+                        <view class="fc-headers-val">{{item.value}}</view>
+                    </block>
+                </view>
+            </fc-collapse>
+        </scroll-view>
+    </view>
+</fc-tabs>

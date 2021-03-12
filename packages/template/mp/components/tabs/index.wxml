@@ -1,21 +1,18 @@
 <view class="fc-tabs fc-tabs-{{direction}} tc-tabs-{{position}} {{outerClass}}">
     <view class="fc-tabs-head">
         <slot name="headBefore"></slot>
-        <scroll-view class="fc-tabs-head-scroll" scroll-into-view="tabTitle_{{index}}" scroll-x="{{direction==='horizontal'}}" scroll-y="{{direction!=='horizontal'}}">
-            <view class="fc-tabs-heads">
-                <view id="tabTitle_{{index}}" wx:for="{{tabs}}" class="fc-tab-title {{active===index?'active':''}}" wx:key="value" <%= bindEvent('tap') %>="tapTab" data-tab="{{index}}">{{item.text}}
+        <view class="fc-tabs-head-scroll">
+            <scroll-view scroll-into-view="tabTitle_{{index}}" scroll-x="{{direction==='horizontal'}}" scroll-y="{{direction!=='horizontal'}}">
+                <view class="fc-tabs-heads">
+                    <view id="tabTitle_{{index}}" wx:for="{{tabs}}" class="fc-tab-title {{active===index?'active':''}}" wx:key="value" <%= bindEvent('tap') %>="tapTab" data-tab="{{index}}">{{item.text}}
+                    </view>
                 </view>
-            </view>
-        </scroll-view>
+            </scroll-view>
+        </view>
         <slot name="headAfter"></slot>
     </view>
     <view class="fc-tabs-body">
-        <swiper wx:if="{{direction==='horizontal'}}" class="fc-tabs-swiper" current="{{active}}" <%= bindEvent('change') %>="swiperChange">
-            <swiper-item wx:for="{{tabs}}" wx:for-item="tab" wx:key="value">
-                <slot name="panel-{{tab.value}}"></slot>
-            </swiper-item>
-        </swiper>
-        <view wx:else class="fc-tab-panels" style="height:{{tabs.length*100}}%;transform: translateY(-{{(active/tabs.length)*100}}%);">
+        <view class="fc-tab-panels" style="{{direction==='horizontal'?'width':'height'}}:{{tabs.length*100}}%;transform: translate{{direction==='horizontal'?'X':'Y'}}(-{{(active/tabs.length)*100}}%);">
             <view class="fc-tab-panel" wx:for="{{tabs}}" wx:for-item="tab" wx:key="value">
                 <slot name="panel-{{tab.value}}"></slot>
             </view>

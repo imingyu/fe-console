@@ -2,10 +2,6 @@
 @import '../../../style/reader.scss';
 @import '../../../style/col-api.scss';
 
-.fc-reader-row-placeholder {
-    height: $ht-renderer-api;
-}
-
 .fc-re-api {
     background-color: $bg-reader-api;
 }
@@ -17,6 +13,11 @@
 .fc-api-reader-th.fc-show-detail {
     .fc-col-1 {
         width: 100%;
+
+        &:after {
+            right: auto;
+            left: 30%;
+        }
     }
 
     .fc-col-2,

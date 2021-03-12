@@ -23,9 +23,6 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-tabs"), {
         tapTab(e) {
             const index = parseInt(e.currentTarget.dataset.tab);
             this.$fcDispatch("changeTab", index);
-        },
-        swiperChange(e) {
-            this.$fcDispatch("changeTab", e.detail.current);
-        },
+        }
     },
 });

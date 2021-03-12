@@ -1,0 +1,87 @@
+.fc-headers-item {
+  padding: 8rpx 10rpx;
+  font-size: 24rpx;
+  line-height: 1.2;
+  color: #545454;
+  font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+}
+
+.fc-headers-item:active {
+  background-color: #1a73ea;
+  color: #fff !important;
+}
+
+.fc-headers-hr {
+  border-bottom: 1px solid #ccc;
+  margin: 6rpx 0;
+}
+
+.fc-headers-name {
+  font-weight: bold;
+}
+
+.fc-headers-name:after {
+  content: ':';
+  display: inline;
+  margin-left: 2rpx;
+  margin-right: 8rpx;
+}
+
+.fc-headers-remark {
+  display: inline;
+  font-size: 20rpx;
+  opacity: .7;
+}
+
+.fc-headers-name,
+.fc-headers-val {
+  display: inline;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.fc-collapse {
+  width: 100%;
+  height: 40rpx;
+  overflow: hidden;
+  padding-left: 30rpx;
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+}
+
+.fc-collapse.is-open {
+  height: auto;
+}
+
+.fc-collapse.is-open .fc-collapse-head:before {
+  content: '';
+  border-left-color: transparent;
+  border-top-color: #5e5e5e;
+  top: 4rpx;
+}
+
+.fc-collapse-hr {
+  margin-left: -30rpx;
+}
+
+.fc-collapse-head {
+  margin-left: -30rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  padding-top: 6rpx;
+  padding-bottom: 6rpx;
+  color: #616161;
+  font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+}
+
+.fc-collapse-head:before {
+  content: '';
+  display: block;
+  margin-right: 8rpx;
+  border: 8rpx solid transparent;
+  border-left-color: #5e5e5e;
+  position: relative;
+  top: 0;
+}

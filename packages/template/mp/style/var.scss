@@ -26,7 +26,8 @@ $cr-bar:#5e5e5e; // 条文字颜色
 $cr-tab-head:$cr-bar;
 $cr-filter-bar:$cr-bar;
 $cr-th-bar:$cr-bar;
-$cr-filter-active:#fff;
+$cr-active:#fff;
+$cr-filter-active:$cr-active;
 $cr-renderer-row:$cr-bar;
 $cr-renderer-row-muted:#999;
 $cr-renderer-row-active:#fff;
@@ -37,7 +38,11 @@ $sz-filter-bar:$zoom * 24rpx;
 $sz-th-bar:$zoom * 26rpx;
 
 // 高度
+$ht-headers-item:$zoom * 70rpx;
 $ht-tab-bar:$zoom * 70rpx;
 $ht-th-bar:$ht-tab-bar;
 $ht-filter-bar:$ht-tab-bar - 10rpx;
 $ht-renderer-api:$zoom * 80rpx;
+
+
+$ft-main:Consolas, Menlo, Monaco, 'Courier New', monospace;

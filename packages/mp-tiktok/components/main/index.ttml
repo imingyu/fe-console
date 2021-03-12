@@ -1,27 +1,21 @@
 <view class="fc-hand cid-{{$cid}} tid-{{$tid}} {{visable?'is-hide':''}}" bindtap="toggleVisable">Mpc</view>
 <!-- TODO:iPhoneX等全面屏适配 -->
-<view tt:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
-    <view class="fc-tabs-container">
-        <view class="fc-tabs-action" bindtap="toggleZoom">
-            <view class="fc-tabs-zoom fc-ic-{{fullScreen?'compress':'expand'}}">
-                <view class="fc-ic-arrow-1"></view>
-                <view class="fc-ic-arrow-2"></view>
+<view tt:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{isFullScreenPhone?'fc-adap-scroll':''}} {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
+    <view class="fc-modal-body">
+        <fc-tabs tabs="{{tabs}}" active="{{activeTabIndex}}" outerClass="fc-product-tabs" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="FcProductTypeTabs">
+            <view slot="headBefore" class="fc-tabs-action" bindtap="toggleZoom">
+                <view class="fc-tabs-zoom fc-ic-{{fullScreen?'compress':'expand'}}">
+                    <view class="fc-ic-arrow-1"></view>
+                    <view class="fc-ic-arrow-2"></view>
+                </view>
             </view>
-        </view>
-        <scroll-view scroll-x class="fc-tabs-scroll">
-            <view class="fc-tabs">
-                <view class="fc-tab {{activeTabIndex===index?'active':''}}" tt:for="{{tabs}}" tt:for-item="tab" tt:="value" bind:tap="setTab" data-tab="{{index}}">{{tab.name}}</view>
+            <view slot="headAfter" class="fc-tabs-action fc-tabs-action-right" bindtap="close">
+                <view class="fc-tabs-close fc-ic-close"></view>
             </view>
-        </scroll-view>
-        <view class="fc-tabs-action fc-tabs-action-right" bindtap="close">
-            <view class="fc-tabs-close fc-ic-close"></view>
-        </view>
+            <fc-api-reader slot="panel-api" class="fc-tab-panel-reader" active="{{activeTabIndex===2}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
+        </fc-tabs>
     </view>
-    <view class="fc-tabs-body">
-        <view class="fc-tabs-panels" style="width:{{tabs.length*100}}%;transform: translateX(-{{(activeTabIndex/tabs.length)*100}}%);">
-            <view class="fc-tabs-panel panel-{{tab.value}}" tt:for="{{tabs}}" tt:for-item="tab" tt:="value">
-                <fc-api-reader class="tab-panel-reader" tt:if="{{tab.value==='api'}}" active="{{tab.value==='api' && activeTabIndex===index}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-reader>
-            </view>
-        </view>
+    <view tt:if="{{isFullScreenPhone}}" class="fc-modal-adap">
+        <view class="fc-ad" bindtap="ad">Github@imingyu/fe-console</view>
     </view>
 </view>

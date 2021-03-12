@@ -27,6 +27,7 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
+    background-color: #fff;
     display: none;
     border-top: 1px solid $bg-tab-border;
 
@@ -37,14 +38,52 @@
     &.is-full {
         top: 0;
     }
+
+    &.fc-adap-scroll {
+        .fc-modal-body {
+            bottom: 100rpx;
+        }
+    }
+}
+
+.fc-modal-adap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 100rpx;
+    bottom: 0;
+    border-top: 1px solid $bg-tab-border;
+    margin-bottom: -1px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fc-modal-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.fc-ad {
+    color: #ccc;
+    text-align: center;
+    font-size: 40rpx;
+    font-weight: 300;
+    opacity: .5;
+    font-family: fantasy;
 }
 
 .fc-tabs-action {
     width: $ht-tab-bar;
+    height: $ht-tab-bar;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    position: absolute;
     z-index: 5;
 
     &::after {
@@ -59,6 +98,9 @@
 }
 
 .fc-tabs-action-right {
+    position: absolute;
+    right: 0;
+
     &::after {
         right: auto;
         left: 0;

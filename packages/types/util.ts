@@ -22,3 +22,8 @@ export interface FcStackInfo {
     /** 执行方法归属名称，如：Object, obj  */
     ascription?: string;
 }
+
+export interface FcNameValue<V = any, T = string> {
+    name: T;
+    value?: V;
+}

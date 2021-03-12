@@ -25,7 +25,7 @@ FcMpComponent(
         data: {
             categoryList: getApiCategoryList(),
             activeCategory: "all",
-            detailMaterial: null,
+            detailMaterialId: null,
         },
         methods: {
             addMaterial(data: Partial<FcMpApiProduct>) {
@@ -220,21 +220,10 @@ FcMpComponent(
                     );
                 }
             },
-            tapMaterial(this: FcMpViewContextBase, id: string) {
-                console.log(`tapMaterial.id=`, id);
-                debugger;
-
-                this.$fcObserver
-                    .call(id)
-                    .then((res) => {
-                        console.log(`tapMaterial.res=`, res);
-                        this.setData({
-                            detailMaterial: {},
-                        });
-                    })
-                    .catch((err) => {
-                        console.log(`tapMaterial.err=`, err);
-                    });
+            setDetailMaterial(this: FcMpViewContextBase, id?: string) {
+                this.setData({
+                    detailMaterialId: id || ''
+                });
             },
             changeCategory(activeCategory) {
                 this.setData({
@@ -287,7 +276,12 @@ FcMpComponent(
                 } else if (data.child.$tid === "fc-api-renderer") {
                     type = data.type;
                     if (type === "tap") {
-                        this.tapMaterial(data.data);
+                        this.setDetailMaterial(data.data);
+                    }
+                } else if (data.child.$tid === "fc-api-detail") {
+                    type = data.type;
+                    if (type === "close") {
+                        this.setDetailMaterial(data.data);
                     }
                 }
             });

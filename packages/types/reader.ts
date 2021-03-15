@@ -1,5 +1,6 @@
+import { FcCookie } from "./cookie";
 import { FcMethodExecStatus } from "./core";
-import { FcMpApiProduct } from "./mp";
+import { FcRendererProduct } from "./renderer";
 import { FcNameValue } from "./util";
 
 export interface FcMpApiMaterial {
@@ -7,7 +8,8 @@ export interface FcMpApiMaterial {
     type: string;
     name: string;
     desc?: string;
-    status: FcMethodExecStatus;
+    status: FcMethodExecStatus | number;
+    statusCode?: number;
     statusDesc?: string;
     startTime: number;
     endTime?: number;
@@ -23,17 +25,30 @@ export interface FcInitiator {
     column?: number;
 }
 
-export interface FcMpDetailHeader extends FcNameValue<string | number> {
+export interface FcMpDetailKV extends FcNameValue<string | number> {
     decodedValue?: string | number;
     remark?: string;
 }
 
+export const enum FcMpRequestApiDataType {
+    FormData = 1,
+    RequestRayload = 2,
+}
+export interface FcMpRequestApiData {
+    type: FcMpRequestApiDataType;
+    kvList?: FcMpDetailKV[];
+    rendererProducts?: FcRendererProduct[];
+}
+
 export interface FcMpApiDetail {
-    general: FcMpDetailHeader[];
-    requestHeaders?: FcMpDetailHeader[];
-    responseHeaders?: FcMpDetailHeader[];
+    general: FcMpDetailKV[];
+    requestHeaders?: FcMpDetailKV[];
+    responseHeaders?: FcMpDetailKV[];
     queryString?: string;
-    queryStringParameters?: FcMpDetailHeader[];
-    cookies?: FcNameValue<string | number>[];
+    queryStringParameters?: FcMpDetailKV[];
+    formData?: FcMpDetailKV[];
+    cookies?: FcCookie[];
+    requestData?: FcMpRequestApiData;
     // arguments
+    // requestRayload
 }

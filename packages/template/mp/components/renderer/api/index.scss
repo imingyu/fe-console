@@ -1,6 +1,7 @@
 @import '../../../style/var.scss';
 @import '../../../style/reader.scss';
 @import '../../../style/col-api.scss';
+@import '../../../style/status.scss';
 
 .fc-rd-api {
     &.is-selected {
@@ -18,6 +19,12 @@
         .fc-col-4,
         .fc-col-5 {
             display: none;
+        }
+    }
+
+    .fc-col-4 {
+        .fc-text-primary {
+            text-decoration: underline;
         }
     }
 

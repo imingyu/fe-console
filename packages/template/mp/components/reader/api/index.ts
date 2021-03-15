@@ -220,9 +220,14 @@ FcMpComponent(
                     );
                 }
             },
-            setDetailMaterial(this: FcMpViewContextBase, id?: string) {
+            setDetailMaterial(
+                this: FcMpViewContextBase,
+                id?: string,
+                tab?: number
+            ) {
                 this.setData({
-                    detailMaterialId: id || ''
+                    detailMaterialId: id || "",
+                    detailTab: tab || 0,
                 });
             },
             changeCategory(activeCategory) {
@@ -276,12 +281,18 @@ FcMpComponent(
                 } else if (data.child.$tid === "fc-api-renderer") {
                     type = data.type;
                     if (type === "tap") {
-                        this.setDetailMaterial(data.data);
+                        this.setDetailMaterial(data.data, 0);
+                    } else if (type === "tapInitiator") {
+                        this.setDetailMaterial(data.data, 3);
                     }
                 } else if (data.child.$tid === "fc-api-detail") {
                     type = data.type;
                     if (type === "close") {
-                        this.setDetailMaterial(data.data);
+                        this.setDetailMaterial();
+                    } else if (type === "changeTab") {
+                        this.setData({
+                            detailTab: data.data,
+                        });
                     }
                 }
             });

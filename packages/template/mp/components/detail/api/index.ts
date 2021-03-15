@@ -11,6 +11,14 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                 this.setDetailData();
             },
         },
+        tab: {
+            type: Number,
+            observer(val) {
+                this.setData({
+                    activeTabIndex: val,
+                });
+            },
+        },
     },
     data: {
         loading: true,
@@ -63,9 +71,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                 if (tidAlias === "FcApiDetailTabs") {
                     type = data.type;
                     if (type === "changeTab") {
-                        this.setData({
-                            activeTabIndex: data.data,
-                        });
+                        this.$fcDispatch("changeTab", data.data);
                     }
                 }
             }
@@ -90,9 +96,20 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                 this.$fcObserver
                     .call(data)
                     .then((res) => {
+                        if (this.$fcComponentIsDeatoryed) {
+                            return;
+                        }
                         if (res && res.length) {
                             const detail = convertApiDetail(res[0]);
+                            const tabs = this.data.tabs;
+                            if (detail.cookies && detail.cookies.length) {
+                                tabs.push({
+                                    text: "Cookies",
+                                    value: "cookies",
+                                });
+                            }
                             this.setData({
+                                tabs,
                                 loading: false,
                                 error: "",
                                 detail,

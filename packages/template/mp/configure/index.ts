@@ -4,7 +4,11 @@ import {
     FcMpApiProduct,
     FcMpRunConfig,
 } from "@fe-console/types";
-import { MpApiOtherCategory } from "./category";
+import {
+    MpApiCategoryMap,
+    MpApiOtherCategory,
+    reportCategoryMapToList,
+} from "./category";
 
 /**
  * 获取小程序Api数据原料的分类值
@@ -80,4 +84,12 @@ export const getApiCategoryList = (
         });
     }
     return res;
+};
+
+export const DefaultConfig: FcMpRunConfig = {
+    observer: ["local"],
+    apiCategoryGetter(product: FcMpApiProduct): string {
+        return MpApiCategoryMap[product.category] || MpApiOtherCategory;
+    },
+    apiCategoryList: reportCategoryMapToList(MpApiCategoryMap),
 };

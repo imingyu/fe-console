@@ -3,9 +3,9 @@
 .fc-headers-item {
     padding: 8rpx 10rpx;
     font-size: 24rpx;
-    line-height: 1.2;
+    line-height: 1.6;
     color: #545454;
-    font-family: $ft-main;
+    font-family: $ft-code;
 
     &:active {
         background-color: $bg-active;
@@ -19,6 +19,7 @@
 }
 
 .fc-headers-name {
+    font-family: $ft-name;
     font-weight: bold;
 
     &:after {

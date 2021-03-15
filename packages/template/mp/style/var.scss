@@ -22,6 +22,9 @@ $bg-filter-active:#aaaaaa;
 
 // 颜色
 $cr-error:red;
+$cr-success:green;
+$cr-muted:#999;
+$cr-link:#1a73ea;
 $cr-bar:#5e5e5e; // 条文字颜色
 $cr-tab-head:$cr-bar;
 $cr-filter-bar:$cr-bar;
@@ -29,7 +32,7 @@ $cr-th-bar:$cr-bar;
 $cr-active:#fff;
 $cr-filter-active:$cr-active;
 $cr-renderer-row:$cr-bar;
-$cr-renderer-row-muted:#999;
+$cr-renderer-row-muted:$cr-muted;
 $cr-renderer-row-active:#fff;
 
 // 文字尺寸
@@ -46,3 +49,5 @@ $ht-renderer-api:$zoom * 80rpx;
 
 
 $ft-main:Consolas, Menlo, Monaco, 'Courier New', monospace;
+$ft-code:Consolas, Menlo, Monaco, 'Courier New', monospace;
+$ft-name:system-ui, #{$ft-code};

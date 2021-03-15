@@ -1,7 +1,7 @@
 .fc-headers-item {
   padding: 8rpx 10rpx;
   font-size: 24rpx;
-  line-height: 1.2;
+  line-height: 1.6;
   color: #545454;
   font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
 }
@@ -17,6 +17,7 @@
 }
 
 .fc-headers-name {
+  font-family: system-ui, Consolas, Menlo, Monaco, Courier New, monospace;
   font-weight: bold;
 }
 
@@ -73,7 +74,7 @@
   padding-top: 6rpx;
   padding-bottom: 6rpx;
   color: #616161;
-  font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+  font-family: system-ui, Consolas, Menlo, Monaco, Courier New, monospace;
 }
 
 .fc-collapse-head:before {

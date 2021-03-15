@@ -152,3 +152,11 @@ export const isFullScreenPhone = (): Promise<boolean> => {
         }
     });
 };
+
+export const findValue = (obj: any, prop: string): any => {
+    for (let key in obj) {
+        if (key === prop || key.toLowerCase() === prop.toLowerCase()) {
+            return obj[prop];
+        }
+    }
+};

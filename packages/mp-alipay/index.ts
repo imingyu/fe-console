@@ -1,7 +1,6 @@
 import { MixinStore, MkApi } from "@mpkit/mixin";
 import { getMpInitLifeName } from "@mpkit/util";
 import { MpViewType } from "@mpkit/types";
-import MpRunConfig from "./config";
 import {
     FcMpAjaxStorager,
     FcMpMemoryObserver,
@@ -12,11 +11,21 @@ import {
 import {
     FcConsoleProduct,
     FcMpApiProduct,
+    FcMpRunConfig,
     FcMpViewProduct,
     IFcStorager,
 } from "@fe-console/types";
+import { DefaultConfig } from "./configure/index";
+export { DefaultConfig } from "./configure/index";
 
-if (MpRunConfig) {
+export const init = (MpRunConfig?: FcMpRunConfig) => {
+    if (typeof MpRunConfig === "undefined") {
+        MpRunConfig = DefaultConfig;
+    }
+    if (typeof MpRunConfig !== "object" || !MpRunConfig) {
+        console.warn("Config对象无效，无法初始化FeConsole");
+        return;
+    }
     let MpObserver: FcMpMemoryObserver;
     const setFcValues = (target: any) => {
         if ("$fcRunConfig" in target) {
@@ -136,4 +145,4 @@ if (MpRunConfig) {
             MpObserver = observerMap.local.observer as FcMpMemoryObserver;
         }
     }
-}
+};

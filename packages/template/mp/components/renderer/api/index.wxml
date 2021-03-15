@@ -1,11 +1,11 @@
-<view class="fc-reader-row fc-nowrap fc-status-{{data.status}} fc-renderer fc-rd-api {{selected?'is-selected':''}} sz-{{size}} cid-{{$cid}} tid-{{$tid}} {{outerClass||''}}" <%= bindEvent('tap') %>="tap">
+<view class="fc-reader-row fc-nowrap {{isError?'fc-status-error':''}} fc-renderer fc-rd-api {{selected?'is-selected':''}} sz-{{size}} cid-{{$cid}} tid-{{$tid}} {{outerClass||''}}" <%= bindEvent('tap') %>="tap">
     <view class="fc-col fc-api-col fc-col-1">
         <view class="fc-text-primary">{{data.name}}</view>
         <view wx:if="{{data.desc}}" class="fc-text-muted">{{data.desc}}</view>
     </view>
     <view class="fc-col fc-api-col fc-col-2">
         <view class="fc-text-primary">
-            {{data.status===1?'<%= MethodExecStatus1 %>':data.status===2?'<%= MethodExecStatus2 %>':data.status===3?'<%= MethodExecStatus3 %>':'<%= MethodExecStatus0 %>'}}
+            {{data.statusCode?data.statusCode: (data.status===1?'<%= MethodExecStatus1 %>':data.status===2?'<%= MethodExecStatus2 %>':data.status===3?'<%= MethodExecStatus3 %>':data.status)}}
         </view>
         <view wx:if="{{data.statusDesc}}" class="fc-text-muted">{{data.statusDesc}}</view>
     </view>
@@ -13,7 +13,8 @@
         <view class="fc-text-primary">{{data.type}}</view>
     </view>
     <view class="fc-col fc-api-col fc-col-4">
-        <!-- TODO:initiator -->
+        <view class="fc-text-primary" <%= catchEvent('tap') %>="tapInitiator">{{data.initiator}}</view>
+        <view wx:if="{{data.initiatorDesc}}" class="fc-text-muted">{{data.initiatorDesc}}</view>
     </view>
     <view class="fc-col fc-api-col fc-col-right fc-col-5 is-last-col">
         <view class="fc-text-primary level-{{timeLevel}}">{{timeVal}}{{timeUnit}}</view>

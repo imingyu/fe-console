@@ -18,5 +18,5 @@
 <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
 
     </scroll-view>
-    <fc-api-detail wx:if="{{detailMaterialId}}" data="{{detailMaterialId}}" class="fc-reader-detail-container has-th has-bar" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-detail>
+    <fc-api-detail wx:if="{{detailMaterialId}}" data="{{detailMaterialId}}" tab="{{detailTab}} " class="fc-reader-detail-container has-th has-bar" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-detail>
 </view>

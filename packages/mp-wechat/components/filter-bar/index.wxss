@@ -33,6 +33,7 @@
   padding: 0 5rpx;
   margin-right: 15rpx;
   font-size: 20rpx;
+  font-weight: bold;
 }
 
 .fc-filter-category {

@@ -1,8 +1,8 @@
-const { existsSync, rmdir } = require('fs');
 const path = require('path');
 const { replaceDir, rmDir } = require('./fs');
 const fse = require('fse');
 const dir = path.resolve(__dirname, '../demo/fe-console');
+rmDir(dir);
 replaceDir(path.resolve(__dirname, '../packages/mp-wechat/dist/npm'), dir);
 
 ['core', 'provider', 'renderer', 'types', 'util'].forEach(pack => {

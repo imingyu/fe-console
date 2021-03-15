@@ -1,4 +1,12 @@
-<fc-tabs class="fc-detail" tabs="{{tabs}}" active="{{activeTabIndex}}" outerClass="fc-apidetail-tabs" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="FcApiDetailTabs">
+<view wx:if="{{loading}}" class="fc-detail fc-status-container fc-status-loading">
+    <view class="fc-status-msg">正在获取详情数据...</view>
+    <view class="fc-status-action" <%= bindEvent('tap') %>="close">关闭</view>
+</view>
+<view wx:elif="{{error}}" class="fc-detail fc-status-container fc-status-error">
+    <view class="fc-status-msg">{{error}}</view>
+    <view class="fc-status-action" <%= bindEvent('tap') %>="close">关闭</view>
+</view>
+<fc-tabs wx:else class="fc-detail" tabs="{{tabs}}" active="{{activeTabIndex}}" outerClass="fc-apidetail-tabs" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="FcApiDetailTabs">
     <view slot="headBefore" class="fc-detail-action" <%= bindEvent('tap') %>="close">
         <view class="fc-detail-close fc-ic-close"></view>
     </view>
@@ -9,11 +17,11 @@
                 <view wx:for="{{detail.general}}" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}" wx:key="name">
                     <block wx:if="{{item.name!=='$$HR$$'}}">
                         <view class="fc-headers-name">{{item.name}}</view>
-                        <view wx:if="{{item.name==='Status'}}" class="fc-headers-val">
-                            {{item.value===1?'<%= MethodExecStatus1 %>':item.value===2?'<%= MethodExecStatus2 %>':item.value===3?'<%= MethodExecStatus3 %>':'<%= MethodExecStatus0 %>'}}
+                        <view wx:if="{{item.name==='Work Status'}}" class="fc-headers-val">
+                            {{item.value===1?'<%= MethodExecStatus1 %>':item.value===2?'<%= MethodExecStatus2 %>':item.value===3?'<%= MethodExecStatus3 %>':item.value}}
                             <view wx:if="{{item.remark}}" class="fc-headers-remark">({{item.remark}})</view>
                         </view>
-                        <view wx:else class="fc-headers-val">{{item.value}}</view>
+                        <view wx:else class="fc-headers-val {{item.name==='Status Code'?(item.value!==200?'fc-status-error':'fc-status-success'):''}}">{{item.value}}</view>
                     </block>
                 </view>
             </fc-collapse>
@@ -36,7 +44,7 @@
                 </view>
             </fc-collapse>
             <fc-collapse wx:if="{{detail.queryStringParameters}}" open="{{headersCollapseOpenState.s4}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse4">
-                <view class="fc-detail-title" slot="head">Query String Parameters</view>
+                <view class="fc-detail-title" slot="head">Query String</view>
                 <view wx:for="{{detail.queryStringParameters}}" class="{{item.name!=='$$HR$$'?'fc-headers-item':'fc-headers-hr'}}" wx:key="name">
                     <block wx:if="{{item.name!=='$$HR$$'}}">
                         <view class="fc-headers-name">{{item.name}}</view>
@@ -46,4 +54,18 @@
             </fc-collapse>
         </scroll-view>
     </view>
+     <view slot="panel-cookies" class="detail-tab-panel">
+        <view class="fc-table-container">
+            <view class="fc-table">
+                <view class="fc-table-tr">
+                    <view class="fc-table-th">Name</view>
+                    <view class="fc-table-th">Value</view>
+                </view>
+                <view wx:for="{{detail.cookies}}" class="fc-table-tr {{index%2?'fc-table-tr-odd':'fc-table-tr-even'}}">
+                    <view class="fc-table-td">{{item.name}}</view>
+                    <view class="fc-table-td">{{item.value}}</view>
+                </view>
+            </view>
+        </view>
+     </view>
 </fc-tabs>

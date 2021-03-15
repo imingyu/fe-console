@@ -16,6 +16,6 @@
         </fc-tabs>
     </view>
     <view a:if="{{isFullScreenPhone}}" class="fc-modal-adap">
-        <view class="fc-ad" onTap="ad">Github@imingyu/fe-console</view>
+        <view class="fc-ad">Github@imingyu/fe-console</view>
     </view>
 </view>

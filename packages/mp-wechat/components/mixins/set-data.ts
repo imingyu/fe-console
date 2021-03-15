@@ -67,6 +67,7 @@ export const createSetDataMixin = (type: MpViewType) => {
             }
         },
         [destoryLife]() {
+            this.$fcComponentIsDeatoryed = true;
             if (this.$fcObserver && this.$fcObserverHandler) {
                 this.$fcObserver.off("data", this.$fcObserverHandler);
                 this.$fcObserver.off("change", this.$fcObserverHandler);

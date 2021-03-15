@@ -41,6 +41,12 @@ const renderPackage = (platform) => {
             MethodExecStatus1: 'Executed',
             MethodExecStatus2: 'Success',
             MethodExecStatus3: 'Fail',
+            catchEvent(eventName) {
+                if (platform === 'alipay') {
+                    return `catch${eventName[0].toUpperCase()}${eventName.substr(1)}`;
+                }
+                return `catch${eventName}`;
+            },
             bindEvent(eventName) {
                 if (platform === 'alipay') {
                     return `on${eventName[0].toUpperCase()}${eventName.substr(1)}`;

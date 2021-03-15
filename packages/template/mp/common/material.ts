@@ -3,11 +3,13 @@ import {
     FcMpApiDetail,
     FcMpApiMaterial,
     FcMpApiProduct,
-    FcMpDetailHeader,
+    FcMpDetailKV,
     FcMpRunConfig,
+    FcStackInfo,
 } from "@fe-console/types";
 import { getApiCategoryValue } from "../configure/index";
-import { computeTime } from "./util";
+import { parseCookie } from "./cookie";
+import { computeTime, findValue } from "./util";
 
 export const convertApiMaterial = (
     product: Partial<FcMpApiProduct>,
@@ -19,6 +21,24 @@ export const convertApiMaterial = (
     if ("category" in product) {
         material.name = product.category;
         material.type = getApiCategoryValue(product, mpRunConfig);
+        if (
+            product.category === "request" &&
+            product.request &&
+            product.request[0] &&
+            product.request[0].url
+        ) {
+            let url = product.request[0].url as string;
+            url = url.startsWith("//") ? `https:${url}` : url;
+            url = url.startsWith("https:") ? url.substr(8) : url.substr(7);
+            const [before, query] = url.split("?");
+            const arr = before.split("/");
+            const name =
+                (arr.length > 1 ? arr[arr.length - 1] : "/") +
+                (query ? `?${query}` : "");
+            const desc = arr.slice(0, arr.length - 1).join("/");
+            material.name = name;
+            material.desc = desc;
+        }
     }
     if ("endTime" in product) {
         material.endTime = product.endTime;
@@ -47,7 +67,38 @@ export const convertApiMaterial = (
             material.statusDesc = product.response[0].errMsg;
         }
     }
+    if (
+        product.response &&
+        product.response.length &&
+        product.response[0] &&
+        typeof product.response[0].statusCode !== "undefined"
+    ) {
+        material.statusCode = product.response[0].statusCode as number;
+    }
+    if ("stack" in product && product.stack && product.stack.length) {
+        material.initiator = convertStockToInitiatorName(product.stack[0]);
+        material.initiatorDesc = convertStockToInitiatorDesc(product.stack[0]);
+    }
     return material;
+};
+
+export const convertStockToInitiatorName = (stock: FcStackInfo): string => {
+    if (stock.fileName) {
+        const fileName = stock.fileName
+            .split("appservice")
+            .slice(1)
+            .map((item) => (item.startsWith("/") ? item : `/${item}`))
+            .join("")
+            .substr(1);
+        if (stock.lineNumebr) {
+            return `${fileName}:${stock.lineNumebr}`;
+        }
+        return fileName;
+    }
+    return stock.original;
+};
+export const convertStockToInitiatorDesc = (stock: FcStackInfo): string => {
+    return "Script";
 };
 
 export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
@@ -66,17 +117,18 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
             failMsg = product.response[0].errMsg;
         }
     }
+    const statusKV: FcMpDetailKV = {
+        name: "Work Status",
+        value: product.status,
+        remark: failMsg,
+    };
     const res: FcMpApiDetail = {
         general: [
             {
                 name: "Api Name",
                 value: product.category,
             },
-            {
-                name: "Status",
-                value: product.status,
-                remark: failMsg,
-            },
+            statusKV,
         ],
     };
     if (product.endTime || product.execEndTime) {
@@ -117,27 +169,6 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
                 name: "Status Code",
                 value: statusCode,
             });
-            if (response && !(response instanceof Error)) {
-                if (response.header) {
-                    res.responseHeaders = Object.keys(response.header).map(
-                        (key) => {
-                            return {
-                                name: key,
-                                value: response.header[key],
-                            };
-                        }
-                    );
-                }
-                if (response.cookies && response.cookies.length) {
-                    res.cookies = response.cookies.map((item) => {
-                        const arr = item.split("=");
-                        return {
-                            name: arr[0],
-                            value: arr[1] || "",
-                        };
-                    });
-                }
-            }
             if (requestOptions.header) {
                 res.requestHeaders = Object.keys(requestOptions.header).map(
                     (key) => {
@@ -168,7 +199,36 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
                             });
                         });
                         return sum;
-                    }, [] as FcMpDetailHeader[]);
+                    }, [] as FcMpDetailKV[]);
+            }
+            if (typeof requestOptions.data !== "undefined") {
+                const reqContentType = requestOptions.header
+                    ? findValue(requestOptions.header, "content-type")
+                    : "application/json";
+                if (reqContentType.startsWith("application/json")) {
+                    // requestRayload
+                } else if (
+                    reqContentType === "application/x-www-form-unlencoded"
+                ) {
+                }
+            }
+
+            if (response && !(response instanceof Error)) {
+                if (response.header) {
+                    res.responseHeaders = Object.keys(response.header).map(
+                        (key) => {
+                            return {
+                                name: key,
+                                value: response.header[key],
+                            };
+                        }
+                    );
+                }
+                if (response.cookies && response.cookies.length) {
+                    res.cookies = (response.cookies as string[]).map((item) => {
+                        return parseCookie(item);
+                    });
+                }
             }
         }
     }

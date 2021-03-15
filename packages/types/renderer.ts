@@ -1,4 +1,4 @@
-export enum FcRendererType {
+export const enum FcRendererType {
     number = 1,
     string = 2,
     boolean = 3,
@@ -38,7 +38,7 @@ export interface FcRendererProduct {
     openable?: boolean;
 }
 
-export enum FcRendererLevel {
+export const enum FcRendererLevel {
     summary = 1,
     symbol = 2,
     head = 3,

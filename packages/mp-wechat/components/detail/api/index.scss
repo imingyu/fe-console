@@ -2,6 +2,8 @@
 @import '../../../style/icon.scss';
 @import '../../../style/headers.scss';
 @import '../../../style/detail.scss';
+@import '../../../style/status.scss';
+@import '../../../style/table.scss';
 
 .fc-detail-action {
     display: flex;
@@ -34,6 +36,10 @@
     color: #616161;
     font-weight: bold;
     font-size: 24rpx;
+
+    &:active {
+        color: #fff;
+    }
 }
 
 .detail-tab-panel {
@@ -42,10 +48,10 @@
     left: 0;
     right: 0;
     bottom: 0;
+    padding: 20rpx 0;
 }
 
 .detail-scroll {
     height: 100%;
     box-sizing: border-box;
-    padding: 20rpx 0;
 }

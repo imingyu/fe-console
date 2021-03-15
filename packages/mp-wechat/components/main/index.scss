@@ -84,7 +84,7 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    z-index: 5;
+    z-index: 15;
 
     &::after {
         content: '';
@@ -94,6 +94,7 @@
         bottom: 15rpx;
         width: 1rpx;
         background-color: $bg-tab-border;
+        z-index: 15;
     }
 }
 

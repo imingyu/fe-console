@@ -12,10 +12,6 @@
     align-items: center;
     color: $cr-renderer-row;
 
-    &.fc-status-3 {
-        color: $cr-error;
-    }
-
     &.is-selected .fc-col {
         border-right-color: $cr-renderer-row-active;
     }

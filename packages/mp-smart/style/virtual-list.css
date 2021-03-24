@@ -1,0 +1,22 @@
+.vl-scroller {
+  height: 100%;
+}
+
+.vl-index,
+.vl-total {
+  width: 40rpx;
+  height: 40rpx;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 24rpx;
+  background-color: #000;
+  position: absolute;
+}
+
+.vl-total {
+  background-color: red !important;
+  left: 100rpx;
+}

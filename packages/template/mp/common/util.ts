@@ -1,5 +1,9 @@
 import { uuid } from "@mpkit/util";
 import { MkApi } from "@mpkit/mixin";
+import {
+    FcBoundingClientRect,
+    FcMpSelectorQuery,
+} from "@fe-console/types";
 export const removeEndZero = (num: number | string): string => {
     const str = num + "";
     if (str.indexOf(".") === -1) {
@@ -52,7 +56,7 @@ export const getMpComponentInsidePage = (component: any): Promise<any> => {
     });
 };
 
-export const createIntersectionObserver = (vm, options?: any) => {
+export const createIntersectionObserver = (vm, options?: any): Promise<any> => {
     const isAlipay = "<%= (platform==='alipay'?'1':'') %>";
     return new Promise((resolve, reject) => {
         if (isAlipay) {
@@ -83,7 +87,9 @@ export const createIntersectionObserver = (vm, options?: any) => {
     });
 };
 
-export const createSelectorQuery = (vm) => {
+export const createSelectorQuery = <T = any>(
+    vm
+): Promise<FcMpSelectorQuery<T>> => {
     const isAlipay = "<%= (platform==='alipay'?'1':'') %>";
     return new Promise((resolve, reject) => {
         if (isAlipay) {
@@ -107,7 +113,32 @@ export const createSelectorQuery = (vm) => {
             resolve(vm);
         }
     }).then((ctx: any) => {
-        return ctx.createSelectorQuery();
+        return ctx.createSelectorQuery() as FcMpSelectorQuery<T>;
+    });
+};
+
+export const boundingClientRect = (
+    vm: any,
+    selector: string
+): Promise<FcBoundingClientRect> => {
+    return createSelectorQuery<FcBoundingClientRect[]>(vm).then((query) => {
+        return new Promise((resolve, reject) => {
+            // TODO: 支付宝小程序需要放到page onReady生命周期后才能执行
+            query
+                .select(selector)
+                .boundingClientRect()
+                .exec((res) => {
+                    if (res && res[0] && "height" in res[0]) {
+                        resolve(res[0]);
+                    } else {
+                        reject(
+                            new Error(
+                                `无法获取元素${selector}的boundingClientRect`
+                            )
+                        );
+                    }
+                });
+        });
     });
 };
 
@@ -159,4 +190,11 @@ export const findValue = (obj: any, prop: string): any => {
             return obj[prop];
         }
     }
+};
+
+export const showLoading = () => {
+    return (MkApi as any).showLoading();
+};
+export const hideLoading = () => {
+    return (MkApi as any).hideLoading();
 };

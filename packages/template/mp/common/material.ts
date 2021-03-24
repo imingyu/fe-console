@@ -84,12 +84,15 @@ export const convertApiMaterial = (
 
 export const convertStockToInitiatorName = (stock: FcStackInfo): string => {
     if (stock.fileName) {
-        const fileName = stock.fileName
+        let fileName = stock.fileName
             .split("appservice")
             .slice(1)
             .map((item) => (item.startsWith("/") ? item : `/${item}`))
             .join("")
             .substr(1);
+        fileName = fileName.startsWith("miniprogram_npm")
+            ? fileName.substr("miniprogram_npm".length + 1)
+            : fileName;
         if (stock.lineNumebr) {
             return `${fileName}:${stock.lineNumebr}`;
         }
@@ -131,6 +134,17 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
             statusKV,
         ],
     };
+    if (product.stack) {
+        res.stack = product.stack.map((item) => {
+            const data: FcMpDetailKV = {
+                name: item.target || '',
+            };
+            if (item.fileName) {
+                data.value = convertStockToInitiatorName(item);
+            }
+            return data;
+        });
+    }
     if (product.endTime || product.execEndTime) {
         res.general.push({
             name: "Take Time",
@@ -156,7 +170,8 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
             });
             res.general.push({
                 name: "Request Method",
-                value: ((requestOptions.method || "") as string).toUpperCase(),
+                value: ((requestOptions.method ||
+                    "get") as string).toUpperCase(),
             });
             const statusCode = response
                 ? response instanceof Error

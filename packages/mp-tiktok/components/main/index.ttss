@@ -79,7 +79,7 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  z-index: 5;
+  z-index: 15;
 }
 
 .fc-tabs-action::after {
@@ -90,6 +90,7 @@
   bottom: 15rpx;
   width: 1rpx;
   background-color: #ccc;
+  z-index: 15;
 }
 
 .fc-tabs-action-right {

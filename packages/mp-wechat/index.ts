@@ -32,23 +32,18 @@ export const init = (MpRunConfig?: FcMpRunConfig) => {
             return;
         }
         if (typeof Object.defineProperties === "function") {
-            try {
-                Object.defineProperties(target, {
-                    $fcRunConfig: {
-                        get() {
-                            return MpRunConfig;
-                        },
+            Object.defineProperties(target, {
+                $fcRunConfig: {
+                    get() {
+                        return MpRunConfig;
                     },
-                    $fcObserver: {
-                        get() {
-                            return MpObserver;
-                        },
+                },
+                $fcObserver: {
+                    get() {
+                        return MpObserver;
                     },
-                });
-            } catch (error) {
-                console.log(target);
-                console.error(error);
-            }
+                },
+            });
         } else {
             target.$fcRunConfig = MpRunConfig;
             target.$fcObserver = MpObserver;

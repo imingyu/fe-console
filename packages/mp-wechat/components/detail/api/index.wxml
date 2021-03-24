@@ -68,4 +68,15 @@
             </view>
         </view>
      </view>
+     <view slot="panel-initiator" class="detail-tab-panel">
+        <scroll-view class="detail-scroll" scroll-y>
+            <fc-collapse open="{{headersCollapseOpenState.s31}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="ApiCollapse31">
+                <view class="fc-detail-title" slot="head">Call stack</view>
+                <view wx:for="{{detail.stack}}" class="fc-headers-item fc-headers-stack" wx:key="index">
+                    <view class="fc-headers-name">{{item.name}}</view>
+                    <view wx:if="{{item.value}}" class="fc-headers-val">{{item.value}}</view>
+                </view>
+            </fc-collapse>
+        </scroll-view>
+     </view>
 </fc-tabs>

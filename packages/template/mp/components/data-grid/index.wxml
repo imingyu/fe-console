@@ -1,0 +1,74 @@
+<view class="fc-datagrid">
+    <view class="fc-datagrid-head">
+        <view
+            class="fc-datagrid-row {{$vlShowList && $vlShowList.length?'has-data':''}}"
+            bindtap="tapRow"
+            bindlongpress="longpressRow"
+        >
+            <view
+                wx:for="{{columns}}"
+                wx:for-item="col"
+                class="fc-datagrid-col"
+                style="width:{{col.width}}%;"
+                bindtap="tapCell"
+                bindlongpress="longpressCell"
+                data-col="{{index}}"
+            >
+                <view wx:if="{{col.title}}" class="fc-datagrid-col-title">{{col.title}}</view>
+                <view wx:if="{{col.subTitle}}" class="fc-datagrid-col-subtitle">{{col.subTitle}}</view>
+            </view>
+        </view>
+    </view>
+    <!-- 吸顶的数据 -->
+    <view wx:if="{{affixable && affixList.length}}" class="fc-datagrid-affix">
+        <view
+            wx:for="{{affixList}}"
+            wx:for-item="row"
+            class="fc-datagrid-row fc-datagrid-row-{{index%2===0?'even':'odd'}}"
+            data-row="{{row}}"
+            data-type="affix"
+            bindtap="tapRow"
+            bindlongpress="longpressRow"
+        >
+            <view
+                wx:for="{{columns}}"
+                wx:for-item="col"
+                class="fc-datagrid-col"
+                style="width:{{col.width}}%;"
+                bindtap="tapCell"
+                bindlongpress="longpressCell"
+                data-col="{{index}}"
+                data-row="{{$vlItemIndex}}"
+            >
+                <view class="fc-datagrid-col-content">{{row[col.field]}}</view>
+                <view wx:if="{{$vlItem[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{row[col.field]}}</view>
+            </view>
+        </view>
+    </view>
+    <!-- 正常的数据 -->
+    <scroll-view scroll-y class="fc-datagrid-scroll">
+        <%= VirtualListStart %>
+        <view
+            wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}"
+            class="fc-datagrid-row fc-datagrid-row-{{$vlItemIndex%2===0?'even':'odd'}}"
+            data-row="{{$vlItemIndex}}"
+            bindtap="tapRow"
+            bindlongpress="longpressRow"
+        >
+            <view
+                wx:for="{{columns}}"
+                wx:for-item="col"
+                class="fc-datagrid-col"
+                style="width:{{col.width}}%;"
+                bindtap="tapCell"
+                bindlongpress="longpressCell"
+                data-col="{{index}}"
+                data-row="{{$vlItemIndex}}"
+            >
+                <view class="fc-datagrid-col-content">{{$vlItem[col.field]}}</view>
+                <view wx:if="{{$vlItem[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{$vlItem[col.field]}}</view>
+            </view>
+        </view>
+        <%= VirtualListEnd %>
+    </scroll-view>
+</view>

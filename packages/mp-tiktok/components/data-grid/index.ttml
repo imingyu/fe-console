@@ -1,0 +1,38 @@
+<view class="fc-datagrid">
+    <view class="fc-datagrid-head">
+        <view class="fc-datagrid-row {{$vlShowList && $vlShowList.length?'has-data':''}}" bindtap="tapRow" bindlongpress="longpressRow">
+            <view tt:for="{{columns}}" tt:for-item="col" class="fc-datagrid-col" style="width:{{col.width}}%;" bindtap="tapCell" bindlongpress="longpressCell" data-col="{{index}}">
+                <view tt:if="{{col.title}}" class="fc-datagrid-col-title">{{col.title}}</view>
+                <view tt:if="{{col.subTitle}}" class="fc-datagrid-col-subtitle">{{col.subTitle}}</view>
+            </view>
+        </view>
+    </view>
+    <!-- 吸顶的数据 -->
+    <view tt:if="{{affixable && affixList.length}}" class="fc-datagrid-affix">
+        <view tt:for="{{affixList}}" tt:for-item="row" class="fc-datagrid-row fc-datagrid-row-{{index%2===0?'even':'odd'}}" data-row="{{row}}" data-type="affix" bindtap="tapRow" bindlongpress="longpressRow">
+            <view tt:for="{{columns}}" tt:for-item="col" class="fc-datagrid-col" style="width:{{col.width}}%;" bindtap="tapCell" bindlongpress="longpressCell" data-col="{{index}}" data-row="{{$vlItemIndex}}">
+                <view class="fc-datagrid-col-content">{{row[col.field]}}</view>
+                <view tt:if="{{$vlItem[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{row[col.field]}}</view>
+            </view>
+        </view>
+    </view>
+    <!-- 正常的数据 -->
+    <scroll-view scroll-y class="fc-datagrid-scroll">
+        <scroll-view scroll-y class="vl-scroller" bindscroll="$vlOnScroll">
+    <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
+    <view class="vl-list">
+        <view tt:for="{{ $vlShowList }}" tt:for-item="$vlItem" tt:for-index="$vlItemIndex" tt:="id" class="vl-item-container vl-item-{{$vlItem.id}}">
+            <view tt:if="{{$vlItemIndex===2}}" class="vl-total">{{$vlTotalCount}}</view>
+            <view tt:if="{{$vlDebug}}" class="vl-index">{{$vlItem.$vlIndex+1}}</view>
+        <view tt:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'weak' }}" class="fc-datagrid-row fc-datagrid-row-{{$vlItemIndex%2===0?'even':'odd'}}" data-row="{{$vlItemIndex}}" bindtap="tapRow" bindlongpress="longpressRow">
+            <view tt:for="{{columns}}" tt:for-item="col" class="fc-datagrid-col" style="width:{{col.width}}%;" bindtap="tapCell" bindlongpress="longpressCell" data-col="{{index}}" data-row="{{$vlItemIndex}}">
+                <view class="fc-datagrid-col-content">{{$vlItem[col.field]}}</view>
+                <view tt:if="{{$vlItem[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{$vlItem[col.field]}}</view>
+            </view>
+        </view>
+                </view>
+    </view>
+    <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
+</scroll-view>
+    </scroll-view>
+</view>

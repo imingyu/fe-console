@@ -30,6 +30,8 @@
     display: table-cell;
     border-right: 1px solid $bg-tab-border;
     padding: 6rpx;
+    word-break: break-all;
+    white-space: normal;
 }
 
 .fc-table-th {

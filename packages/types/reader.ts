@@ -1,7 +1,7 @@
 import { FcCookie } from "./cookie";
 import { FcMethodExecStatus } from "./core";
-import { FcRendererProduct } from "./renderer";
-import { FcNameValue } from "./util";
+import { FcRendererProduct } from "./json-tree";
+import { FcNameValue, FcStackInfo } from "./util";
 
 export interface FcMpApiMaterial {
     id: string;
@@ -49,6 +49,7 @@ export interface FcMpApiDetail {
     formData?: FcMpDetailKV[];
     cookies?: FcCookie[];
     requestData?: FcMpRequestApiData;
+    stack?: FcMpDetailKV[];
     // arguments
     // requestRayload
 }

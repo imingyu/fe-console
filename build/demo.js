@@ -5,7 +5,7 @@ const dir = path.resolve(__dirname, '../demo/fe-console');
 rmDir(dir);
 replaceDir(path.resolve(__dirname, '../packages/mp-wechat/dist/npm'), dir);
 
-['core', 'provider', 'renderer', 'types', 'util'].forEach(pack => {
+['core', 'provider', 'json-tree', 'types', 'util'].forEach(pack => {
     const name = `@fe-console/${pack}`;
     const packRoot = path.resolve(__dirname, `../packages/${pack}`);
     const nodeModulesDir = path.resolve(__dirname, '../demo/node_modules');

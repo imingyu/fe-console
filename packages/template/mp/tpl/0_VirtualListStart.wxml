@@ -1,10 +1,6 @@
-<view class="vl-list-placeholder is-start"
-        style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
+<scroll-view scroll-y class="vl-scroller" <%= bindEvent('scroll') %>="$vlOnScroll">
+    <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
     <view class="vl-list">
-        <view wx:for="{{ $vlShowList }}"
-            wx:for-item="$vlItem"
-            wx:for-index="$vlItemIndex"
-            wx:key="id"
-            wx:if="{{ $vlItemStatus['s'+$vlItem.id] !== 'recovery'}}"
-            class="vl-item-container status-{{ $vlItemStatus['s'+$vlItem.id] || 'none' }} vl-item-{{$vlItem.id}}"
-            style="height:{{!$vlItemStaticHeight?($vlItemHeight['s'+item.id]&&$vlItemStatus['s'+item.id]==='weak'?($vlItemHeight['s'+item.id]):'auto'):''}};">
+        <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" class="vl-item-container vl-item-{{$vlItem.id}}">
+            <view wx:if="{{$vlItemIndex===2}}" class="vl-total">{{$vlTotalCount}}</view>
+            <view wx:if="{{$vlDebug}}" class="vl-index">{{$vlItem.$vlIndex+1}}</view>

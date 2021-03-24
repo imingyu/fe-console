@@ -1,7 +1,7 @@
 {
   "packages": [
     "packages/core",
-    "packages/renderer",
+    "packages/json-tree",
     "packages/provider",
     "packages/types",
     "packages/util",

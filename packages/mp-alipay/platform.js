@@ -16,5 +16,13 @@ module.exports = {
     "importNodeName": "import",
     "importSrcAttrName": "src",
     "includeNodeName": "include",
-    "includeSrcAttrName": "src"
+    "includeSrcAttrName": "src",
+    "mpxUnit": "rpx",
+    "cssFileSuffix": ".wxss",
+    "bindEvent": true,
+    "catchEvent": true,
+    "triggerCustomEvent": true,
+    "captureBindEvent": true,
+    "captureCatchEvent": true,
+    "mutBindEvent": true
 }

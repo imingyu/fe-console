@@ -3,6 +3,7 @@ import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
 import { convertApiDetail } from "../../../common/material";
 import { getMpInitLifeName } from "@mpkit/util";
+import { FcMpApiProduct } from "@fe-console/types";
 FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
     properties: {
         data: {
@@ -48,6 +49,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
             s2: true,
             s3: true,
             s4: true,
+            s31: true,
         },
     },
     [getMpInitLifeName(MpViewType.Component)]() {
@@ -94,7 +96,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                     });
                 }
                 this.$fcObserver
-                    .call(data)
+                    .call<Array<FcMpApiProduct>>(data)
                     .then((res) => {
                         if (this.$fcComponentIsDeatoryed) {
                             return;

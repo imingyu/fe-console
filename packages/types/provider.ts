@@ -22,8 +22,8 @@ export interface FcWhereProduct<T> extends FcProduct {
  * 数据原料筛选函数，调用时机：1.原料对象创建前（传递原料ID和类型、context）；2.原料准备送往生成事件（create）前（已创建好的原料对象包含很多信息）；3.原料变化对象创建前（传递原料ID和类型、context）；4.原料准备送往变化(change)事件前（传递原料的变化对象，一定包含ID，其他字段可能包含）；
  */
 export interface FcProductFilter<T extends FcProduct = FcProduct, S = number> {
-    (data: Partial<T>, context?:any): boolean;
-    (id: string, type?: S, context?:any): boolean;
+    (data: Partial<T>, context?: any): boolean;
+    (id: string, type?: S, context?: any): boolean;
 }
 export interface IFcProducer<T extends FcProduct = FcProduct>
     extends IFcEventEmitter<T> {
@@ -53,5 +53,5 @@ export interface IFcObserver<
     storager?: IFcStorager<S>;
     connect(storager?: IFcStorager<S>): Promise<void>;
     close();
-    call<R>(where: W, eid?: string, timeout?: number): Promise<R>;
+    call<R = Array<T>>(where: W, eid?: string, timeout?: number): Promise<R>;
 }

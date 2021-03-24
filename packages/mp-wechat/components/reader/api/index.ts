@@ -6,15 +6,20 @@ import { getMpInitLifeName } from "@mpkit/util";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
+    FcMpComponentDataAny,
+    FcMpComponentMethods,
     FcMpViewProduct,
+    FcMpVirtualListComponent,
+    FcMpVirtualListComponentMethods,
     FcProductType,
+    FcRequireId,
 } from "@fe-console/types";
 import { FcMpApiMaterial, FcMpViewContextBase } from "@fe-console/types";
 import { getApiCategoryList } from "../../../configure/index";
 import { convertApiMaterial } from "../../../common/material";
-FcMpComponent(
+FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
-    createVirtualListMixin(MpViewType.Component),
+    createVirtualListMixin(MpViewType.Component) as any,
     {
         properties: {
             active: {
@@ -23,6 +28,8 @@ FcMpComponent(
             },
         },
         data: {
+            $vlItemStaticHeight: 40,
+            $vlDebug: true,
             categoryList: getApiCategoryList(),
             activeCategory: "all",
             detailMaterialId: null,
@@ -34,7 +41,7 @@ FcMpComponent(
                 this.addMaterialToCategory(material);
             },
             addMaterialToCategory(
-                material: Partial<FcMpApiMaterial>,
+                material: Partial<FcMpApiMaterial> & FcRequireId,
                 map?: any
             ) {
                 if (!map) {
@@ -195,10 +202,7 @@ FcMpComponent(
             reloadVlList(allList) {
                 this.$vlClear();
                 this.$vlAllList = [...allList];
-                this.$vlTrySetShowList(
-                    0,
-                    this.data.$vlPageSize + this.data.$vlBufferSize - 1
-                );
+                this.$vlListChange();
             },
             filterMaterial(keyword: string) {
                 this.filterKeyword = keyword;
@@ -263,8 +267,21 @@ FcMpComponent(
                     this.addMaterial(data);
                 }
             },
+            vlOnContainerHeightComputed() {
+                this.setData({
+                    $vlPageSize:
+                        Math.ceil(
+                            this.$vlContainerHeight /
+                                this.data.$vlItemStaticHeight
+                        ) + 5,
+                });
+            },
         },
-        [getMpInitLifeName(MpViewType.Component)]() {
+        [getMpInitLifeName(MpViewType.Component)](
+            this: FcMpVirtualListComponent
+        ) {
+            (global as any).sss = this;
+            this.$vlInit();
             setTimeout(() => {
                 this.refreshCategory();
             }, 400);

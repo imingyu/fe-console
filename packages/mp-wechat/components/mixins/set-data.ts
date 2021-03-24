@@ -1,5 +1,10 @@
 import { MpViewType } from "@mpkit/types";
-import { MkSetDataPerformer, diffMpData, openMpData } from "@mpkit/set-data";
+import {
+    MkSetDataPerformer,
+    diffMpData,
+    openMpData,
+    replaceUndefinedValues,
+} from "@mpkit/set-data";
 import { getMpInitLifeName, isEmptyObject } from "@mpkit/util";
 import { FcMpViewContextBase } from "@fe-console/types";
 const performer = new MkSetDataPerformer();
@@ -22,27 +27,6 @@ export const createSetDataMixin = (type: MpViewType) => {
             });
         },
     };
-    const rewriteUndefinedProp = (data) => {
-        for (let prop in data) {
-            const type = typeof data[prop];
-            if (type === "undefined") {
-                data[prop] = null;
-            } else if (Array.isArray(data)) {
-                data[prop].forEach((item, index) => {
-                    rewriteUndefinedProp[item];
-                    if (typeof item === "undefined") {
-                        data[index] = null;
-                    }
-                });
-            } else if (
-                type === "object" &&
-                data[prop] &&
-                isEmptyObject(data[prop])
-            ) {
-                rewriteUndefinedProp(data[prop]);
-            }
-        }
-    };
     let observerHandler = function (type, data) {
         this && this.onFcObserverEvent && this.onFcObserverEvent(type, data);
     };
@@ -56,7 +40,7 @@ export const createSetDataMixin = (type: MpViewType) => {
             if (!this.$mkDiffSetDataBeforeValue) {
                 this.$mkDiffSetDataBeforeValue = this.setData;
                 this.setData = function (data, callback) {
-                    rewriteUndefinedProp(data);
+                    replaceUndefinedValues(data, null);
                     return performer.exec(this, data, callback);
                 };
             }

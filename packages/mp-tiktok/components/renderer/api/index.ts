@@ -1,5 +1,9 @@
 import { removeEndZero } from "../../../common/util";
-import { FcMpViewContextBase } from "@fe-console/types";
+import {
+    FcMethodExecStatus,
+    FcMpApiMaterial,
+    FcMpViewContextBase,
+} from "@fe-console/types";
 import { FcMpComponent } from "../../mixins/view";
 import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
@@ -7,8 +11,12 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
     properties: {
         data: {
             type: Object,
-            observer() {
-                this.computeTime();
+            observer(val: FcMpApiMaterial) {
+                this.computeTime(
+                    "statusCode" in val
+                        ? val.statusCode !== 200
+                        : val.status === FcMethodExecStatus.Fail
+                );
             },
         },
         size: {
@@ -27,7 +35,10 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
         tap() {
             this.$fcDispatch("tap", this.$fcGetProp("data", {}).id);
         },
-        computeTime(this: FcMpViewContextBase) {
+        tapInitiator() {
+            this.$fcDispatch("tapInitiator", this.$fcGetProp("data", {}).id);
+        },
+        computeTime(this: FcMpViewContextBase, isError: boolean = false) {
             const { startTime, endTime } = this.$fcGetProp("data", {});
             if (startTime && endTime) {
                 const total: number = endTime - startTime;
@@ -51,9 +62,14 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-renderer"), {
                 }
                 // TODO:根据config中配置计算出性能level
                 this.setData({
+                    isError,
                     timeUnit,
                     timeVal,
                     timeLevel,
+                });
+            } else {
+                this.setData({
+                    isError,
                 });
             }
         },

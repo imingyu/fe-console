@@ -2,6 +2,7 @@
   height: 100%;
   position: relative;
   z-index: 5;
+  overflow: hidden;
 }
 
 .fc-tabs.fc-apidetail-tabs .fc-tabs-head {
@@ -24,6 +25,7 @@
   background: #f3f3f3;
   color: #5e5e5e;
   position: relative;
+  z-index: 10;
 }
 
 .fc-tabs-heads {
@@ -46,11 +48,13 @@
   top: 0;
   left: 0;
   right: 0;
+  z-index: 11;
 }
 
 .fc-tabs-horizontal.fc-product-tabs .fc-tabs-head-scroll {
   left: 70rpx;
   right: 70rpx;
+  margin-left: 1px;
 }
 
 .fc-tabs-horizontal.fc-apidetail-tabs .fc-tab-title {

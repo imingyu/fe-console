@@ -13,6 +13,14 @@
     }
 }
 
+.fc-headers-stack {
+    .fc-headers-name {
+        &:after {
+            display: none;
+        }
+    }
+}
+
 .fc-headers-hr {
     border-bottom: 1px solid $bg-tab-border;
     margin: 6rpx 0;
@@ -37,6 +45,7 @@
 }
 
 .fc-headers-name,
+.fc-headers-key,
 .fc-headers-val {
     display: inline;
     white-space: normal;

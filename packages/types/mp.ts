@@ -62,9 +62,9 @@ export interface FcMpViewContextBase<T = any> {
     setData(data: any, callback?: Function): void;
     $fcEvents?: { [prop: string]: FcEventHandler[] };
     $fcUnDispatchEvents?: Array<[string, any, FcMpViewContextBase]>;
-    $fcGetProp(prop: string, defaultVal?:any): any;
+    $fcGetProp(prop: string, defaultVal?: any): any;
     /** 向父组件（不限层级）广播数据 */
-    $fcDispatch(type: string, data: any, root: FcMpViewContextBase);
+    $fcDispatch(type: string, data?: any, root?: FcMpViewContextBase);
     $fcGetParentTid(): string;
     $fcGetParentCid(): string;
     $fcOn(this: FcMpViewContextBase, name: string, handler: FcEventHandler);
@@ -101,4 +101,31 @@ export interface FcMpRunConfig {
     >;
     apiCategoryGetter: FcMpApiCategoryMap | FcMpApiCategoryGetter;
     apiCategoryList: Array<string | FcMpApiCategoryInfo>;
+}
+
+export interface FcMpEventTarget {
+    dataset: {
+        [prop: string]: any;
+    };
+}
+export interface FcMpEvent<T = any> {
+    type: string;
+    target: FcMpEventTarget;
+    currentTarget: FcMpEventTarget;
+    detail?: T;
+}
+
+export interface FcMpScrollEventDetail {
+    scrollTop: number;
+    scrollHeight: number;
+}
+
+export interface FcMpSelectorQueryCallback<T = Array<any>> {
+    (res: T);
+}
+
+export interface FcMpSelectorQuery<T=any> {
+    exec(cb: FcMpSelectorQueryCallback<T>);
+    select(selector:string): FcMpSelectorQuery<T>;
+    boundingClientRect(): FcMpSelectorQuery<T>;
 }

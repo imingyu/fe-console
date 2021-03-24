@@ -41,7 +41,7 @@ function cssStyle2DomStyle(sName) {
 module.exports = [
     'core',
     'provider',
-    'renderer',
+    'json-tree',
     'types',
     'util',
 ].reduce((sum, package) => {

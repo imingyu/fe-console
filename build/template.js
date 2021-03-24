@@ -91,6 +91,7 @@ const renderFile = (platform, fileName, renderData) => {
                 writeFile(fileName, newContent);
                 renderSass(fileName).then((cssContent) => {
                     writeFile(fileName.substr(0, fileName.lastIndexOf('.')) + (spec.cssFileSuffix || cssFileSuffixMap[platform]), cssContent);
+                    removeFile(fileName);
                     resolve();
                 }).catch(reject);
                 return;

@@ -3,12 +3,21 @@ import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
 import { convertApiDetail } from "../../../common/material";
 import { getMpInitLifeName } from "@mpkit/util";
+import { FcMpApiProduct } from "@fe-console/types";
 FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
     properties: {
         data: {
             type: String,
             observer() {
                 this.setDetailData();
+            },
+        },
+        tab: {
+            type: Number,
+            observer(val) {
+                this.setData({
+                    activeTabIndex: val,
+                });
             },
         },
     },
@@ -40,6 +49,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
             s2: true,
             s3: true,
             s4: true,
+            s31: true,
         },
     },
     [getMpInitLifeName(MpViewType.Component)]() {
@@ -63,9 +73,7 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                 if (tidAlias === "FcApiDetailTabs") {
                     type = data.type;
                     if (type === "changeTab") {
-                        this.setData({
-                            activeTabIndex: data.data,
-                        });
+                        this.$fcDispatch("changeTab", data.data);
                     }
                 }
             }
@@ -88,11 +96,22 @@ FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-api-detail"), {
                     });
                 }
                 this.$fcObserver
-                    .call(data)
+                    .call<Array<FcMpApiProduct>>(data)
                     .then((res) => {
+                        if (this.$fcComponentIsDeatoryed) {
+                            return;
+                        }
                         if (res && res.length) {
                             const detail = convertApiDetail(res[0]);
+                            const tabs = this.data.tabs;
+                            if (detail.cookies && detail.cookies.length) {
+                                tabs.push({
+                                    text: "Cookies",
+                                    value: "cookies",
+                                });
+                            }
                             this.setData({
+                                tabs,
                                 loading: false,
                                 error: "",
                                 detail,

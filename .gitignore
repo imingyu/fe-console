@@ -108,3 +108,9 @@ demo
 *.d.ts
 spec
 server-demo
+
+# 暂时将mp-*过滤掉
+packages/mp-wechat
+packages/mp-alipay
+packages/mp-smart
+packages/mp-tiktok

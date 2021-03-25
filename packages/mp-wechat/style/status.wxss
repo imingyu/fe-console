@@ -1,7 +1,0 @@
-.fc-status-success {
-  color: green !important;
-}
-
-.fc-status-error {
-  color: red !important;
-}

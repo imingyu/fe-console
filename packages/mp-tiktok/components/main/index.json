@@ -1,7 +1,0 @@
-{
-    "component": true,
-    "usingComponents": {
-        "fc-tabs": "../tabs/index",
-        "fc-api-reader": "../reader/api/index"
-    }
-}

@@ -1,7 +1,0 @@
-<view class="fc-collapse {{open?'is-open':''}}">
-    <view class="fc-collapse-head fc-headers-item" bindtap="toggle">
-        <slot name="head"></slot>
-    </view>
-    <slot></slot>
-    <view wx:if="{{open && border}}" class="fc-headers-hr fc-collapse-hr"></view>
-</view>

@@ -1,10 +1,14 @@
 @import './var.scss';
-@import './virtual-list.scss';
 
 .fc-reader {
     height: 100%;
     position: relative;
     background-color: $bg-reader;
+    display: none;
+
+    &.fc-active {
+        display: block;
+    }
 }
 
 

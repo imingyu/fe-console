@@ -59,6 +59,7 @@ export interface FcMpViewContextAny {
     [prop: string]: any;
 }
 export interface FcMpViewContextBase<T = any> {
+    $fcExports?: any;
     $fcComponent?: boolean;
     $mkDiffSetDataBeforeValue?: Function;
     $fcObserverHandler?(
@@ -92,6 +93,7 @@ export interface FcMpViewContextBase<T = any> {
         type: string,
         data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
     );
+    $fcGetBaseExports(): any;
 }
 
 export interface FcMpViewMethod<T = any> {

@@ -40,6 +40,10 @@ export interface FcClientRect {
     left: number;
 }
 
+export interface FcActionSheetOptions {
+    items: string[];
+}
+
 /**跨平台Api对象*/
 export interface Fc {
     /**窗口尺寸变化事件的回调函数*/
@@ -50,8 +54,8 @@ export interface Fc {
     // request<T = any>(
     //     options: FcStandardRequestOptions
     // ): Promise<FcStandardRequestResponse<T>>;
-    // /**显示消息提示框*/
-    // showToast(title: string | FcStandardToastOptions);
+    /**显示消息提示框*/
+    showToast(title: string | FcStandardToastOptions);
     /**返回元素的大小及其相对于视口的位置*/
     getBoundingClientRect<T = string>(
         /**选择器或者元素本身*/
@@ -59,4 +63,6 @@ export interface Fc {
         /**小程序平台时，此参数必选*/
         ctx?: any
     ): Promise<FcClientRect>;
+    /**显示操作菜单*/
+    showActionSheet(options: string[] | FcActionSheetOptions): Promise<number>;
 }

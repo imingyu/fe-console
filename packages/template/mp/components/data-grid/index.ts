@@ -6,7 +6,9 @@
 import {
     FcDataGridCol,
     FcMpDataGridComponent,
+    FcMpDataGridComponentExports,
     FcMpEvent,
+    FcMpViewContextBase,
     FcMpVirtualListComponent,
 } from "@fe-console/types";
 import { FcMpComponent } from "../mixins/view";
@@ -73,19 +75,92 @@ FcMpComponent<FcMpDataGridComponent>(
         data: {
             columnWidthMap: {},
             affixList: [],
+            scrollMarginTop: 0,
         },
         methods: {
             computeAffixList() {
                 const rows = this.$fcGetProp("affixRows", []) as string[];
-                this.setData({
-                    affixList: rows
-                        .map((id) => {
-                            return (this.$fcGetProp("data", []) as any[]).find(
-                                (item) => item.id === id
-                            );
-                        })
-                        .filter((item) => item),
-                });
+                let scrollMarginTop = this.data.scrollMarginTop || 0;
+                const affixList = rows
+                    .map((id) => {
+                        return (this.$vlAllList || []).find(
+                            (item) => item.id === id
+                        );
+                    })
+                    .filter((item) => item)
+                    .map((item, index) => {
+                        return this.$vlMergeItem(
+                            this.data.affixList
+                                ? this.data.affixList[index]
+                                : null,
+                            item
+                        );
+                    });
+                console.log(
+                    `affixList=`,
+                    JSON.parse(JSON.stringify(affixList))
+                );
+                let vlItemHeight = this.$fcGetProp("vlItemHeight");
+                const renderCallBacks = [];
+                if (vlItemHeight) {
+                    scrollMarginTop = vlItemHeight * affixList.length;
+                } else {
+                    scrollMarginTop = 0;
+                    affixList.forEach((item) => {
+                        if (
+                            this.affixItemHeightMap &&
+                            this.affixItemHeightMap[item.id]
+                        ) {
+                            scrollMarginTop += this.affixItemHeightMap[item.id];
+                        } else {
+                            renderCallBacks.push(() => {
+                                return this.$fc
+                                    .getBoundingClientRect(
+                                        `.row${item.id}`,
+                                        this
+                                    )
+                                    .then((res) => {
+                                        if (!this.affixItemHeightMap) {
+                                            this.affixItemHeightMap = {};
+                                        }
+                                        this.affixItemHeightMap[item.id] =
+                                            res.height;
+                                    })
+                                    .catch(() => Promise.resolve());
+                            });
+                        }
+                    });
+                }
+                this.setData(
+                    {
+                        affixList,
+                        scrollMarginTop,
+                    },
+                    () => {
+                        Promise.all(renderCallBacks.map((item) => item())).then(
+                            () => {
+                                if (
+                                    this.data.affixList &&
+                                    this.data.affixList.length
+                                ) {
+                                    let scrollMarginTop = 0;
+                                    affixList.forEach((item) => {
+                                        if (
+                                            this.affixItemHeightMap &&
+                                            this.affixItemHeightMap[item.id]
+                                        ) {
+                                            scrollMarginTop += this
+                                                .affixItemHeightMap[item.id];
+                                        }
+                                    });
+                                    this.setData({
+                                        scrollMarginTop,
+                                    });
+                                }
+                            }
+                        );
+                    }
+                );
             },
             computeColWidth() {
                 if (this.computeColWidthTimer) {
@@ -199,7 +274,18 @@ FcMpComponent<FcMpDataGridComponent>(
                 this.fireCellEvent("longpressRow", e);
             },
         },
-        [getMpMountLifeName(MpViewType.Component)]() {
+        [getMpMountLifeName(MpViewType.Component)](
+            this: FcMpVirtualListComponent
+        ) {
+            this.$fcExports = {
+                ...this.$fcGetBaseExports(),
+                addItem: this.$vlAddItem.bind(this),
+                replaceAllList(this: FcMpVirtualListComponent, list) {
+                    this.$vlClear();
+                    this.$vlAllList = [...list];
+                    this.$vlListChange();
+                },
+            } as FcMpDataGridComponentExports;
             this.setData({
                 $vlPageSize: this.$fcGetProp("vlPageSize"),
                 $vlItemStaticHeight: this.$fcGetProp("vlItemHeight"),

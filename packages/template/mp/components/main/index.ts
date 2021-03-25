@@ -3,7 +3,11 @@ import { createLiaisonMixin } from "../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName, getApiVar } from "@mpkit/util";
 import { isFullScreenPhone } from "../../common/util";
-import { FcMpViewContextAny, FcMpViewContextBase } from "@fe-console/types";
+import {
+    FcMpDispatchEventData,
+    FcMpViewContextAny,
+    FcMpViewContextBase,
+} from "@fe-console/types";
 const destoryLife = '<%= (platform==="alipay"?"didUnmount":"detached") %>';
 FcMpComponent<FcMpViewContextBase & FcMpViewContextAny>(
     createLiaisonMixin(MpViewType.Component, "fc-main"),
@@ -46,6 +50,9 @@ FcMpComponent<FcMpViewContextBase & FcMpViewContextAny>(
             ],
         },
         [getMpInitLifeName(MpViewType.Component)]() {
+            this.emitContainerSizeChange = this.emitContainerSizeChange.bind(
+                this
+            );
             isFullScreenPhone().then((res) => {
                 this.setData(
                     {
@@ -56,19 +63,23 @@ FcMpComponent<FcMpViewContextBase & FcMpViewContextAny>(
                     }
                 );
             });
-            this.$fcOn(`Dispatch.${this.$cid}`, (t, data) => {
-                if (
-                    data.child.$tid === "fc-tabs" &&
-                    data.child.$fcGetProp("tidAlias") === "FcProductTypeTabs"
-                ) {
-                    if (data.type === "changeTab") {
-                        console.log(`activeTabIndex=${data.data}`);
-                        this.setData({
-                            activeTabIndex: data.data,
-                        });
+            this.$fcOn(
+                `Dispatch.${this.$cid}`,
+                (t, data: FcMpDispatchEventData) => {
+                    if (
+                        data.child.tid === "fc-tabs" &&
+                        data.child.tidAlias ===
+                            "FcProductTypeTabs"
+                    ) {
+                        if (data.type === "changeTab") {
+                            console.log(`activeTabIndex=${data.data}`);
+                            this.setData({
+                                activeTabIndex: data.data,
+                            });
+                        }
                     }
                 }
-            });
+            );
 
             const api = getApiVar();
             if (api && typeof api.onWindowResize === "function") {

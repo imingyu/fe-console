@@ -1,10 +1,15 @@
 import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName, uuid } from "@mpkit/util";
-import { FcEventHandler, FcMpViewContextBase } from "@fe-console/types";
+import {
+    FcEventHandler,
+    FcMpComponentId,
+    FcMpDispatchEventData,
+    FcMpViewContextBase,
+} from "@fe-console/types";
 import { once, emit, on, off } from "../../common/ebus";
 export const createLiaisonMixin = (() => {
     const viewMap: any = {};
-    (global as any).viewMap=viewMap;
+    (global as any).viewMap = viewMap;
     return (type: MpViewType, tid: string) => {
         const methods = {
             $fcOn(name: string, handler: FcEventHandler) {
@@ -41,19 +46,23 @@ export const createLiaisonMixin = (() => {
                 }
                 off(name, handler);
             },
-            $fcDispatch(
-                type: string,
-                data: any,
-                root: FcMpViewContextBase = this
-            ) {
+            $fcGetBaseExports(): FcMpComponentId {
+                return {
+                    tid: this.$tid,
+                    cid: this.$cid,
+                    tidAlias: this.$fcGetProp("tidAlias"),
+                };
+            },
+            $fcDispatch(type: string, data: any, root?: any) {
+                root = root || this.$fcExports || this.$fcGetBaseExports();
                 const parentCid = this.$fcGetParentCid();
                 if (parentCid) {
                     this.$fcEmit(`Dispatch.${parentCid}`, {
-                        child: this,
+                        child: this.$fcExports || this.$fcGetBaseExports(),
                         root,
                         type,
                         data,
-                    });
+                    } as FcMpDispatchEventData);
                     return;
                 }
                 if (!this.$fcUnDispatchEvents) {

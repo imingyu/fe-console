@@ -1,18 +1,20 @@
 import { FcMpComponent } from "../../mixins/view";
 import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
-import { getMpInitLifeName } from "@mpkit/util";
+import { getMpInitLifeName, safeJSON } from "@mpkit/util";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
     FcMpApiReaderComponent,
     FcMpApiReaderComponentMethods,
     FcMpComponentMethods,
+    FcMpDataGridComponentExports,
+    FcMpDispatchEventData,
     FcMpViewProduct,
     FcProductType,
-    FcRequireId,
+    PartialFcMpApiMaterial,
 } from "@fe-console/types";
-import { FcMpApiMaterial, FcMpViewContextBase } from "@fe-console/types";
+import { FcMpViewContextBase } from "@fe-console/types";
 import { getApiCategoryList } from "../../../configure/index";
 import { convertApiMaterial } from "../../../common/material";
 import { computeTime } from "../../../common/util";
@@ -29,6 +31,7 @@ FcMpComponent<FcMpApiReaderComponent>(
             categoryList: getApiCategoryList(),
             activeCategory: "all",
             detailMaterialId: null,
+            affixIds: [],
             readerCols: [
                 {
                     field: "name",
@@ -63,15 +66,12 @@ FcMpComponent<FcMpApiReaderComponent>(
             ],
         },
         methods: {
-            addMaterial(data: Partial<FcMpApiProduct>) {
+            addMaterial(data) {
                 const material = convertApiMaterial(data, this.$fcRunConfig);
                 material.type && this.refreshCategory(material.type);
                 this.addMaterialToCategory(material);
             },
-            addMaterialToCategory(
-                material: Partial<FcMpApiMaterial> & FcRequireId,
-                map
-            ) {
+            addMaterialToCategory(material, map) {
                 if (!map) {
                     this.initMaterialCategoryMap();
                     this.addMaterialToCategory(
@@ -239,9 +239,7 @@ FcMpComponent<FcMpApiReaderComponent>(
             },
             reloadVlList(allList) {
                 if (this.$DataGridMain) {
-                    this.$DataGridMain.$vlClear();
-                    this.$DataGridMain.$vlAllList = [...allList];
-                    this.$DataGridMain.$vlListChange();
+                    this.$DataGridMain.replaceAllList(allList);
                 }
             },
             filterMaterial(keyword: string) {
@@ -253,7 +251,7 @@ FcMpComponent<FcMpApiReaderComponent>(
                 );
             },
             clearMaterial() {
-                delete this.$dataGridWaitMaterials;
+                delete this.dataGridWaitMaterials;
                 this.initMaterialCategoryMap(true);
                 if (this.filterKeyword) {
                     this.reloadVlList(
@@ -280,7 +278,7 @@ FcMpComponent<FcMpApiReaderComponent>(
                 this.setData({
                     activeCategory,
                 });
-                delete this.$dataGridWaitMaterials;
+                delete this.dataGridWaitMaterials;
                 if (this.filterKeyword) {
                     this.reloadVlList(
                         this.FilterMaterialCategoryMap[activeCategory]
@@ -297,28 +295,85 @@ FcMpComponent<FcMpApiReaderComponent>(
             ) {
                 if (
                     data.type === FcProductType.MpApi ||
-                    (this.materialMark && this.materialMark[data.id])
+                    (this.materialExist && this.materialExist[data.id])
                 ) {
-                    if (!this.materialMark) {
-                        this.materialMark = {};
+                    if (!this.materialExist) {
+                        this.materialExist = {};
                     }
                     if (data.category) {
-                        this.materialMark[data.id] = data.category;
-                    } else if (!this.materialMark[data.id]) {
-                        this.materialMark[data.id] = "other";
+                        this.materialExist[data.id] = data.category;
+                    } else if (!this.materialExist[data.id]) {
+                        this.materialExist[data.id] = "other";
                     }
                     this.addMaterial(data as FcMpApiProduct);
                 }
             },
             appendDataToGrid(material) {
                 if (this.$DataGridMain) {
-                    this.$DataGridMain.$vlAddItem(material);
+                    this.$DataGridMain.addItem(material);
                     return;
                 }
                 if (!this.dataGridWaitMaterials) {
                     this.dataGridWaitMaterials = [];
                 }
                 this.dataGridWaitMaterials.push(material);
+            },
+            keepSaveMaterial(id: string) {
+                if (!this.keepSaveMaterials) {
+                    this.keepSaveMaterials = {};
+                }
+                this.keepSaveMaterials[id] = 1;
+            },
+            cancelKeepSaveMaterial(id?: string) {
+                if (this.keepSaveMaterials) {
+                    if (id) {
+                        delete this.keepSaveMaterials[id];
+                    } else {
+                        delete this.keepSaveMaterials;
+                    }
+                }
+            },
+            markMaterial(id: string) {
+                if (!this.markMaterials) {
+                    this.markMaterials = {};
+                }
+                this.markMaterials[id] = 1;
+            },
+            cancelMarkMaterial(id?: string) {
+                if (this.markMaterials) {
+                    if (id) {
+                        delete this.markMaterials[id];
+                    } else {
+                        delete this.markMaterials;
+                    }
+                }
+            },
+            topMaterial(id: string) {
+                if (!this.topMaterials) {
+                    this.topMaterials = [];
+                }
+                this.topMaterials.unshift(id);
+                // 最多置顶3条
+                this.topMaterials.length = 3;
+                this.syncAffixList();
+            },
+            cancelTopMaterial(id?: string) {
+                if (this.topMaterials) {
+                    if (id) {
+                        const index = this.topMaterials.indexOf(id);
+                        if (index !== -1) {
+                            this.topMaterials.splice(index, 1);
+                        }
+                    } else {
+                        delete this.topMaterials;
+                    }
+                }
+                this.syncAffixList();
+            },
+            syncAffixList() {
+                this.setData({
+                    affixIds: safeJSON(this.topMaterials || []),
+                });
             },
         } as FcMpApiReaderComponentMethods &
             FcMpComponentMethods<FcMpApiReaderComponent>,
@@ -328,48 +383,119 @@ FcMpComponent<FcMpApiReaderComponent>(
             setTimeout(() => {
                 this.refreshCategory();
             }, 400);
-            this.$fcOn(`Dispatch.${this.$cid}`, (type, data) => {
-                if (data.child.$tid === "fc-filter-bar") {
-                    type = data.type;
-                    if (type === "category") {
-                        this.changeCategory(data.data);
-                    } else if (type === "clear") {
-                        this.clearMaterial();
-                    } else if (type === "filter") {
-                        this.filterMaterial(data.data);
-                    }
-                } else if (data.child.$tid === "fc-api-detail") {
-                    type = data.type;
-                    if (type === "close") {
-                        this.setDetailMaterial();
-                    } else if (type === "changeTab") {
-                        this.setData({
-                            detailTab: data.data,
-                        });
-                    }
-                } else if (data.child.$tid === "fc-data-grid") {
-                    type = data.type;
-                    if (type === "ready") {
-                        this.$DataGridMain = data.child;
-                        if (this.dataGridWaitMaterials) {
-                            this.dataGridWaitMaterials.forEach((item) => {
-                                this.$DataGridMain.$vlAddItem(item);
-                            });
-                            delete this.dataGridWaitMaterials;
+            this.$fcOn(
+                `Dispatch.${this.$cid}`,
+                (type, data: FcMpDispatchEventData) => {
+                    if (data.child.tid === "fc-filter-bar") {
+                        type = data.type;
+                        if (type === "category") {
+                            this.changeCategory(data.data);
+                        } else if (type === "clear") {
+                            this.clearMaterial();
+                        } else if (type === "filter") {
+                            this.filterMaterial(data.data);
                         }
-                    } else if (type === "tapCell") {
-                        const { rowId, col } = data.data;
-                        if (rowId) {
-                            this.setDetailMaterial(
-                                rowId,
-                                col && col.field && col.field === "initiator"
-                                    ? 3
-                                    : 0
-                            );
+                    } else if (data.child.tid === "fc-api-detail") {
+                        type = data.type;
+                        if (type === "close") {
+                            this.setDetailMaterial();
+                        } else if (type === "changeTab") {
+                            this.setData({
+                                detailTab: data.data,
+                            });
+                        }
+                    } else if (data.child.tid === "fc-data-grid") {
+                        type = data.type;
+                        if (type === "ready") {
+                            this.$DataGridMain = data.child as FcMpDataGridComponentExports<PartialFcMpApiMaterial>;
+                            if (this.dataGridWaitMaterials) {
+                                this.dataGridWaitMaterials.forEach((item) => {
+                                    this.$DataGridMain.addItem(item);
+                                });
+                                delete this.dataGridWaitMaterials;
+                            }
+                        } else if (type === "tapCell") {
+                            const { rowId, col } = data.data;
+                            if (rowId) {
+                                this.setDetailMaterial(
+                                    rowId,
+                                    col &&
+                                        col.field &&
+                                        col.field === "initiator"
+                                        ? 3
+                                        : 0
+                                );
+                            }
+                        } else if (type === "longpressRow") {
+                            const { rowId, col } = data.data;
+                            if (rowId) {
+                                const isTop =
+                                    this.topMaterials &&
+                                    this.topMaterials.some(
+                                        (item) => item === rowId
+                                    );
+                                const isMark =
+                                    this.markMaterials &&
+                                    this.markMaterials[rowId];
+                                const isKeppSave =
+                                    this.keepSaveMaterials &&
+                                    this.keepSaveMaterials[rowId];
+                                this.$fc
+                                    .showActionSheet([
+                                        `${isTop ? "取消" : ""}置顶显示`,
+                                        "分类为...",
+                                        `${isMark ? "取消" : ""}标记`,
+                                        "取消全部标记",
+                                        `${isKeppSave ? "取消" : ""}留存`,
+                                        "取消全部留存",
+                                    ])
+                                    .then((index) => {
+                                        if (index === 0) {
+                                            if (isTop) {
+                                                this.cancelTopMaterial(rowId);
+                                            } else {
+                                                this.topMaterial(rowId);
+                                            }
+                                            return;
+                                        }
+                                        if (index === 1) {
+                                            this.$fc.showToast(
+                                                "TODO:分类为..."
+                                            );
+                                            return;
+                                        }
+                                        if (index === 2) {
+                                            if (isMark) {
+                                                this.cancelMarkMaterial(rowId);
+                                            } else {
+                                                this.markMaterial(rowId);
+                                            }
+                                            return;
+                                        }
+                                        if (index === 3) {
+                                            this.cancelMarkMaterial();
+                                            return;
+                                        }
+                                        if (index === 4) {
+                                            if (isKeppSave) {
+                                                this.cancelKeepSaveMaterial(
+                                                    rowId
+                                                );
+                                            } else {
+                                                this.keepSaveMaterial(rowId);
+                                            }
+                                            return;
+                                        }
+                                        if (index === 5) {
+                                            this.cancelKeepSaveMaterial();
+                                            return;
+                                        }
+                                    });
+                            }
                         }
                     }
                 }
-            });
+            );
         },
     }
 );

@@ -29,7 +29,7 @@
         ></template>
     </view>
     <!-- 正常的数据 -->
-    <view class="fc-datagrid-scroll">
+    <view class="fc-datagrid-scroll" style="margin-top:{{scrollMarginTop}}px;">
         <%= VirtualListStart %>
             <template
                 is="data-grid-row"

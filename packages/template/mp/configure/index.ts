@@ -52,6 +52,10 @@ export const getApiCategoryList = (
             text: "All",
             value: "all",
         },
+        {
+            text: "Mark",
+            value: "mark",
+        },
     ];
     if (
         runConfig &&

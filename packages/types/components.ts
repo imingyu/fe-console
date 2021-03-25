@@ -11,7 +11,7 @@ export interface FcDataGridCol {
     field: string;
     title: string;
     /**是否显示 */
-    visable?:boolean;
+    visable?: boolean;
     /**是否可换行 */
     wrap?: boolean;
     subTitle?: string;
@@ -76,62 +76,124 @@ export interface FcMpApiReaderComponentData {
     activeCategory: string;
     detailMaterialId: string;
     readerCols: FcDataGridCol[];
+    affixIds: string[];
 }
 
 export interface FcMpMaterialCategoryMap<T> {
     [prop: string]: T[];
 }
 
+export type PartialFcMpApiMaterial = Partial<FcMpApiMaterial> & FcRequireId;
+export type PartialFcMpApiProduct = Partial<FcMpApiProduct> & FcRequireId;
 export interface FcMpApiReaderComponentMethods {
-    addMaterial(data: Partial<FcMpApiProduct> & FcRequireId);
-    refreshCategory(categoryVal?: string);
+    addMaterial(this: FcMpApiReaderComponent, data: PartialFcMpApiProduct);
+    refreshCategory(this: FcMpApiReaderComponent, categoryVal?: string);
     addMaterialToCategory(
-        material: Partial<FcMpApiMaterial> & FcRequireId,
-        map?: FcMpMaterialCategoryMap<Partial<FcMpApiMaterial> & FcRequireId>
+        this: FcMpApiReaderComponent,
+        material: PartialFcMpApiMaterial,
+        map?: FcMpMaterialCategoryMap<PartialFcMpApiMaterial>
     );
     initMaterialCategoryMap(
+        this: FcMpApiReaderComponent,
         clear?: boolean,
-        map?: FcMpMaterialCategoryMap<Partial<FcMpApiMaterial> & FcRequireId>
+        map?: FcMpMaterialCategoryMap<PartialFcMpApiMaterial>
     );
-    syncNormalMaterialToFilter();
-    reloadVlList(list: FcMpApiMaterial[]);
-    changeCategory(activeCategory: string);
-    clearMaterial();
-    setDetailMaterial(id?: string, tab?: number);
-    filterMaterial(keyword: string);
-    appendDataToGrid(material: Partial<FcMpApiMaterial> & FcRequireId);
+    syncNormalMaterialToFilter(this: FcMpApiReaderComponent);
+    reloadVlList(this: FcMpApiReaderComponent, list: PartialFcMpApiMaterial[]);
+    changeCategory(this: FcMpApiReaderComponent, activeCategory: string);
+    clearMaterial(this: FcMpApiReaderComponent);
+    setDetailMaterial(this: FcMpApiReaderComponent, id?: string, tab?: number);
+    filterMaterial(this: FcMpApiReaderComponent, keyword: string);
+    appendDataToGrid(
+        this: FcMpApiReaderComponent,
+        material: PartialFcMpApiMaterial
+    );
+    /**留存记录 */
+    keepSaveMaterial(this: FcMpApiReaderComponent, id: string);
+    /**取消留存记录，不传ID则代表全部取消 */
+    cancelKeepSaveMaterial(this: FcMpApiReaderComponent, id?: string);
+    /**标记记录，记录将放置在mark类型下 */
+    markMaterial(this: FcMpApiReaderComponent, id: string);
+    /**取消标记记录，不传ID则代表全部取消，取消后记录将从mark类型中移除 */
+    cancelMarkMaterial(this: FcMpApiReaderComponent, id?: string);
+    /**置顶记录，最多置顶3条记录 */
+    topMaterial(this: FcMpApiReaderComponent, id: string);
+    /**取消置顶记录，不传ID则代表全部取消 */
+    cancelTopMaterial(this: FcMpApiReaderComponent, id?: string);
+    /**向DataGrid组件同步置顶记录列表 */
+    syncAffixList();
 }
 
 export interface FcMpApiReaderComponent
     extends FcMpViewContextBase<FcMpApiReaderComponentData>,
         FcMpApiReaderComponentMethods {
     filterKeyword?: string;
-    dataGridWaitMaterials?: FcMpApiMaterial[];
-    materialMark?: {
+    dataGridWaitMaterials?: Array<PartialFcMpApiMaterial>;
+    materialExist?: {
         [prop: string]: string;
     };
-    NormalMaterialCategoryMap?: FcMpMaterialCategoryMap<FcMpApiMaterial>;
-    FilterMaterialCategoryMap?: FcMpMaterialCategoryMap<FcMpApiMaterial>;
-    $DataGridMain?: FcMpDataGridComponent;
+    NormalMaterialCategoryMap?: FcMpMaterialCategoryMap<PartialFcMpApiMaterial>;
+    FilterMaterialCategoryMap?: FcMpMaterialCategoryMap<PartialFcMpApiMaterial>;
+    $DataGridMain?: FcMpDataGridComponentExports<PartialFcMpApiMaterial>;
+    /**留存记录 */
+    keepSaveMaterials?: {
+        [prop: string]: number;
+    };
+    /**标记记录 */
+    markMaterials?: {
+        [prop: string]: number;
+    };
+    /**置顶记录ID */
+    topMaterials?: string[];
+    /**记录分类 */
+    materialClassifyMap?: {
+        [prop: string]: string[];
+    };
 }
 
-export interface FcMpDataGridComponentData {
+export interface FcMpDataGridComponentData<
+    T extends FcRequireId = FcRequireId
+> {
     columns: FcDataGridCol[];
     columnWidthMap: {
         [prop: string]: number;
     };
-    affixList?: FcMpApiMaterial[];
+    affixList?: T[];
+    scrollMarginTop?: number;
 }
 export interface FcMpDataGridComponentMethods {
     computeAffixList();
     computeColWidth();
     fireCellEvent(name: string, e: FcMpEvent);
 }
-export interface FcMpDataGridComponent
-    extends FcMpVirtualListComponent<
-            FcMpApiMaterial,
-            FcMpDataGridComponentData
-        >,
+export interface FcMpDataGridComponent<T extends FcRequireId = FcRequireId>
+    extends FcMpVirtualListComponent<T, FcMpDataGridComponentData<T>>,
         FcMpDataGridComponentMethods {
     computeColWidthTimer?: any;
+    affixItemHeightMap?: {
+        [prop: string]: number;
+    };
+}
+
+export interface FcMpDataGridComponentExports<
+    T extends FcRequireId = FcRequireId
+> extends Required<FcMpComponentId> {
+    addItem(item: T);
+    replaceAllList(list: T[]);
+}
+
+export interface FcMpComponentId {
+    tid?: string;
+    cid?: string;
+    tidAlias?: string;
+}
+
+export interface FcMpDispatchEventData<
+    T extends FcMpComponentId = FcMpComponentId,
+    S = any
+> {
+    child: T;
+    root: T;
+    type: string;
+    data?: S;
 }

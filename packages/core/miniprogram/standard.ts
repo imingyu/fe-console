@@ -7,14 +7,6 @@ import {
 import { MpPlatform } from "@mpkit/types";
 import { getApiVar, getMpPlatform, uuid } from "@mpkit/util";
 
-const asyncApiVar = (): Promise<any> => {
-    const api = getApiVar();
-    if (!api) {
-        return Promise.reject(new Error("无法在当前环境找到小程序Api对象"));
-    }
-    return Promise.resolve(api);
-};
-
 const callMpApi = (apiName: string, ...args) => {
     const api = getApiVar();
     if (!api) {
@@ -28,6 +20,31 @@ const callMpApi = (apiName: string, ...args) => {
         return;
     }
     return api[apiName].apply(api, args);
+};
+const promiseifyMpApi = <T = any>(apiName: string, options?: any) => {
+    const api = getApiVar();
+    if (!api) {
+        return Promise.reject(
+            new Error(
+                `无法在当前环境找到小程序Api对象，暂时无法执行${apiName}方法`
+            )
+        );
+    }
+    if (!(apiName in api) || typeof api[apiName] !== "function") {
+        return Promise.reject(new Error(`无法小程序Api对象找到${apiName}方法`));
+    }
+    return new Promise((resolve, reject) => {
+        if (!options) {
+            options = {};
+        }
+        options.success = (res) => {
+            resolve(res as T);
+        };
+        options.fail = (res) => {
+            reject(new Error(`${res && res.errMsg ? res.errMsg : "未知错误"}`));
+        };
+        api[apiName](options);
+    });
 };
 
 const getPageId = (vm) => {
@@ -167,5 +184,52 @@ export const MpFc: Fc = {
                     });
             });
         });
+    },
+    showToast(title) {
+        const options: any = {};
+        const platform = getMpPlatform();
+        const type = typeof title;
+        if (type === "string") {
+            options.title = title;
+        } else if (title && type === "object") {
+            Object.assign(options, title);
+        }
+        if (platform === MpPlatform.alipay) {
+            options.content = options.title;
+            options.type = "none";
+        }
+        return callMpApi("showToast", options);
+    },
+    showActionSheet(options): Promise<number> {
+        if (Array.isArray(options)) {
+            options = {
+                items: options,
+            };
+        } else if (typeof options === "object" && options) {
+        } else {
+            options = {
+                items: [],
+            };
+        }
+
+        const tsOptions: any = options;
+
+        if (!Array.isArray(tsOptions.items)) {
+            return Promise.reject(new Error("未传递items选项，无法显示菜单"));
+        }
+        const platform = getMpPlatform();
+        if (platform !== MpPlatform.alipay) {
+            tsOptions.itemList = tsOptions.items;
+        }
+        return promiseifyMpApi("showActionSheet", tsOptions).then(
+            (res: any) => {
+                if (res && ("tapIndex" in res || "index" in res)) {
+                    if (platform === MpPlatform.alipay) {
+                        return res.index;
+                    }
+                    return res.tapIndex as number;
+                }
+            }
+        );
     },
 };

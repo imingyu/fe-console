@@ -38,6 +38,7 @@ export interface FcMpVirtualListComponent<
     $vlOldScrollTop?: number;
     $vlScrollTop?: number;
     $vlSetDataTimer?: any;
+    $vlClearing?: boolean;
     $vlComputeShowListTimer?: any;
     $vlItemSelectQueryMap?: {
         [prop: string]: FcMpSelectorQuery;

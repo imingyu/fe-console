@@ -6,7 +6,7 @@ import {
     FcMpVirtualListComponentSpec,
     FcRequireId,
 } from "@fe-console/types";
-import { isEmptyObject } from "@mpkit/util";
+import { getMpInitLifeName, isEmptyObject } from "@mpkit/util";
 export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     type: MpViewType
 ): FcMpVirtualListComponentSpec<T> => {
@@ -34,6 +34,9 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             this.$vlReload();
         },
         $vlOnScroll(e) {
+            if (this.$vlClearing) {
+                return;
+            }
             const { scrollTop } = e.detail;
             this.$vlOldScrollTop = this.$vlScrollTop;
             this.$vlScrollTop = scrollTop;
@@ -53,12 +56,18 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 (it) => it.id === item.id
             );
             if (readyShowIndex !== -1) {
-                this.setData({
-                    [`$vlShowList[${readyShowIndex}]`]: this.$vlMergeItem(
-                        this.data.$vlShowList[readyShowIndex],
-                        readyItem
-                    ),
-                });
+                this.$vlLock();
+                this.setData(
+                    {
+                        [`$vlShowList[${readyShowIndex}]`]: this.$vlMergeItem(
+                            this.data.$vlShowList[readyShowIndex],
+                            readyItem
+                        ),
+                    },
+                    () => {
+                        this.$vlUnLock();
+                    }
+                );
                 return this.$vlListChange();
             }
             this.$vlListChange();
@@ -70,6 +79,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             this.$vlComputeShowList();
         },
         $vlClear() {
+            this.$vlClearing = true;
             if (this.$vlSetDataTimer) {
                 clearTimeout(this.$vlSetDataTimer);
                 delete this.$vlSetDataTimer;
@@ -85,12 +95,17 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             delete this.$vlItemHeightMap;
             delete this.$vlContainerHeightComputeing;
             delete this.$vlContainerHeightComputeQueue;
-            this.setData({
-                $vlTotalCount: 0,
-                $vlShowList: [],
-                $vlStartPlaceholderHeight: 0,
-                $vlEndPlaceholderHeight: 0,
-            });
+            this.setData(
+                {
+                    $vlTotalCount: 0,
+                    $vlShowList: [],
+                    $vlStartPlaceholderHeight: 0,
+                    $vlEndPlaceholderHeight: 0,
+                },
+                () => {
+                    delete this.$vlClearing;
+                }
+            );
         },
         $vlComputeContainerHeight(callback) {
             if (this.$vlContainerHeightComputeing) {
@@ -229,9 +244,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                         newStart = 0;
                     }
                 }
-                if (oldStart !== newStart || oldEnd !== newEnd) {
-                    this.$vlSetShowList(newStart, newEnd);
-                }
+                this.$vlSetShowList(newStart, newEnd);
             }, this.data.$vlUpdateDelay);
         },
         $vlLock() {
@@ -277,6 +290,13 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 endIndex < 0 || endIndex > this.$vlAllList.length
                     ? this.$vlAllList.length
                     : endIndex;
+            if (
+                this.$vlEndIndex - this.$vlStartIndex < this.data.$vlPageSize &&
+                this.$vlAllList.length < this.data.$vlPageSize
+            ) {
+                this.$vlStartIndex = 0;
+                this.$vlEndIndex = this.$vlAllList.length;
+            }
             let startHeight = 0;
             let endHeight = 0;
             let list = [];
@@ -387,6 +407,11 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     } else {
         Object.assign(mixin, methods);
     }
+    mixin[getMpInitLifeName(type)] = function () {
+        this.$fcOn("FcConatinerSizeChange", () => {
+            this.$vlReload();
+        });
+    };
     if (type !== MpViewType.App) {
         mixin[destoryLife] = function () {
             this.$vlClear();

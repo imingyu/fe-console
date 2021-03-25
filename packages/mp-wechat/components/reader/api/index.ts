@@ -253,6 +253,7 @@ FcMpComponent<FcMpApiReaderComponent>(
                 );
             },
             clearMaterial() {
+                delete this.$dataGridWaitMaterials;
                 this.initMaterialCategoryMap(true);
                 if (this.filterKeyword) {
                     this.reloadVlList(
@@ -279,6 +280,7 @@ FcMpComponent<FcMpApiReaderComponent>(
                 this.setData({
                     activeCategory,
                 });
+                delete this.$dataGridWaitMaterials;
                 if (this.filterKeyword) {
                     this.reloadVlList(
                         this.FilterMaterialCategoryMap[activeCategory]

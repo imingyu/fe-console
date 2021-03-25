@@ -71,11 +71,6 @@ export interface FcMpComponentSpec<
     deriveDataFromProps?: Function;
 }
 
-export interface FcBoundingClientRect {
-    width: number;
-    height: number;
-}
-
 export interface FcMpApiReaderComponentData {
     categoryList: FcMpApiCategoryInfo[];
     activeCategory: string;

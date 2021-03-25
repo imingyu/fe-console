@@ -9,4 +9,5 @@ export * from "./json-tree";
 export * from "./reader";
 export * from "./template";
 export * from "./components";
+export * from "./standard";
 export * from "./virtual-list";

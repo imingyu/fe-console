@@ -7,6 +7,7 @@ import {
     FcMpMemoryStorager,
     FcMpObserver,
     FcMpProducer,
+    MpFc,
 } from "@fe-console/core";
 import {
     FcConsoleProduct,
@@ -27,7 +28,11 @@ export const init = (MpRunConfig?: FcMpRunConfig) => {
         return;
     }
     let MpObserver: FcMpMemoryObserver;
-    const setFcValues = (target: any) => {
+    const setFcValues = (
+        target: any,
+        observer: boolean = true,
+        fc: boolean = true
+    ) => {
         if ("$fcRunConfig" in target) {
             return;
         }
@@ -43,10 +48,16 @@ export const init = (MpRunConfig?: FcMpRunConfig) => {
                         return MpObserver;
                     },
                 },
+                $fc: {
+                    get() {
+                        return MpFc;
+                    },
+                },
             });
         } else {
             target.$fcRunConfig = MpRunConfig;
             target.$fcObserver = MpObserver;
+            target.$fc = MpFc;
         }
     };
     const runConfigMixin = (type: MpViewType) => {
@@ -66,11 +77,7 @@ export const init = (MpRunConfig?: FcMpRunConfig) => {
         }
         return mixin;
     };
-    Object.defineProperty(MkApi, "$fcRunConfig", {
-        get() {
-            return MpRunConfig;
-        },
-    });
+    setFcValues(MkApi, false, false);
     MixinStore.addHook(MpViewType.App, runConfigMixin(MpViewType.App));
     MixinStore.addHook(MpViewType.Page, runConfigMixin(MpViewType.Page));
     MixinStore.addHook(

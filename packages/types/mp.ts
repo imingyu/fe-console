@@ -7,6 +7,7 @@ import {
     FcResponseProduct,
 } from "./core";
 import { IFcObserver } from "./provider";
+import { Fc, FcStandardCallback } from "./standard";
 import { FcEventHandler } from "./util";
 
 export interface FcMpApiProduct<T = any, K = any>
@@ -65,6 +66,7 @@ export interface FcMpViewContextBase<T = any> {
         data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
     );
     $fcRunConfig?: FcMpRunConfig;
+    $fc?: Fc;
     $fcComponentIsDeatoryed?: boolean;
     $tid: string;
     $cid: string;
@@ -132,14 +134,4 @@ export interface FcMpEvent<T = any> {
 export interface FcMpScrollEventDetail {
     scrollTop: number;
     scrollHeight: number;
-}
-
-export interface FcMpSelectorQueryCallback<T = Array<any>> {
-    (res: T);
-}
-
-export interface FcMpSelectorQuery<T = any> {
-    exec(cb: FcMpSelectorQueryCallback<T>);
-    select(selector: string): FcMpSelectorQuery<T>;
-    boundingClientRect(): FcMpSelectorQuery<T>;
 }

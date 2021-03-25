@@ -1,2 +1,2 @@
-export * from "./miniprogram/provider";
-export * from "./web/provider";
+export * from "./miniprogram/index";
+export * from "./web/index";

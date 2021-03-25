@@ -1,4 +1,3 @@
-import { boundingClientRect } from "../../common/util";
 import { MpViewType } from "@mpkit/types";
 import {
     FcMpVirtualListComponentData,
@@ -88,7 +87,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 clearTimeout(this.$vlComputeShowListTimer);
                 delete this.$vlComputeShowListTimer;
             }
-            delete this.$vlItemSelectQueryMap;
+            delete this.$vlItemClientRectQueryMap;
             this.$vlScrollTop = 0;
             this.$vlOldScrollTop = 0;
             delete this.$vlAllList;
@@ -114,8 +113,9 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             }
             this.$vlContainerHeightComputeing = true;
             this.$vlContainerHeightComputeQueue = [];
-            boundingClientRect(this, this.data.$vlContainerSelector).then(
-                (res) => {
+            this.$fc
+                .getBoundingClientRect(this.data.$vlContainerSelector, this)
+                .then((res) => {
                     this.$vlContainerHeight = res.height;
                     this.$vlOnContainerHeightComputed &&
                         this.$vlOnContainerHeightComputed();
@@ -134,8 +134,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                         });
                         this.$vlComputeContainerHeight(last);
                     }
-                }
-            );
+                });
         },
         $vlComputeShowList() {
             if (this.$vlIsLock) {
@@ -320,25 +319,29 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             if (this.data.$vlEndPlaceholderHeight !== endHeight) {
                 renderData.$vlEndPlaceholderHeight = endHeight;
             }
-            if (!this.vlItemSelectQueryMap) {
-                this.vlItemSelectQueryMap = {};
+            if (!this.$vlItemClientRectQueryMap) {
+                this.$vlItemClientRectQueryMap = {};
             }
             const mergeList = [];
             list.forEach((item, index) => {
-                if (!this.vlItemSelectQueryMap[item.id]) {
-                    this.vlItemSelectQueryMap[item.id] = () => {
+                if (!this.$vlItemClientRectQueryMap[item.id]) {
+                    this.$vlItemClientRectQueryMap[item.id] = () => {
                         return new Promise<void>((resolve) => {
                             if (
-                                !this.vlItemSelectQueryMap ||
-                                !this.vlItemSelectQueryMap[item.id]
+                                !this.$vlItemClientRectQueryMap ||
+                                !this.$vlItemClientRectQueryMap[item.id]
                             ) {
                                 return resolve();
                             }
-                            boundingClientRect(this, `.vl-item-${item.id}`)
+                            this.$fc
+                                .getBoundingClientRect(
+                                    `.vl-item-${item.id}`,
+                                    this
+                                )
                                 .then((res) => {
                                     if (
-                                        !this.vlItemSelectQueryMap ||
-                                        !this.vlItemSelectQueryMap[item.id]
+                                        !this.$vlItemClientRectQueryMap ||
+                                        !this.$vlItemClientRectQueryMap[item.id]
                                     ) {
                                         return resolve();
                                     }
@@ -350,7 +353,9 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                                 });
                         });
                     };
-                    renderCallbacks.push(this.vlItemSelectQueryMap[item.id]);
+                    renderCallbacks.push(
+                        this.$vlItemClientRectQueryMap[item.id]
+                    );
                 }
                 mergeList.push(
                     this.$vlMergeItem(this.data.$vlShowList[index], item)

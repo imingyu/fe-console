@@ -1,10 +1,4 @@
-import { FcMpApiMaterial } from ".";
-import {
-    FcMpEvent,
-    FcMpScrollEventDetail,
-    FcMpSelectorQuery,
-    FcMpViewContextBase,
-} from "./mp";
+import { FcMpEvent, FcMpScrollEventDetail, FcMpViewContextBase } from "./mp";
 
 export interface FcMpVirtualListComponentData<
     T extends FcRequireId = FcRequireId
@@ -40,8 +34,8 @@ export interface FcMpVirtualListComponent<
     $vlSetDataTimer?: any;
     $vlClearing?: boolean;
     $vlComputeShowListTimer?: any;
-    $vlItemSelectQueryMap?: {
-        [prop: string]: FcMpSelectorQuery;
+    $vlItemClientRectQueryMap?: {
+        [prop: string]: Function;
     };
     $vlItemHeightMap: {
         [prop: string]: number;
@@ -72,25 +66,33 @@ export interface FcMpVirtualListComponentMethods<
     $vlGetItemHeight?(this: FcMpVirtualListComponent<T>, index: number): number;
     /**计算并生成要显示的列表数据*/
     $vlComputeShowList(this: FcMpVirtualListComponent<T>);
-    $vlOnContainerHeightComputed?();
+    $vlOnContainerHeightComputed?(this: FcMpVirtualListComponent<T>);
     /**计算容器高度/可视区域高度*/
     $vlComputeContainerHeight(
         this: FcMpVirtualListComponent<T>,
         callback?: Function
     );
     /**当列表发生变化时，执行该函数*/
-    $vlListChange();
+    $vlListChange(this: FcMpVirtualListComponent<T>);
     /**重新计算容器高度，并计算showList*/
-    $vlReload();
+    $vlReload(this: FcMpVirtualListComponent<T>);
     /**锁住列表更新*/
-    $vlLock();
+    $vlLock(this: FcMpVirtualListComponent<T>);
     /**解锁列表更新*/
-    $vlUnLock();
+    $vlUnLock(this: FcMpVirtualListComponent<T>);
     /**设置显示列表数据*/
-    $vlSetShowList(startIndex: number, endIndex: number);
+    $vlSetShowList(
+        this: FcMpVirtualListComponent<T>,
+        startIndex: number,
+        endIndex: number
+    );
     /**设置某项高度，并触发列表计算*/
-    $vlSetItemHeight(itemId: string, height: number);
-    $vlMergeItem(source: T, target: T): T;
+    $vlSetItemHeight(
+        this: FcMpVirtualListComponent<T>,
+        itemId: string,
+        height: number
+    );
+    $vlMergeItem(this: FcMpVirtualListComponent<T>, source: T, target: T): T;
 }
 
 export interface FcMpVirtualListComponentSpec<

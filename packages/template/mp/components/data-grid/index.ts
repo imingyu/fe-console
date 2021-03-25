@@ -271,11 +271,14 @@ FcMpComponent<FcMpDataGridComponent>(
             },
         },
         [getMpMountLifeName(MpViewType.Component)](
-            this: FcMpVirtualListComponent
+            this: FcMpDataGridComponent
         ) {
             this.$fcExports = {
                 ...this.$fcGetBaseExports(),
                 addItem: this.$vlAddItem.bind(this),
+                reloadAffixList: () => {
+                    this.computeAffixList();
+                },
                 replaceAllList: (list) => {
                     this.$vlClear();
                     this.$vlAllList = [...list];

@@ -180,6 +180,7 @@ export interface FcMpDataGridComponentExports<
 > extends Required<FcMpComponentId> {
     addItem(item: T);
     replaceAllList(list: T[]);
+    reloadAffixList();
 }
 
 export interface FcMpComponentId {

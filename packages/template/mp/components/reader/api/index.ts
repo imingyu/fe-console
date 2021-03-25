@@ -240,6 +240,7 @@ FcMpComponent<FcMpApiReaderComponent>(
             reloadVlList(allList) {
                 if (this.$DataGridMain) {
                     this.$DataGridMain.replaceAllList(allList);
+                    this.$DataGridMain.reloadAffixList();
                 }
             },
             filterMaterial(keyword: string) {
@@ -251,7 +252,12 @@ FcMpComponent<FcMpApiReaderComponent>(
                 );
             },
             clearMaterial() {
+                // 清空DataGrid操作缓存
                 delete this.dataGridWaitMaterials;
+                // 取消全部置顶
+                this.cancelTopMaterial();
+                // 把标记清空
+                this.cancelMarkMaterial();
                 this.initMaterialCategoryMap(true);
                 if (this.filterKeyword) {
                     this.reloadVlList(
@@ -279,15 +285,25 @@ FcMpComponent<FcMpApiReaderComponent>(
                     activeCategory,
                 });
                 delete this.dataGridWaitMaterials;
+                let list: PartialFcMpApiMaterial[];
                 if (this.filterKeyword) {
-                    this.reloadVlList(
-                        this.FilterMaterialCategoryMap[activeCategory]
-                    );
+                    list = this.FilterMaterialCategoryMap[activeCategory];
                 } else {
-                    this.reloadVlList(
-                        this.NormalMaterialCategoryMap[activeCategory]
-                    );
+                    list = this.NormalMaterialCategoryMap[activeCategory];
                 }
+
+                if (activeCategory === "mark" && this.markMaterials) {
+                    list = [];
+                    Object.keys(this.markMaterials).forEach((id) => {
+                        const item = this.NormalMaterialCategoryMap.all.find(
+                            (it) => it.id === id
+                        );
+                        if (item) {
+                            list.push(item);
+                        }
+                    });
+                }
+                this.reloadVlList(list || []);
             },
             onFcObserverEvent(
                 type: string,
@@ -345,6 +361,9 @@ FcMpComponent<FcMpApiReaderComponent>(
                         delete this.markMaterials[id];
                     } else {
                         delete this.markMaterials;
+                    }
+                    if (this.data.activeCategory === "mark") {
+                        this.changeCategory("mark");
                     }
                 }
             },
@@ -429,6 +448,12 @@ FcMpComponent<FcMpApiReaderComponent>(
                         } else if (type === "longpressRow") {
                             const { rowId, col } = data.data;
                             if (rowId) {
+                                const row = this.NormalMaterialCategoryMap.all.find(
+                                    (item) => item.id === rowId
+                                );
+                                if (!row) {
+                                    return;
+                                }
                                 const isTop =
                                     this.topMaterials &&
                                     this.topMaterials.some(
@@ -440,10 +465,13 @@ FcMpComponent<FcMpApiReaderComponent>(
                                 const isKeppSave =
                                     this.keepSaveMaterials &&
                                     this.keepSaveMaterials[rowId];
+                                this.$fc.showToast(
+                                    `正在对【${row.name}】进行操作`
+                                );
                                 this.$fc
                                     .showActionSheet([
                                         `${isTop ? "取消" : ""}置顶显示`,
-                                        "分类为...",
+                                        `分类为...`,
                                         `${isMark ? "取消" : ""}标记`,
                                         "取消全部标记",
                                         `${isKeppSave ? "取消" : ""}留存`,

@@ -197,6 +197,8 @@ export const MpFc: Fc = {
         if (platform === MpPlatform.alipay) {
             options.content = options.title;
             options.type = "none";
+        } else {
+            options.icon = "none";
         }
         return callMpApi("showToast", options);
     },

@@ -1,0 +1,148 @@
+@import '../../style/var.scss';
+@import '../../style/virtual-list.scss';
+
+.fc-datagrid {
+    height: 100%;
+    position: relative;
+    background-color: $bg-datagrid;
+    color: $cr-datagrid;
+
+    &.has-data {
+        .fc-datagrid-head {
+            .fc-datagrid-col {
+                padding-right: 0;
+                border-right-color: transparent;
+
+                &.is-last-col:after {
+                    display: none;
+                }
+
+                &:after {
+                    content: '';
+                    position: absolute;
+                    z-index: 10;
+                    width: 1px;
+                    margin-right: -1px;
+                    background-color: $bg-datagrid-border;
+                    top: 0;
+                    bottom: 0;
+                    justify-self: flex-end;
+                    align-self: flex-end;
+                }
+            }
+        }
+    }
+}
+
+
+
+.fc-api-datagrid {
+
+    .fc-datagrid-affix,
+    .fc-datagrid-scroll {
+        .fc-i3 {
+            text-decoration: underline;
+        }
+    }
+
+}
+
+.fc-datagrid-head {
+    background-color: $bg-datagrid-head;
+    box-sizing: border-box;
+    height: $ht-datagrid-th;
+    font-size: $sz-datagrid-th;
+    border-bottom: 1px solid $bg-datagrid-border;
+
+    .fc-datagrid-col {
+        height: 100%;
+        font-size: inherit;
+    }
+}
+
+.fc-datagrid-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    color: $cr-renderer-row;
+
+    &.fc-500,
+    &.fc-404 {
+        color: $cr-datagrid-error;
+    }
+
+    &.fc-even {
+        background-color: $bg-row-even;
+    }
+
+    &.fc-odd {
+        background-color: $bg-row-odd;
+    }
+}
+
+.fc-datagrid-row-xhr,
+.fc-datagrid-row-ws {
+    font-weight: bold;
+}
+
+
+
+.fc-datagrid-col {
+    box-sizing: border-box;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rpx 10rpx;
+    border-right: 1px solid $bg-datagrid-border;
+    line-height: 1.2;
+    font-size: $sz-datagrid-th - 2rpx;
+
+    &.fc-last {
+        border-right: none;
+    }
+}
+
+.fc-datagrid-col.fc-nowrap {
+    overflow: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    text-overflow: ellipsis;
+
+    .fc-datagrid-col-content,
+    .fc-datagrid-col-desc {
+        overflow: hidden;
+        vertical-align: middle;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .fc-datagrid-col-content {
+        height: ($sz-datagrid-th - 2rpx) * 1.2;
+    }
+
+    .fc-datagrid-col-desc {
+        height: ($sz-datagrid-th - 4rpx) * 1.2;
+    }
+}
+
+.fc-datagrid-col-desc {
+    font-size: $sz-datagrid-th - 4rpx;
+    opacity: .7;
+    margin-top: 4rpx;
+}
+
+.fc-datagrid-affix {
+    box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, .075);
+}
+
+.fc-datagrid-scroll {
+    position: absolute;
+    top: $ht-datagrid-th;
+    left: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+}

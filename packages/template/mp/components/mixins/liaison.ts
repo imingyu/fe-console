@@ -4,6 +4,7 @@ import { FcEventHandler, FcMpViewContextBase } from "@fe-console/types";
 import { once, emit, on, off } from "../../common/ebus";
 export const createLiaisonMixin = (() => {
     const viewMap: any = {};
+    (global as any).viewMap=viewMap;
     return (type: MpViewType, tid: string) => {
         const methods = {
             $fcOn(name: string, handler: FcEventHandler) {

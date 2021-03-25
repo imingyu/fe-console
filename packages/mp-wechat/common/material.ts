@@ -5,6 +5,7 @@ import {
     FcMpApiProduct,
     FcMpDetailKV,
     FcMpRunConfig,
+    FcRequireId,
     FcStackInfo,
 } from "@fe-console/types";
 import { getApiCategoryValue } from "../configure/index";
@@ -14,8 +15,8 @@ import { computeTime, findValue } from "./util";
 export const convertApiMaterial = (
     product: Partial<FcMpApiProduct>,
     mpRunConfig?: FcMpRunConfig
-): Partial<FcMpApiMaterial> => {
-    const material: Partial<FcMpApiMaterial> = {
+): Partial<FcMpApiMaterial> & FcRequireId => {
+    const material: Partial<FcMpApiMaterial> & FcRequireId = {
         id: product.id,
     };
     if ("category" in product) {
@@ -37,20 +38,30 @@ export const convertApiMaterial = (
                 (query ? `?${query}` : "");
             const desc = arr.slice(0, arr.length - 1).join("/");
             material.name = name;
-            material.desc = desc;
+            material.nameDesc = desc;
         }
     }
-    if ("endTime" in product) {
-        material.endTime = product.endTime;
-    }
-    if ("execEndTime" in product && !material.endTime) {
-        material.endTime = product.execEndTime;
-    }
-    if ("time" in product) {
+    if (product.time) {
         material.startTime = product.time;
     }
+    if (product.endTime || product.execEndTime) {
+        material.endTime = product.endTime || product.execEndTime;
+    }
+    if (material.endTime && material.startTime) {
+        material.time = computeTime(material.endTime - material.startTime);
+    }
     if ("status" in product) {
-        material.status = product.status;
+        material.status =
+            product.status === 1
+                ? "Executed"
+                : product.status === 2
+                ? "Success"
+                : product.status === 3
+                ? "Fail"
+                : "Unknown";
+        if (material.status === "Fail") {
+            material.code = 500;
+        }
     }
     if (
         !material.statusDesc &&
@@ -73,7 +84,8 @@ export const convertApiMaterial = (
         product.response[0] &&
         typeof product.response[0].statusCode !== "undefined"
     ) {
-        material.statusCode = product.response[0].statusCode as number;
+        material.code = product.response[0].statusCode as number;
+        material.status = material.code + "";
     }
     if ("stack" in product && product.stack && product.stack.length) {
         material.initiator = convertStockToInitiatorName(product.stack[0]);
@@ -137,7 +149,7 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
     if (product.stack) {
         res.stack = product.stack.map((item) => {
             const data: FcMpDetailKV = {
-                name: item.target || '',
+                name: item.target || "",
             };
             if (item.fileName) {
                 data.value = convertStockToInitiatorName(item);

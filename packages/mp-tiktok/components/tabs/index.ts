@@ -1,7 +1,8 @@
 import { FcMpComponent } from "../mixins/view";
 import { createLiaisonMixin } from "../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
-FcMpComponent(createLiaisonMixin(MpViewType.Component, "fc-tabs"), {
+import { FcMpViewContextAny, FcMpViewContextBase } from "@fe-console/types";
+FcMpComponent<FcMpViewContextBase & FcMpViewContextAny>(createLiaisonMixin(MpViewType.Component, "fc-tabs"), {
     options: {
         multipleSlots: true,
     },

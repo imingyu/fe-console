@@ -54,7 +54,18 @@ export interface FcMpHookInfo {
     socketTasks?: Array<FcMpSocketTaskHookInfo>;
     productMap?: { [prop: string]: FcMpApiProduct | FcMpViewProduct };
 }
+export interface FcMpViewContextAny {
+    [prop: string]: any;
+}
 export interface FcMpViewContextBase<T = any> {
+    $fcComponent?: boolean;
+    $mkDiffSetDataBeforeValue?: Function;
+    $fcObserverHandler?(
+        type: string,
+        data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+    );
+    $fcRunConfig?: FcMpRunConfig;
+    $fcComponentIsDeatoryed?: boolean;
     $tid: string;
     $cid: string;
     data: T;
@@ -75,7 +86,10 @@ export interface FcMpViewContextBase<T = any> {
         string,
         FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
     >;
-    [prop: string]: any;
+    onFcObserverEvent?(
+        type: string,
+        data: FcMpApiProduct | FcMpViewProduct | FcConsoleProduct
+    );
 }
 
 export interface FcMpViewMethod<T = any> {
@@ -124,8 +138,8 @@ export interface FcMpSelectorQueryCallback<T = Array<any>> {
     (res: T);
 }
 
-export interface FcMpSelectorQuery<T=any> {
+export interface FcMpSelectorQuery<T = any> {
     exec(cb: FcMpSelectorQueryCallback<T>);
-    select(selector:string): FcMpSelectorQuery<T>;
+    select(selector: string): FcMpSelectorQuery<T>;
     boundingClientRect(): FcMpSelectorQuery<T>;
 }

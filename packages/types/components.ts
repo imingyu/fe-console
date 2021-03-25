@@ -1,8 +1,17 @@
-import { FcMpViewContextBase } from "./mp";
+import {
+    FcMpApiCategoryInfo,
+    FcMpApiProduct,
+    FcMpEvent,
+    FcMpViewContextBase,
+} from "./mp";
+import { FcMpApiMaterial } from "./reader";
+import { FcMpVirtualListComponent, FcRequireId } from "./virtual-list";
 
 export interface FcDataGridCol {
     field: string;
     title: string;
+    /**是否可换行 */
+    wrap?: boolean;
     subTitle?: string;
     width?: number; // 只接受%单位
 }
@@ -63,4 +72,69 @@ export interface FcMpComponentSpec<
 export interface FcBoundingClientRect {
     width: number;
     height: number;
+}
+
+export interface FcMpApiReaderComponentData {
+    categoryList: FcMpApiCategoryInfo[];
+    activeCategory: string;
+    detailMaterialId: string;
+    readerCols: FcDataGridCol[];
+}
+
+export interface FcMpMaterialCategoryMap<T> {
+    [prop: string]: T[];
+}
+
+export interface FcMpApiReaderComponentMethods {
+    addMaterial(data: Partial<FcMpApiProduct> & FcRequireId);
+    refreshCategory(categoryVal?: string);
+    addMaterialToCategory(
+        material: Partial<FcMpApiMaterial> & FcRequireId,
+        map?: FcMpMaterialCategoryMap<Partial<FcMpApiMaterial> & FcRequireId>
+    );
+    initMaterialCategoryMap(
+        clear?: boolean,
+        map?: FcMpMaterialCategoryMap<Partial<FcMpApiMaterial> & FcRequireId>
+    );
+    syncNormalMaterialToFilter();
+    reloadVlList(list: FcMpApiMaterial[]);
+    changeCategory(activeCategory: string);
+    clearMaterial();
+    setDetailMaterial(id?: string, tab?: number);
+    filterMaterial(keyword: string);
+    appendDataToGrid(material: Partial<FcMpApiMaterial> & FcRequireId);
+}
+
+export interface FcMpApiReaderComponent
+    extends FcMpViewContextBase<FcMpApiReaderComponentData>,
+        FcMpApiReaderComponentMethods {
+    filterKeyword?: string;
+    dataGridWaitMaterials?: FcMpApiMaterial[];
+    materialMark?: {
+        [prop: string]: string;
+    };
+    NormalMaterialCategoryMap?: FcMpMaterialCategoryMap<FcMpApiMaterial>;
+    FilterMaterialCategoryMap?: FcMpMaterialCategoryMap<FcMpApiMaterial>;
+    $DataGridMain?: FcMpDataGridComponent;
+}
+
+export interface FcMpDataGridComponentData {
+    columns: FcDataGridCol[];
+    columnWidthMap: {
+        [prop: string]: number;
+    };
+    affixList?: FcMpApiMaterial[];
+}
+export interface FcMpDataGridComponentMethods {
+    computeAffixList();
+    computeColWidth();
+    fireCellEvent(name: string, e: FcMpEvent);
+}
+export interface FcMpDataGridComponent
+    extends FcMpVirtualListComponent<
+            FcMpApiMaterial,
+            FcMpDataGridComponentData
+        >,
+        FcMpDataGridComponentMethods {
+    computeColWidthTimer?: any;
 }

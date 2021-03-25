@@ -7,7 +7,6 @@ import {
     FcRequireId,
 } from "@fe-console/types";
 import { isEmptyObject } from "@mpkit/util";
-// TODO: setData程序有BUG，diff结果不太正确，需要排查
 export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     type: MpViewType
 ): FcMpVirtualListComponentSpec<T> => {
@@ -110,8 +109,8 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             boundingClientRect(this, this.data.$vlContainerSelector).then(
                 (res) => {
                     this.$vlContainerHeight = res.height;
-                    this.vlOnContainerHeightComputed &&
-                        this.vlOnContainerHeightComputed();
+                    this.$vlOnContainerHeightComputed &&
+                        this.$vlOnContainerHeightComputed();
                     callback && callback(res.height);
                     if (!this.$vlContainerHeightComputeing) {
                         return;
@@ -388,7 +387,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     }
     if (type !== MpViewType.App) {
         mixin[destoryLife] = function () {
-            this.$vlDestory();
+            this.$vlClear();
         };
     }
     return mixin;

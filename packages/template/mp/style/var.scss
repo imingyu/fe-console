@@ -51,3 +51,14 @@ $ht-renderer-api:$zoom * 80rpx;
 $ft-main:Consolas, Menlo, Monaco, 'Courier New', monospace;
 $ft-code:Consolas, Menlo, Monaco, 'Courier New', monospace;
 $ft-name:system-ui, #{$ft-code};
+
+
+
+// DataGrid组件
+$bg-datagrid:#fff;
+$bg-datagrid-head:$bg-bar;
+$cr-datagrid:$cr-bar;
+$bg-datagrid-border:$bg-border;
+$ht-datagrid-th:$ht-tab-bar;
+$sz-datagrid-th:$zoom * 26rpx;
+$cr-datagrid-error:$cr-error;

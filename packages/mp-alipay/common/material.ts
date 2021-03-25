@@ -5,6 +5,7 @@ import {
     FcMpApiProduct,
     FcMpDetailKV,
     FcMpRunConfig,
+    FcRequireId,
     FcStackInfo,
 } from "@fe-console/types";
 import { getApiCategoryValue } from "../configure/index";
@@ -14,8 +15,8 @@ import { computeTime, findValue } from "./util";
 export const convertApiMaterial = (
     product: Partial<FcMpApiProduct>,
     mpRunConfig?: FcMpRunConfig
-): Partial<FcMpApiMaterial> => {
-    const material: Partial<FcMpApiMaterial> = {
+): Partial<FcMpApiMaterial> & FcRequireId => {
+    const material: Partial<FcMpApiMaterial> & FcRequireId = {
         id: product.id,
     };
     if ("category" in product) {
@@ -137,7 +138,7 @@ export const convertApiDetail = (product: FcMpApiProduct): FcMpApiDetail => {
     if (product.stack) {
         res.stack = product.stack.map((item) => {
             const data: FcMpDetailKV = {
-                name: item.target || '',
+                name: item.target || "",
             };
             if (item.fileName) {
                 data.value = convertStockToInitiatorName(item);

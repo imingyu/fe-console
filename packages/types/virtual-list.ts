@@ -1,4 +1,10 @@
-import { FcMpEvent, FcMpScrollEventDetail, FcMpViewContextBase } from "./mp";
+import { FcMpApiMaterial } from ".";
+import {
+    FcMpEvent,
+    FcMpScrollEventDetail,
+    FcMpSelectorQuery,
+    FcMpViewContextBase,
+} from "./mp";
 
 export interface FcMpVirtualListComponentData<
     T extends FcRequireId = FcRequireId
@@ -18,16 +24,29 @@ export interface FcMpVirtualListComponentData<
     $vlDebug?: boolean;
 }
 
-export interface FcMpVirtualListComponent<T extends FcRequireId = FcRequireId>
-    extends FcMpViewContextBase,
+export interface FcMpVirtualListComponent<
+    T extends FcRequireId = FcRequireId,
+    S = any
+> extends FcMpViewContextBase<FcMpVirtualListComponentData<T> & S>,
         FcMpVirtualListComponentMethods<T> {
     $vlContainerHeight?: number;
     $vlContainerHeightComputeing?: boolean;
     $vlContainerHeightComputeQueue?: Function[];
+    $vlIsLock?: boolean;
+    $vlHasListUpdate?: boolean;
     $vlAllList?: T[];
     $vlOldScrollTop?: number;
     $vlScrollTop?: number;
-    data: FcMpVirtualListComponentData<T>;
+    $vlSetDataTimer?: any;
+    $vlComputeShowListTimer?: any;
+    $vlItemSelectQueryMap?: {
+        [prop: string]: FcMpSelectorQuery;
+    };
+    $vlItemHeightMap: {
+        [prop: string]: number;
+    };
+    $vlStartIndex?: number;
+    $vlEndIndex?: number;
 }
 
 export interface FcRequireId<T = string> {
@@ -70,6 +89,7 @@ export interface FcMpVirtualListComponentMethods<
     $vlSetShowList(startIndex: number, endIndex: number);
     /**设置某项高度，并触发列表计算*/
     $vlSetItemHeight(itemId: string, height: number);
+    $vlMergeItem(source: T, target: T): T;
 }
 
 export interface FcMpVirtualListComponentSpec<

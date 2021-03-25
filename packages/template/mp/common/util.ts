@@ -147,16 +147,16 @@ export const computeTime = (total: number): string => {
     let timeVal;
     if (total < 1000) {
         timeUnit = "ms";
-        timeVal = removeEndZero(total.toFixed(2));
+        timeVal = removeEndZero(total.toFixed(1));
     } else if (total < 60 * 1000) {
         timeUnit = "s";
-        timeVal = removeEndZero((total / 1000).toFixed(2));
+        timeVal = removeEndZero((total / 1000).toFixed(1));
     } else if (total < 60 * 60 * 1000) {
         timeUnit = "m";
-        timeVal = removeEndZero((total / (60 * 1000)).toFixed(2));
+        timeVal = removeEndZero((total / (60 * 1000)).toFixed(1));
     } else {
         timeUnit = "h";
-        timeVal = removeEndZero((total / (60 * 60 * 1000)).toFixed(2));
+        timeVal = removeEndZero((total / (60 * 60 * 1000)).toFixed(1));
     }
     return `${timeVal}${timeUnit}`;
 };

@@ -7,7 +7,6 @@ import {
     FcRequireId,
 } from "@fe-console/types";
 import { isEmptyObject } from "@mpkit/util";
-// TODO: setData程序有BUG，diff结果不太正确，需要排查
 export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     type: MpViewType
 ): FcMpVirtualListComponentSpec<T> => {
@@ -65,7 +64,10 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             );
             if (readyShowIndex !== -1) {
                 this.setData({
-                    [`$vlShowList[${readyShowIndex}]`]: item,
+                    [`$vlShowList[${readyShowIndex}]`]: this.$vlMergeItem(
+                        this.data.$vlShowList[readyShowIndex],
+                        readyItem
+                    ),
                 });
                 return this.$vlListChange();
             }
@@ -110,8 +112,8 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             boundingClientRect(this, this.data.$vlContainerSelector).then(
                 (res) => {
                     this.$vlContainerHeight = res.height;
-                    this.vlOnContainerHeightComputed &&
-                        this.vlOnContainerHeightComputed();
+                    this.$vlOnContainerHeightComputed &&
+                        this.$vlOnContainerHeightComputed();
                     callback && callback(res.height);
                     if (!this.$vlContainerHeightComputeing) {
                         return;
@@ -255,6 +257,25 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 this.$vlComputeShowList();
             }
         },
+        $vlMergeItem(source: T, target: T): T {
+            const res: T = {
+                id: target.id,
+            } as T;
+            Object.keys(target).forEach((key) => {
+                if (key in target) {
+                    res[key] =
+                        typeof target[key] === "undefined" ? null : target[key];
+                }
+            });
+            if (source) {
+                Object.keys(source).forEach((key) => {
+                    if (!(key in res)) {
+                        res[key] = null;
+                    }
+                });
+            }
+            return res;
+        },
         $vlSetShowList(startIndex, endIndex) {
             this.$vlLock();
             this.$vlStartIndex =
@@ -284,10 +305,6 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                     endHeight += this.$vlItemHeightMap[item.id] || 0;
                 }
             });
-            const expIds = list.map((item) => item.id).join(",");
-            const readyIds = this.data.$vlShowList
-                .map((item) => item.id)
-                .join(",");
             const renderData: Partial<FcMpVirtualListComponentData> = {};
             const renderCallbacks = [];
             if (this.data.$vlStartPlaceholderHeight !== startHeight) {
@@ -296,46 +313,43 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
             if (this.data.$vlEndPlaceholderHeight !== endHeight) {
                 renderData.$vlEndPlaceholderHeight = endHeight;
             }
-            if (expIds !== readyIds) {
-                renderData.$vlShowList = list;
-                if (!this.vlItemSelectQueryMap) {
-                    this.vlItemSelectQueryMap = {};
-                }
-                list.forEach((item) => {
-                    if (!this.vlItemSelectQueryMap[item.id]) {
-                        this.vlItemSelectQueryMap[item.id] = () => {
-                            return new Promise<void>((resolve) => {
-                                if (
-                                    !this.vlItemSelectQueryMap ||
-                                    !this.vlItemSelectQueryMap[item.id]
-                                ) {
-                                    return resolve();
-                                }
-                                boundingClientRect(this, `.vl-item-${item.id}`)
-                                    .then((res) => {
-                                        if (
-                                            !this.vlItemSelectQueryMap ||
-                                            !this.vlItemSelectQueryMap[item.id]
-                                        ) {
-                                            return resolve();
-                                        }
-                                        this.$vlSetItemHeight(
-                                            item.id,
-                                            res.height
-                                        );
-                                        return resolve();
-                                    })
-                                    .catch(() => {
-                                        resolve();
-                                    });
-                            });
-                        };
-                        renderCallbacks.push(
-                            this.vlItemSelectQueryMap[item.id]
-                        );
-                    }
-                });
+            if (!this.vlItemSelectQueryMap) {
+                this.vlItemSelectQueryMap = {};
             }
+            const mergeList = [];
+            list.forEach((item, index) => {
+                if (!this.vlItemSelectQueryMap[item.id]) {
+                    this.vlItemSelectQueryMap[item.id] = () => {
+                        return new Promise<void>((resolve) => {
+                            if (
+                                !this.vlItemSelectQueryMap ||
+                                !this.vlItemSelectQueryMap[item.id]
+                            ) {
+                                return resolve();
+                            }
+                            boundingClientRect(this, `.vl-item-${item.id}`)
+                                .then((res) => {
+                                    if (
+                                        !this.vlItemSelectQueryMap ||
+                                        !this.vlItemSelectQueryMap[item.id]
+                                    ) {
+                                        return resolve();
+                                    }
+                                    this.$vlSetItemHeight(item.id, res.height);
+                                    return resolve();
+                                })
+                                .catch(() => {
+                                    resolve();
+                                });
+                        });
+                    };
+                    renderCallbacks.push(this.vlItemSelectQueryMap[item.id]);
+                }
+                mergeList.push(
+                    this.$vlMergeItem(this.data.$vlShowList[index], item)
+                );
+            });
+            renderData.$vlShowList = mergeList;
             if (!isEmptyObject(renderData)) {
                 this.setData(renderData, () => {
                     Promise.all(renderCallbacks.map((item) => item())).then(
@@ -388,7 +402,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     }
     if (type !== MpViewType.App) {
         mixin[destoryLife] = function () {
-            this.$vlDestory();
+            this.$vlClear();
         };
     }
     return mixin;

@@ -1,25 +1,21 @@
 import { FcMpComponent } from "../../mixins/view";
 import { createLiaisonMixin } from "../../mixins/liaison";
-import { createVirtualListMixin } from "../../mixins/virtual-list";
 import { MpViewType } from "@mpkit/types";
 import { getMpInitLifeName } from "@mpkit/util";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
-    FcMpComponentDataAny,
-    FcMpComponentMethods,
+    FcMpApiReaderComponent,
     FcMpViewProduct,
     FcMpVirtualListComponent,
-    FcMpVirtualListComponentMethods,
     FcProductType,
     FcRequireId,
 } from "@fe-console/types";
 import { FcMpApiMaterial, FcMpViewContextBase } from "@fe-console/types";
 import { getApiCategoryList } from "../../../configure/index";
 import { convertApiMaterial } from "../../../common/material";
-FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
+FcMpComponent<FcMpApiReaderComponent>(
     createLiaisonMixin(MpViewType.Component, "fc-api-reader"),
-    createVirtualListMixin(MpViewType.Component) as any,
     {
         properties: {
             active: {
@@ -28,11 +24,36 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
             },
         },
         data: {
-            $vlItemStaticHeight: 40,
-            $vlDebug: true,
             categoryList: getApiCategoryList(),
             activeCategory: "all",
             detailMaterialId: null,
+            readerCols: [
+                {
+                    field: "name",
+                    title: "Name",
+                    width: 30,
+                },
+                {
+                    field: "status",
+                    title: "Status",
+                    width: 20,
+                },
+                {
+                    field: "type",
+                    title: "Type",
+                    width: 15,
+                },
+                {
+                    field: "initiator",
+                    title: "Initiator",
+                    width: 17.5,
+                },
+                {
+                    field: "time",
+                    title: "Time",
+                    width: 17.5,
+                },
+            ],
         },
         methods: {
             addMaterial(data: Partial<FcMpApiProduct>) {
@@ -91,7 +112,7 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                                 category === this.data.activeCategory ||
                                 this.data.activeCategory === "all"
                             ) {
-                                this.$vlAddItem(material);
+                                this.appendDataToGrid(material);
                             }
                         }
                     } else {
@@ -100,7 +121,7 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                             category === this.data.activeCategory ||
                             this.data.activeCategory === "all"
                         ) {
-                            this.$vlAddItem(material);
+                            this.appendDataToGrid(material);
                         }
                     }
                     return;
@@ -200,9 +221,11 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                 }
             },
             reloadVlList(allList) {
-                this.$vlClear();
-                this.$vlAllList = [...allList];
-                this.$vlListChange();
+                if (this.$DataGridMain) {
+                    this.$DataGridMain.$vlClear();
+                    this.$DataGridMain.$vlAllList = [...allList];
+                    this.$DataGridMain.$vlListChange();
+                }
             },
             filterMaterial(keyword: string) {
                 this.filterKeyword = keyword;
@@ -235,6 +258,7 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                 });
             },
             changeCategory(activeCategory) {
+                this.initMaterialCategoryMap();
                 this.setData({
                     activeCategory,
                 });
@@ -264,24 +288,23 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                     } else if (!this.materialMark[data.id]) {
                         this.materialMark[data.id] = "other";
                     }
-                    this.addMaterial(data);
+                    this.addMaterial(data as FcMpApiProduct);
                 }
             },
-            vlOnContainerHeightComputed() {
-                this.setData({
-                    $vlPageSize:
-                        Math.ceil(
-                            this.$vlContainerHeight /
-                                this.data.$vlItemStaticHeight
-                        ) + 5,
-                });
+            appendDataToGrid(material) {
+                if (this.$DataGridMain) {
+                    this.$DataGridMain.$vlAddItem(material);
+                    return;
+                }
+                if (!this.dataGridWaitMaterials) {
+                    this.dataGridWaitMaterials = [];
+                }
+                this.dataGridWaitMaterials.push(material);
             },
         },
         [getMpInitLifeName(MpViewType.Component)](
-            this: FcMpVirtualListComponent
+            this: FcMpApiReaderComponent
         ) {
-            (global as any).sss = this;
-            this.$vlInit();
             setTimeout(() => {
                 this.refreshCategory();
             }, 400);
@@ -310,6 +333,17 @@ FcMpComponent<FcMpVirtualListComponent & FcMpComponentDataAny>(
                         this.setData({
                             detailTab: data.data,
                         });
+                    }
+                } else if (data.child.$tid === "fc-data-grid") {
+                    type = data.type;
+                    if (type === "ready") {
+                        this.$DataGridMain = data.child;
+                        if (this.dataGridWaitMaterials) {
+                            this.dataGridWaitMaterials.forEach((item) => {
+                                this.$DataGridMain.$vlAddItem(item);
+                            });
+                            delete this.dataGridWaitMaterials;
+                        }
                     }
                 }
             });

@@ -5,14 +5,15 @@ import { FcNameValue, FcStackInfo } from "./util";
 
 export interface FcMpApiMaterial {
     id: string;
+    code?: number | string;
     type: string;
     name: string;
-    desc?: string;
-    status: FcMethodExecStatus | number;
-    statusCode?: number;
+    nameDesc?: string;
+    status: string;
     statusDesc?: string;
     startTime: number;
     endTime?: number;
+    time: string;
     initiator: string;
     initiatorDesc?: string;
 }

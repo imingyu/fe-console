@@ -33,16 +33,46 @@ export class FcEventEmitter<T = any> implements IFcEventEmitter<T> {
         if (this.events[type]) {
             if (handler) {
                 const index = this.events[type].indexOf(handler);
-                index !== -1 && this.events[type].splice(index, 1);
+                if (index !== -1) {
+                    this.events[type].splice(index, 1);
+                }
             } else {
                 delete this.events[type];
             }
         }
     }
     emit(type: string, data?: T) {
-        this.events[type] &&
-            this.events[type].forEach((handler) => {
-                handler(type, data);
-            });
+        const currentIsFireHandlers = [];
+        const fire = () => {
+            let needReload;
+            if (this.events[type]) {
+                const list = this.events[type] as FcEventHandler<T>[];
+                for (let i = 0, len = list.length; i < len; i++) {
+                    if (!this.events[type]) {
+                        break;
+                    }
+                    if (this.events[type] && i in list && list[i]) {
+                        const handler = list[i];
+                        if (currentIsFireHandlers.indexOf(handler) !== -1) {
+                            continue;
+                        }
+                        const nextHandler = list[i + 1];
+                        currentIsFireHandlers.push(handler);
+                        handler(type, data);
+                        if (
+                            !list[i] ||
+                            list[i] !== handler ||
+                            !list[i + 1] ||
+                            list[i + 1] !== nextHandler
+                        ) {
+                            needReload = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            needReload && fire();
+        };
+        fire();
     }
 }

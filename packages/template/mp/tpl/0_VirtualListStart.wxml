@@ -2,5 +2,5 @@
     <view class="vl-list-placeholder is-start" style="height:{{ $vlStartPlaceholderHeight }}px;"></view>
     <view class="vl-list">
         <view wx:for="{{ $vlShowList }}" wx:for-item="$vlItem" wx:for-index="$vlItemIndex" wx:key="id" class="vl-item-container vl-item-{{$vlItem.id}}">
-            <view wx:if="{{$vlItemIndex===2}}" class="vl-total">{{$vlTotalCount}}</view>
+            <view wx:if="{{$vlDebug && $vlItemIndex===2}}" class="vl-total">{{$vlTotalCount}}</view>
             <view wx:if="{{$vlDebug}}" class="vl-index">{{$vlItem.$vlIndex+1}}</view>

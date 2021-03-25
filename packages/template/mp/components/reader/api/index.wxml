@@ -1,5 +1,5 @@
-<view wx:if="{{ active }}" class="fc-reader fc-re-api cid-{{$cid}} tid-{{$tid}}">
+<view wx:if="{{ active }}" class="fc-reader fc-re-api">
     <filter-bar categorys="{{categoryList}}" activeCategory="{{activeCategory}}" filter clear parentCid="{{$cid}}" parentTid="{{$tid}}"></filter-bar>
-    <data-grid outerClass="fc-api-datagrid" rowClass="type" vlItemHeight="{{40}}" cols="{{readerCols}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></data-grid>
-    <fc-api-detail wx:if="{{detailMaterialId}}" data="{{detailMaterialId}}" tab="{{detailTab}} "class="fc-reader-detail-container has-th has-bar" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-detail>
+    <data-grid outerClass="fc-api-datagrid {{detailMaterialId?'show-detail':''}}" rowClass="type" vlItemHeight="{{40}}" cols="{{readerCols}}" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></data-grid>
+    <fc-api-detail wx:if="{{detailMaterialId}}" data="{{detailMaterialId}}" tab="{{detailTab}} " class="fc-reader-detail-container has-th has-bar" parentCid="{{ $cid }}" parentTid="{{ $tid }}"></fc-api-detail>
 </view>

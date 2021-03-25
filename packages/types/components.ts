@@ -10,6 +10,8 @@ import { FcMpVirtualListComponent, FcRequireId } from "./virtual-list";
 export interface FcDataGridCol {
     field: string;
     title: string;
+    /**是否显示 */
+    visable?:boolean;
     /**是否可换行 */
     wrap?: boolean;
     subTitle?: string;

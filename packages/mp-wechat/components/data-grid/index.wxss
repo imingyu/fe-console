@@ -55,6 +55,19 @@
   text-decoration: underline;
 }
 
+.fc-api-datagrid.show-detail {
+  width: 30%;
+}
+
+.fc-api-datagrid.show-detail .fc-datagrid-col {
+  display: none;
+}
+
+.fc-api-datagrid.show-detail .fc-i0 {
+  display: flex;
+  width: 100% !important;
+}
+
 .fc-datagrid-head {
   background-color: #f3f3f3;
   box-sizing: border-box;
@@ -107,6 +120,10 @@
 
 .fc-datagrid-col.fc-last {
   border-right: none;
+}
+
+.fc-datagrid-col.fc-hide {
+  display: none;
 }
 
 .fc-datagrid-col.fc-nowrap {

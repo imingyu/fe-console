@@ -1,14 +1,12 @@
 import { boundingClientRect } from "../../common/util";
 import { MpViewType } from "@mpkit/types";
 import {
-    FcMpApiMaterial,
     FcMpVirtualListComponentData,
     FcMpVirtualListComponentMethods,
     FcMpVirtualListComponentSpec,
     FcRequireId,
 } from "@fe-console/types";
 import { isEmptyObject } from "@mpkit/util";
-// TODO: setData好像还有bug，需要排查
 export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
     type: MpViewType
 ): FcMpVirtualListComponentSpec<T> => {
@@ -50,16 +48,6 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 Object.assign(readyItem, item);
             } else {
                 this.$vlAllList.push(item);
-                this.$vlAllList.reduce((sum, item) => {
-                    if (!sum[item.id]) {
-                        sum[item.id] = 0;
-                    }
-                    if (sum[item.id] > 0) {
-                        debugger;
-                    }
-                    sum[item.id]++;
-                    return sum;
-                }, {});
             }
             const readyShowIndex = this.data.$vlShowList.findIndex(
                 (it) => it.id === item.id
@@ -242,9 +230,6 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                     }
                 }
                 if (oldStart !== newStart || oldEnd !== newEnd) {
-                    console.log(
-                        `${oldStart},${oldEnd} | ${newStart},${newEnd}`
-                    );
                     this.$vlSetShowList(newStart, newEnd);
                 }
             }, this.data.$vlUpdateDelay);

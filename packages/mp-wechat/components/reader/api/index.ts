@@ -8,9 +8,7 @@ import {
     FcMpApiReaderComponent,
     FcMpApiReaderComponentMethods,
     FcMpComponentMethods,
-    FcMpDataGridComponentMethods,
     FcMpViewProduct,
-    FcMpVirtualListComponent,
     FcProductType,
     FcRequireId,
 } from "@fe-console/types";
@@ -338,13 +336,6 @@ FcMpComponent<FcMpApiReaderComponent>(
                     } else if (type === "filter") {
                         this.filterMaterial(data.data);
                     }
-                } else if (data.child.$tid === "fc-api-renderer") {
-                    type = data.type;
-                    if (type === "tap") {
-                        this.setDetailMaterial(data.data, 0);
-                    } else if (type === "tapInitiator") {
-                        this.setDetailMaterial(data.data, 3);
-                    }
                 } else if (data.child.$tid === "fc-api-detail") {
                     type = data.type;
                     if (type === "close") {
@@ -363,6 +354,16 @@ FcMpComponent<FcMpApiReaderComponent>(
                                 this.$DataGridMain.$vlAddItem(item);
                             });
                             delete this.dataGridWaitMaterials;
+                        }
+                    } else if (type === "tapCell") {
+                        const { rowId, col } = data.data;
+                        if (rowId) {
+                            this.setDetailMaterial(
+                                rowId,
+                                col && col.field && col.field === "initiator"
+                                    ? 3
+                                    : 0
+                            );
                         }
                     }
                 }

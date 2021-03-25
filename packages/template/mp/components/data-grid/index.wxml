@@ -1,3 +1,4 @@
+<import src="./row.wxml" />
 <view class="fc-datagrid {{(affixable && affixList.length) || ($vlShowList && $vlShowList.length) ? 'has-data':''}} {{outerClass}}">
     <view
         class="fc-datagrid-head fc-datagrid-row"
@@ -19,56 +20,21 @@
     </view>
     <!-- 吸顶的数据 -->
     <view wx:if="{{affixable && affixList.length}}" class="fc-datagrid-affix">
-        <view
+        <template
+            is="data-grid-row"
             wx:for="{{affixList}}"
             wx:for-item="row"
             wx:for-index="rowIndex"
-            wx:key="id"
-            class="fc-datagrid-row fc-i{{rowIndex}} fc-{{rowIndex%2===0?'even':'odd'}} fc-{{row.code||''}} {{rowClass?(columnWidthMap[rowClass]?('fc-datagrid-row-'+row[rowClass]):rowClass):''}}"
-            data-rowid="{{row.id}}"
-            data-type="affix"
-            bindtap="tapRow"
-            bindlongpress="longpressRow"
-        >
-            <view
-                wx:for="{{cols}}"
-                wx:for-item="col"
-                wx:for-index="colIndex"
-                wx:key="field"
-                class="fc-datagrid-col fc-i{{colIndex}} {{colIndex===cols.length-1?'fc-last':''}} {{col.wrap===false?'fc-nowrap':''}}"
-                style="width:{{columnWidthMap[col.field]}}%;height:{{vlItemHeight?(vlItemHeight+'px'):'auto'}};"
-                bindtap="tapCell"
-                data-col="{{colIndex}}"
-                data-rowid="{{row.id}}"
-            >
-                <view class="fc-datagrid-col-content">{{row[col.field]}}</view>
-                <view wx:if="{{row[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{row[col.field+'Desc']}}</view>
-            </view>
-        </view>
+            data="{{row, rowIndex,type:'affix', cols, rowClass, columnWidthMap, vlItemHeight}}"
+        ></template>
     </view>
     <!-- 正常的数据 -->
     <view class="fc-datagrid-scroll">
         <%= VirtualListStart %>
-            <view
-                class="fc-datagrid-row fc-i{{$vlItem.$vlIndex}} fc-{{$vlItem.$vlIndex%2===0?'even':'odd'}}  fc-{{$vlItem.code||''}} {{rowClass?(columnWidthMap[rowClass]?('fc-datagrid-row-'+$vlItem[rowClass]):rowClass):''}}"
-                data-rowid="{{$vlItem.id}}"
-                bindtap="tapRow"
-                bindlongpress="longpressRow"
-            >
-                <view
-                    wx:for="{{cols}}"
-                    wx:for-item="col"
-                    wx:key="field"
-                    class="fc-datagrid-col fc-i{{index}} {{index===cols.length-1?'fc-last':''}} {{col.wrap===false?'fc-nowrap':''}}"
-                    style="width:{{columnWidthMap[col.field]}}%;height:{{vlItemHeight?(vlItemHeight+'px'):'auto'}};"
-                    bindtap="tapCell"
-                    data-col="{{index}}"
-                    data-rowid="{{$vlItem.id}}"
-                >
-                    <view class="fc-datagrid-col-content">{{$vlItem[col.field]}}</view>
-                    <view wx:if="{{$vlItem[col.field+'Desc']}}" class="fc-datagrid-col-desc">{{$vlItem[col.field+'Desc']}}</view>
-                </view>
-            </view>
+            <template
+                is="data-grid-row"
+                data="{{row:$vlItem,rowIndex:$vlItem.$vlIndex, cols, rowClass, columnWidthMap, vlItemHeight}}"
+            ></template>
         <%= VirtualListEnd %>
     </view>
 </view>

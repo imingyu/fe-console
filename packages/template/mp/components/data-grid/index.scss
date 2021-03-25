@@ -45,6 +45,18 @@
         }
     }
 
+    &.show-detail {
+        width: 30%;
+        .fc-datagrid-col{
+            display: none;
+        }
+
+        .fc-i0 {
+            display: flex;
+            width: 100% !important;
+        }
+    }
+
 }
 
 .fc-datagrid-head {
@@ -101,6 +113,10 @@
 
     &.fc-last {
         border-right: none;
+    }
+
+    &.fc-hide {
+        display: none;
     }
 }
 

@@ -96,10 +96,6 @@ FcMpComponent<FcMpDataGridComponent>(
                             item
                         );
                     });
-                console.log(
-                    `affixList=`,
-                    JSON.parse(JSON.stringify(affixList))
-                );
                 let vlItemHeight = this.$fcGetProp("vlItemHeight");
                 const renderCallBacks = [];
                 if (vlItemHeight) {
@@ -280,7 +276,7 @@ FcMpComponent<FcMpDataGridComponent>(
             this.$fcExports = {
                 ...this.$fcGetBaseExports(),
                 addItem: this.$vlAddItem.bind(this),
-                replaceAllList(this: FcMpVirtualListComponent, list) {
+                replaceAllList: (list) => {
                     this.$vlClear();
                     this.$vlAllList = [...list];
                     this.$vlListChange();

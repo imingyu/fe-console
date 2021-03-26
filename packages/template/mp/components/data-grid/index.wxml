@@ -25,7 +25,7 @@
             wx:for="{{affixList}}"
             wx:for-item="row"
             wx:for-index="rowIndex"
-            data="{{row, rowIndex,type:'affix', cols, rowClass, columnWidthMap, vlItemHeight}}"
+            data="{{row, rowIndex,type:'affix',selectedMap, cols, rowClass, columnWidthMap, vlItemHeight}}"
         ></template>
     </view>
     <!-- 正常的数据 -->
@@ -33,7 +33,7 @@
         <%= VirtualListStart %>
             <template
                 is="data-grid-row"
-                data="{{row:$vlItem,rowIndex:$vlItem.$vlIndex, cols, rowClass, columnWidthMap, vlItemHeight}}"
+                data="{{row:$vlItem,rowIndex:$vlItem.$vlIndex,selectedMap, cols, rowClass, columnWidthMap, vlItemHeight}}"
             ></template>
         <%= VirtualListEnd %>
     </view>

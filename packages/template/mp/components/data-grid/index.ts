@@ -22,6 +22,12 @@ FcMpComponent<FcMpDataGridComponent>(
         properties: {
             outerClass: String,
             rowClass: String,
+            selected: {
+                type: null,
+                observer() {
+                    this.computeSelectMap();
+                },
+            },
             vlPageSize: {
                 type: Number,
                 value: 20,
@@ -74,8 +80,32 @@ FcMpComponent<FcMpDataGridComponent>(
             columnWidthMap: {},
             affixList: [],
             scrollMarginTop: 0,
+            selectedMap: {},
         },
         methods: {
+            computeSelectMap() {
+                if (this.computeSelectMapTimer) {
+                    clearTimeout(this.computeSelectMapTimer);
+                }
+                this.computeSelectMapTimer = setTimeout(() => {
+                    const selected = this.$fcGetProp("selected", []);
+                    if (!selected || !selected.length) {
+                        this.setData({
+                            selectedMap: {},
+                        });
+                    } else {
+                        this.setData({
+                            selectedMap: (Array.isArray(selected)
+                                ? selected
+                                : [selected]
+                            ).reduce((sum, item) => {
+                                sum[item] = 1;
+                                return sum;
+                            }, {}),
+                        });
+                    }
+                }, 50);
+            },
             computeAffixList() {
                 if (this.computeAffixAllListTimer) {
                     clearTimeout(this.computeAffixAllListTimer);

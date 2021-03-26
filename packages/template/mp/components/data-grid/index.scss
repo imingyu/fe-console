@@ -47,7 +47,8 @@
 
     &.show-detail {
         width: 30%;
-        .fc-datagrid-col{
+
+        .fc-datagrid-col {
             display: none;
         }
 
@@ -89,6 +90,11 @@
 
     &.fc-odd {
         background-color: $bg-row-odd;
+    }
+
+    &.fc-selected {
+        background-color: $bg-datagrid-active;
+        color: $cr-datagrid-active !important;
     }
 }
 

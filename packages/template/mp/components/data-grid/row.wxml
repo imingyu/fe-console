@@ -1,7 +1,7 @@
 <template name="data-grid-row">
     <view
         wx:key="id"
-        class="fc-datagrid-row fc-i{{rowIndex}} fc-{{rowIndex%2===0?'even':'odd'}} fc-{{row.code||''}} {{rowClass?(columnWidthMap[rowClass]?('fc-datagrid-row-'+row[rowClass]):rowClass):''}} row{{row.id}}"
+        class="fc-datagrid-row fc-i{{rowIndex}} fc-{{rowIndex%2===0?'even':'odd'}} fc-{{row.code||''}} {{rowClass?(columnWidthMap[rowClass]?('fc-datagrid-row-'+row[rowClass]):rowClass):''}} row{{row.id}} {{selectedMap[row.id]?'fc-selected':''}}"
         data-rowid="{{row.id}}"
         data-type="{{type}}"
         bindtap="tapRow"

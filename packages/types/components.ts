@@ -164,6 +164,7 @@ export interface FcMpDataGridComponentData<
 export interface FcMpDataGridComponentMethods<
     T extends FcRequireId = FcRequireId
 > {
+    computeSelectMap(this: FcMpDataGridComponent<T>);
     computeAffixList(this: FcMpDataGridComponent<T>);
     computeColWidth(this: FcMpDataGridComponent<T>);
     fireCellEvent(this: FcMpDataGridComponent<T>, name: string, e: FcMpEvent);
@@ -171,6 +172,7 @@ export interface FcMpDataGridComponentMethods<
 export interface FcMpDataGridComponent<T extends FcRequireId = FcRequireId>
     extends FcMpVirtualListComponent<T, FcMpDataGridComponentData<T>>,
         FcMpDataGridComponentMethods<T> {
+    computeSelectMapTimer?: any;
     computeColWidthTimer?: any;
     computeAffixAllListTimer?: any;
     affixAllList?: T[];

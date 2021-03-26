@@ -1,7 +1,7 @@
 import { FcMpComponent } from "../../mixins/view";
 import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
-import { getMpInitLifeName, safeJSON } from "@mpkit/util";
+import { getMpInitLifeName, isEmptyObject, safeJSON } from "@mpkit/util";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
@@ -258,7 +258,21 @@ FcMpComponent<FcMpApiReaderComponent>(
                 this.cancelTopMaterial();
                 // 把标记清空
                 this.cancelMarkMaterial();
+
+                // 将留存的id记录找出
+                const keepSaveList =
+                    !this.keepSaveMaterials ||
+                    isEmptyObject(this.keepSaveMaterials)
+                        ? []
+                        : this.NormalMaterialCategoryMap.all.filter(
+                              (item) => this.keepSaveMaterials[item.id]
+                          );
+                // 清空本地map
                 this.initMaterialCategoryMap(true);
+                // 将留存的记录重新插入本地map
+                keepSaveList.forEach((item) => {
+                    this.addMaterialToCategory(item);
+                });
                 if (this.filterKeyword) {
                     this.reloadVlList(
                         this.FilterMaterialCategoryMap[this.data.activeCategory]
@@ -426,7 +440,7 @@ FcMpComponent<FcMpApiReaderComponent>(
                                 detailTab: data.data,
                             });
                         }
-                    } else if (data.child.tid === "fc-data-grid") {
+                    } else if (data.child.tidAlias === "ApiReaderDataGrid") {
                         type = data.type;
                         if (type === "ready") {
                             this.$DataGridMain = data.child as FcMpDataGridComponentExports<PartialFcMpApiMaterial>;

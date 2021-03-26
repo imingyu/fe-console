@@ -8,15 +8,13 @@ import {
     FcMpDataGridComponent,
     FcMpDataGridComponentExports,
     FcMpEvent,
-    FcMpViewContextBase,
-    FcMpVirtualListComponent,
 } from "@fe-console/types";
 import { FcMpComponent } from "../mixins/view";
 import { createLiaisonMixin } from "../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
-import { getMpInitLifeName, getMpMountLifeName } from "@mpkit/util";
+import { getMpMountLifeName } from "@mpkit/util";
 import { createVirtualListMixin } from "../mixins/virtual-list";
-
+const destoryLife: any = '<%= (platform==="alipay"?"didUnmount":"detached") %>';
 FcMpComponent<FcMpDataGridComponent>(
     createLiaisonMixin(MpViewType.Component, "fc-data-grid"),
     createVirtualListMixin(MpViewType.Component) as any,
@@ -79,62 +77,74 @@ FcMpComponent<FcMpDataGridComponent>(
         },
         methods: {
             computeAffixList() {
-                const rows = this.$fcGetProp("affixRows", []) as string[];
-                let scrollMarginTop = this.data.scrollMarginTop || 0;
-                const affixList = rows
-                    .map((id) => {
-                        return (this.$vlAllList || []).find(
-                            (item) => item.id === id
-                        );
-                    })
-                    .filter((item) => item)
-                    .map((item, index) => {
-                        return this.$vlMergeItem(
-                            this.data.affixList
-                                ? this.data.affixList[index]
-                                : null,
-                            item
-                        );
-                    });
-                let vlItemHeight = this.$fcGetProp("vlItemHeight");
-                const renderCallBacks = [];
-                if (vlItemHeight) {
-                    scrollMarginTop = vlItemHeight * affixList.length;
-                } else {
-                    scrollMarginTop = 0;
-                    affixList.forEach((item) => {
-                        if (
-                            this.affixItemHeightMap &&
-                            this.affixItemHeightMap[item.id]
-                        ) {
-                            scrollMarginTop += this.affixItemHeightMap[item.id];
-                        } else {
-                            renderCallBacks.push(() => {
-                                return this.$fc
-                                    .getBoundingClientRect(
-                                        `.row${item.id}`,
-                                        this
-                                    )
-                                    .then((res) => {
-                                        if (!this.affixItemHeightMap) {
-                                            this.affixItemHeightMap = {};
-                                        }
-                                        this.affixItemHeightMap[item.id] =
-                                            res.height;
-                                    })
-                                    .catch(() => Promise.resolve());
-                            });
-                        }
-                    });
+                if (this.computeAffixAllListTimer) {
+                    clearTimeout(this.computeAffixAllListTimer);
                 }
-                this.setData(
-                    {
-                        affixList,
-                        scrollMarginTop,
-                    },
-                    () => {
-                        Promise.all(renderCallBacks.map((item) => item())).then(
-                            () => {
+                this.computeAffixAllListTimer = setTimeout(() => {
+                    const rows = this.$fcGetProp("affixRows", []) as string[];
+                    let scrollMarginTop = this.data.scrollMarginTop || 0;
+                    const affixList = rows
+                        .map((id) => {
+                            return (
+                                (this.$vlAllList || []).find(
+                                    (item) => item.id === id
+                                ) ||
+                                (this.affixAllList || []).find(
+                                    (item) => item.id === id
+                                )
+                            );
+                        })
+                        .filter((item) => item)
+                        .map((item, index) => {
+                            return this.$vlMergeItem(
+                                this.data.affixList
+                                    ? this.data.affixList[index]
+                                    : null,
+                                item
+                            );
+                        });
+                    let vlItemHeight = this.$fcGetProp("vlItemHeight");
+                    const renderCallBacks = [];
+                    if (vlItemHeight) {
+                        scrollMarginTop = vlItemHeight * affixList.length;
+                    } else {
+                        scrollMarginTop = 0;
+                        affixList.forEach((item) => {
+                            if (
+                                this.affixItemHeightMap &&
+                                this.affixItemHeightMap[item.id]
+                            ) {
+                                scrollMarginTop += this.affixItemHeightMap[
+                                    item.id
+                                ];
+                            } else {
+                                renderCallBacks.push(() => {
+                                    return this.$fc
+                                        .getBoundingClientRect(
+                                            `.row${item.id}`,
+                                            this
+                                        )
+                                        .then((res) => {
+                                            if (!this.affixItemHeightMap) {
+                                                this.affixItemHeightMap = {};
+                                            }
+                                            this.affixItemHeightMap[item.id] =
+                                                res.height;
+                                        })
+                                        .catch(() => Promise.resolve());
+                                });
+                            }
+                        });
+                    }
+                    this.setData(
+                        {
+                            affixList,
+                            scrollMarginTop,
+                        },
+                        () => {
+                            Promise.all(
+                                renderCallBacks.map((item) => item())
+                            ).then(() => {
                                 if (
                                     this.data.affixList &&
                                     this.data.affixList.length
@@ -153,10 +163,10 @@ FcMpComponent<FcMpDataGridComponent>(
                                         scrollMarginTop,
                                     });
                                 }
-                            }
-                        );
-                    }
-                );
+                            });
+                        }
+                    );
+                }, 100);
             },
             computeColWidth() {
                 if (this.computeColWidthTimer) {
@@ -235,7 +245,7 @@ FcMpComponent<FcMpDataGridComponent>(
                         columnWidthMap,
                     });
                     delete this.computeColWidthTimer;
-                });
+                }, 100);
             },
             fireCellEvent(name: string, e: FcMpEvent) {
                 const data: any = {};
@@ -270,13 +280,26 @@ FcMpComponent<FcMpDataGridComponent>(
                 this.fireCellEvent("longpressRow", e);
             },
         },
+        [destoryLife]() {
+            if (this.computeColWidthTimer) {
+                clearTimeout(this.computeColWidthTimer);
+            }
+            delete this.computeColWidthTimer;
+            if (this.computeAffixAllListTimer) {
+                clearTimeout(this.computeAffixAllListTimer);
+            }
+            delete this.computeAffixAllListTimer;
+        },
         [getMpMountLifeName(MpViewType.Component)](
             this: FcMpDataGridComponent
         ) {
             this.$fcExports = {
                 ...this.$fcGetBaseExports(),
                 addItem: this.$vlAddItem.bind(this),
-                reloadAffixList: () => {
+                reloadAffixList: (allList?: any[]) => {
+                    if (allList) {
+                        this.affixAllList = allList;
+                    }
                     this.computeAffixList();
                 },
                 replaceAllList: (list) => {

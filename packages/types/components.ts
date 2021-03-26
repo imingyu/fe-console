@@ -121,7 +121,7 @@ export interface FcMpApiReaderComponentMethods {
     /**取消置顶记录，不传ID则代表全部取消 */
     cancelTopMaterial(this: FcMpApiReaderComponent, id?: string);
     /**向DataGrid组件同步置顶记录列表 */
-    syncAffixList();
+    syncAffixList(this: FcMpApiReaderComponent);
 }
 
 export interface FcMpApiReaderComponent
@@ -161,15 +161,19 @@ export interface FcMpDataGridComponentData<
     affixList?: T[];
     scrollMarginTop?: number;
 }
-export interface FcMpDataGridComponentMethods {
-    computeAffixList();
-    computeColWidth();
-    fireCellEvent(name: string, e: FcMpEvent);
+export interface FcMpDataGridComponentMethods<
+    T extends FcRequireId = FcRequireId
+> {
+    computeAffixList(this: FcMpDataGridComponent<T>);
+    computeColWidth(this: FcMpDataGridComponent<T>);
+    fireCellEvent(this: FcMpDataGridComponent<T>, name: string, e: FcMpEvent);
 }
 export interface FcMpDataGridComponent<T extends FcRequireId = FcRequireId>
     extends FcMpVirtualListComponent<T, FcMpDataGridComponentData<T>>,
-        FcMpDataGridComponentMethods {
+        FcMpDataGridComponentMethods<T> {
     computeColWidthTimer?: any;
+    computeAffixAllListTimer?: any;
+    affixAllList?: T[];
     affixItemHeightMap?: {
         [prop: string]: number;
     };
@@ -180,7 +184,7 @@ export interface FcMpDataGridComponentExports<
 > extends Required<FcMpComponentId> {
     addItem(item: T);
     replaceAllList(list: T[]);
-    reloadAffixList();
+    reloadAffixList(allList?: T[]);
 }
 
 export interface FcMpComponentId {

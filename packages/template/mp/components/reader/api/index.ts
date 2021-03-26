@@ -393,6 +393,9 @@ FcMpComponent<FcMpApiReaderComponent>(
                 this.setData({
                     affixIds: safeJSON(this.topMaterials || []),
                 });
+                this.$DataGridMain.reloadAffixList(
+                    this.NormalMaterialCategoryMap.all
+                );
             },
         } as FcMpApiReaderComponentMethods &
             FcMpComponentMethods<FcMpApiReaderComponent>,
@@ -465,9 +468,9 @@ FcMpComponent<FcMpApiReaderComponent>(
                                 const isKeppSave =
                                     this.keepSaveMaterials &&
                                     this.keepSaveMaterials[rowId];
-                                this.$fc.showToast(
-                                    `正在对【${row.name}】进行操作`
-                                );
+                                // this.$fc.showToast(
+                                //     `正在对【${row.name}】进行操作`
+                                // );
                                 this.$fc
                                     .showActionSheet([
                                         `${isTop ? "取消" : ""}置顶显示`,

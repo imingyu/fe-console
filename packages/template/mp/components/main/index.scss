@@ -3,21 +3,87 @@
 
 .fc-hand {
     position: fixed;
-    bottom: 100rpx;
-    right: 100rpx;
+    bottom: 20rpx;
+    right: 20rpx;
     z-index: 500;
     border-radius: 50%;
-    width: 100rpx;
-    height: 100rpx;
-    background-color: #000;
+    width: $ht-hand;
+    height: $ht-hand;
+    line-height: $ht-hand;
+    background-color: $bg-primary;
     color: #fff;
-    font-size: 30rpx;
+    font-size: 24rpx;
+    font-family: $ft-code;
     text-align: center;
-    line-height: 100rpx;
+    cursor: pointer;
+    $sh1: 0 7rpx 0 $bg-secondary, 0 8rpx 3rpx rgba(0, 0, 0, 0.3);
+    $sh2: 0 2rpx 0 $bg-secondary-active, 0 3rpx 3rpx rgba(0, 0, 0, 0.2);
+    box-shadow: $sh1;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 1;
+    transition-property: all;
+    transition-duration: 0.15s;
+
+    &:hover,
+    &:focus {
+        box-shadow: $sh1;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    &:active,
+    &.fc-active {
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        bottom: 25rpx;
+        box-shadow: $sh2;
+    }
 
     &.is-hide {
-        display: none;
+        transition-duration: .8s;
+        opacity: 0;
+        right: -($ht-hand + 30rpx);
     }
+}
+
+.button-3d {
+    position: relative;
+    top: 0;
+    -webkit-box-shadow: 0 7px 0 #bbbbbb, 0 8px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 7px 0 #bbbbbb, 0 8px 3px rgba(0, 0, 0, 0.2);
+}
+
+.button-3d:hover,
+.button-3d:focus {
+    -webkit-box-shadow: 0 7px 0 #bbbbbb, 0 8px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 7px 0 #bbbbbb, 0 8px 3px rgba(0, 0, 0, 0.2);
+}
+
+.button-3d:active,
+.button-3d.active,
+.button-3d.is-active {
+    top: 5px;
+    transition-property: all;
+    transition-duration: 0.15s;
+    box-shadow: 0 2px 0 #bbbbbb, 0 3px 3px rgba(0, 0, 0, 0.2);
+}
+
+.button-3d.button-action {
+    -webkit-box-shadow: 0 7px 0 #8bc220, 0 8px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 7px 0 #8bc220, 0 8px 3px rgba(0, 0, 0, 0.3);
+}
+
+.button-3d.button-action:hover,
+.button-3d.button-action:focus {
+    -webkit-box-shadow: 0 7px 0 #84b91f, 0 8px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 7px 0 #84b91f, 0 8px 3px rgba(0, 0, 0, 0.3);
+}
+
+.button-3d.button-action:active,
+.button-3d.button-action.active,
+.button-3d.button-action.is-active {
+    -webkit-box-shadow: 0 2px 0 #6b9619, 0 3px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 0 #6b9619, 0 3px 3px rgba(0, 0, 0, 0.2);
 }
 
 .fc-modal {

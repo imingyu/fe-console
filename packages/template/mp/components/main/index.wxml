@@ -1,4 +1,4 @@
-<view class="fc-hand cid-{{$cid}} tid-{{$tid}} {{visable?'is-hide':''}}" <%= bindEvent('tap') %>="toggleVisable">Mpc</view>
+<view class="fc-hand {{visable?'is-hide':''}}" hover-class="fc-active" <%= bindEvent('tap') %>="toggleVisable">Fc</view>
 <view wx:if="{{visable || mounted}}" class="cid-{{$cid}} tid-{{$tid}} fc-modal {{isFullScreenPhone?'fc-adap-scroll':''}} {{visable?'is-show':''}} {{fullScreen?'is-full':''}}">
     <view class="fc-modal-body">
         <fc-tabs tabs="{{tabs}}" active="{{activeTabIndex}}" outerClass="fc-product-tabs" parentCid="{{ $cid }}" parentTid="{{ $tid }}" tidAlias="FcProductTypeTabs">

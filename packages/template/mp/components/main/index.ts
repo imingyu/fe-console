@@ -13,7 +13,7 @@ FcMpComponent<FcMpViewContextBase & FcMpViewContextAny>(
     createLiaisonMixin(MpViewType.Component, "fc-main"),
     {
         data: {
-            visable: true,
+            visable: false,
             mounted: false,
             fullScreen: false,
             activeTabIndex: 2,

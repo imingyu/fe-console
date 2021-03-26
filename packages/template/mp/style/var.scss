@@ -2,8 +2,11 @@
 $zoom:1;
 
 // 背景
+$bg-primary:#1B9AF7;
+$bg-secondary:#0880d7;
+$bg-secondary-active:#0662a6;
 $bg-bar:#f3f3f3; // 条背景
-$bg-active:#1a73ea; // 活动的项目
+$bg-active:$bg-primary; // 活动的项目
 $bg-border:#ccc; // 边框
 $bg-tab-head:$bg-bar;
 $bg-filter-bar:$bg-bar;
@@ -41,6 +44,7 @@ $sz-filter-bar:$zoom * 24rpx;
 $sz-th-bar:$zoom * 26rpx;
 
 // 高度
+$ht-hand:$zoom * 60rpx;
 $ht-headers-item:$zoom * 70rpx;
 $ht-tab-bar:$zoom * 70rpx;
 $ht-th-bar:$ht-tab-bar;

@@ -1,7 +1,7 @@
 import { FcMpComponent } from "../../mixins/view";
 import { createLiaisonMixin } from "../../mixins/liaison";
 import { MpViewType } from "@mpkit/types";
-import { getMpInitLifeName, isEmptyObject, safeJSON } from "@mpkit/util";
+import { getMpInitLifeName, isEmptyObject, clone } from "@mpkit/util";
 import {
     FcConsoleProduct,
     FcMpApiProduct,
@@ -405,7 +405,7 @@ FcMpComponent<FcMpApiReaderComponent>(
             },
             syncAffixList() {
                 this.setData({
-                    affixIds: safeJSON(this.topMaterials || []),
+                    affixIds: clone(this.topMaterials || []),
                 });
                 this.$DataGridMain.reloadAffixList(
                     this.NormalMaterialCategoryMap.all

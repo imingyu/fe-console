@@ -30,6 +30,12 @@ export interface IFcProducer<T extends FcProduct = FcProduct>
     create(data: PartialBy<T, "id" | "time">): T;
     change(id: string, data?: Partial<T>);
 }
+export interface IFcHotPatchProducer<T extends FcProduct = FcProduct>
+    extends IFcEventEmitter<T>,
+        IFcProducer<T> {
+    replace();
+    restore();
+}
 export interface FcStoragerFilter<T extends FcProduct = FcProduct> {
     (): T[] | Promise<T[]>;
 }

@@ -58,10 +58,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 this.$vlLock();
                 this.setData(
                     {
-                        [`$vlShowList[${readyShowIndex}]`]: this.$vlMergeItem(
-                            this.data.$vlShowList[readyShowIndex],
-                            readyItem
-                        ),
+                        [`$vlShowList[${readyShowIndex}]`]: readyItem,
                     },
                     () => {
                         this.$vlUnLock();
@@ -256,25 +253,6 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                 this.$vlComputeShowList();
             }
         },
-        $vlMergeItem(source: T, target: T): T {
-            const res: T = {
-                id: target.id,
-            } as T;
-            Object.keys(target).forEach((key) => {
-                if (key in target) {
-                    res[key] =
-                        typeof target[key] === "undefined" ? null : target[key];
-                }
-            });
-            if (source) {
-                Object.keys(source).forEach((key) => {
-                    if (!(key in res)) {
-                        res[key] = null;
-                    }
-                });
-            }
-            return res;
-        },
         $vlSetShowList(startIndex, endIndex) {
             this.$vlLock();
             this.$vlStartIndex =
@@ -357,9 +335,7 @@ export const createVirtualListMixin = <T extends FcRequireId = FcRequireId>(
                         this.$vlItemClientRectQueryMap[item.id]
                     );
                 }
-                mergeList.push(
-                    this.$vlMergeItem(this.data.$vlShowList[index], item)
-                );
+                mergeList.push(item);
             });
             renderData.$vlShowList = mergeList;
             if (!isEmptyObject(renderData)) {

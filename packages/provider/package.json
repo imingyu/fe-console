@@ -12,8 +12,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@mpkit/ebus": "^1.0.17",
-        "@mpkit/util": "^1.0.17",
+        "@mpkit/util": "^1.1.0",
         "@fe-console/types": "^1.0.0",
         "@fe-console/util": "^1.0.0"
     }

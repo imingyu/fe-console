@@ -14,6 +14,26 @@ export const enum FcProductType {
     MpView = 4,
 }
 
+/**
+ * 小程序数据生产者监听作用域
+ */
+export const enum FcMpProducerScope {
+    Console = 1,
+    ConsoleLog = 2,
+    ConsoleWarn = 3,
+    ConsoleError = 4,
+    ConsoleInfo = 5,
+    ConsoleDir = 6,
+    View = 7,
+    App = 8,
+    Page = 9,
+    Component = 10,
+    ViewLife = 11,
+    AppLife = 13,
+    PageLife = 14,
+    ComponentLife = 15,
+}
+
 export interface FcProducerRange<T extends FcCommonProduct = FcCommonProduct> {
     type: FcProductType;
     disabled?: boolean;

@@ -13,7 +13,7 @@ replaceDir(path.resolve(__dirname, '../packages/mp-wechat/dist/npm'), dir);
     replaceDir(path.join(packRoot, 'dist'), path.join(nodeModulesDir, name, 'dist'));
 });
 
-['set-data', 'util', 'types', 'mixin'].forEach(pack => {
+['set-data', 'util', 'types', 'mixin','func-helper'].forEach(pack => {
     const name = `@mpkit/${pack}`;
     const packRoot = path.resolve(__dirname, `../node_modules/@mpkit/${pack}`);
     const nodeModulesDir = path.resolve(__dirname, '../demo/node_modules');

@@ -1,4 +1,5 @@
         </view>
     </view>
-    <view class="mp-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
+    <view class="vl-list-placeholder is-end" style="height:{{ $vlEndPlaceholderHeight }}px;"></view>
+    <view class="vl-list-placeholder is-patch"></view>
 </scroll-view>

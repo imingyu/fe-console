@@ -96,6 +96,7 @@ export const init = (MpRunConfig?: FcMpRunConfig) => {
     if (MpRunConfig && MpRunConfig.observer && MpRunConfig.observer.length) {
         const producer = new FcMpProducer(MpRunConfig.producerOptions);
         const observerMap: ObserverMap = {};
+        (global as any).observerMap=observerMap;
         MpRunConfig.observer.map((item) => {
             if (item === "local") {
                 if (!observerMap[item]) {

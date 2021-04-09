@@ -124,15 +124,7 @@ FcMpComponent<FcMpDataGridComponent>(
                                 )
                             );
                         })
-                        .filter((item) => item)
-                        .map((item, index) => {
-                            return this.$vlMergeItem(
-                                this.data.affixList
-                                    ? this.data.affixList[index]
-                                    : null,
-                                item
-                            );
-                        });
+                        .filter((item) => item);
                     let vlItemHeight = this.$fcGetProp("vlItemHeight");
                     const renderCallBacks = [];
                     if (vlItemHeight) {
